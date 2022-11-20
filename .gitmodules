@@ -1,0 +1,6 @@
+[submodule "python_algorithms/microfaune_ai"]
+	path = python_algorithms/microfaune_ai
+	url = https://github.com/W-Alphonse/microfaune_ai
+[submodule "python_algorithms/All-Conv-Net-for-Bird-Activity-Detection-Significance-of-Learned-Pooling"]
+	path = python_algorithms/All-Conv-Net-for-Bird-Activity-Detection-Significance-of-Learned-Pooling
+	url = https://github.com/PiniponSelvagem/All-Conv-Net-for-Bird-Activity-Detection-Significance-of-Learned-Pooling
