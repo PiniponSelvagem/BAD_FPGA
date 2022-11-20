@@ -6,7 +6,7 @@ import tensorflow as tf
 import pathlib
 
 # Load TFLite model and allocate tensors.
-interpreter = tf.lite.Interpreter(model_path="converted_model_float16.tflite")
+interpreter = tf.lite.Interpreter(model_path="microfaune_converted_model_float16.tflite")
 
 # Get input and output tensors.
 input_details = interpreter.get_input_details()

@@ -1,5 +1,6 @@
 import os
-from microfaune_ai.microfaune.detection import RNNDetector
+
+from microfaune.detection import RNNDetector
 
 
 """
@@ -25,7 +26,7 @@ converter.target_spec.supported_ops = [
 tflite_model = converter.convert()
 
 # save the model
-open("tflite_model.tflite", "wb").write(tflite_model)
+open("microfaune_tflite_model.tflite", "wb").write(tflite_model)
 """
 
 """
@@ -44,7 +45,7 @@ converter.target_spec.supported_types = [tf.float16]
 
 # Convert and Save the model
 tflite_model = converter.convert()
-open("converted_model_float16.tflite", "wb").write(tflite_model)
+open("microfaune_converted_model_float16.tflite", "wb").write(tflite_model)
 """
 
 
@@ -63,7 +64,8 @@ converter.optimizations = [tf.lite.Optimize.DEFAULT]
 
 # Convert and Save the model
 tflite_model = converter.convert()
-open("converted_model_dynamic.tflite", "wb").write(tflite_model)
+directory = "tflite_models\\"
+open(directory+"microfaune_converted_model_dynamic.tflite", "wb").write(tflite_model)
 
 
 
