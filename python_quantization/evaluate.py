@@ -1,6 +1,6 @@
 import os
 import numpy as np
-from microfaune_ai.microfaune.detection import RNNDetector
+from microfaune.detection import RNNDetector
 
 """
 required:

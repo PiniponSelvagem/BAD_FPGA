@@ -29,7 +29,7 @@ tflite_model = converter.convert()
 open("microfaune_tflite_model.tflite", "wb").write(tflite_model)
 """
 
-"""
+
 # Convert the model (float16 quantization)
 converter = tf.lite.TFLiteConverter.from_keras_model(model)
 converter.target_spec.supported_ops = [
@@ -46,9 +46,9 @@ converter.target_spec.supported_types = [tf.float16]
 # Convert and Save the model
 tflite_model = converter.convert()
 open("microfaune_converted_model_float16.tflite", "wb").write(tflite_model)
+
+
 """
-
-
 # Convert the model (dynamic quantization)
 converter = tf.lite.TFLiteConverter.from_keras_model(model)
 
@@ -66,7 +66,7 @@ converter.optimizations = [tf.lite.Optimize.DEFAULT]
 tflite_model = converter.convert()
 directory = "tflite_models\\"
 open(directory+"microfaune_converted_model_dynamic.tflite", "wb").write(tflite_model)
-
+"""
 
 
 """

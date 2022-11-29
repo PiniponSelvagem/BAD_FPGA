@@ -6,7 +6,9 @@ import tensorflow as tf
 import pathlib
 
 # Load TFLite model and allocate tensors.
-interpreter = tf.lite.Interpreter(model_path="microfaune_converted_model_float16.tflite")
+#interpreter = tf.lite.Interpreter(model_path="microfaune_tflite_model.tflite")            # 0.474...
+interpreter = tf.lite.Interpreter(model_path="microfaune_converted_model_float16.tflite")  # 0.696...
+#interpreter = tf.lite.Interpreter(model_path="microfaune_converted_model_dynamic.tflite") # 0.372...
 
 # Get input and output tensors.
 input_details = interpreter.get_input_details()
@@ -52,6 +54,8 @@ for file in pathlib.Path(directory).iterdir():
     spec = audio.wav2spc(file)
 
     new_img = cv2.resize(spec, (1, 40))
+
+    new_img = np.expand_dims(new_img, axis=0)
 
     # input_details[0]['index'] = the index which accepts the input
     interpreter.set_tensor(input_details[0]['index'], [new_img])
