@@ -1,0 +1,79 @@
+_________________________________________________________________
+ Layer (type)                Output Shape              Param #
+=================================================================
+ input_1 (InputLayer)        [(None, None, 40, 1)]     0
+
+ conv2d (Conv2D)             (None, None, 40, 64)      640
+
+ batch_normalization (BatchN  (None, None, 40, 64)     256
+ ormalization)
+
+ re_lu (ReLU)                (None, None, 40, 64)      0
+
+ conv2d_1 (Conv2D)           (None, None, 40, 64)      36928
+
+ batch_normalization_1 (Batc  (None, None, 40, 64)     256
+ hNormalization)
+
+ re_lu_1 (ReLU)              (None, None, 40, 64)      0
+
+ max_pooling2d (MaxPooling2D  (None, None, 20, 64)     0
+ )
+
+ conv2d_2 (Conv2D)           (None, None, 20, 64)      36928
+
+ batch_normalization_2 (Batc  (None, None, 20, 64)     256
+ hNormalization)
+
+ re_lu_2 (ReLU)              (None, None, 20, 64)      0
+
+ conv2d_3 (Conv2D)           (None, None, 20, 64)      36928
+
+ batch_normalization_3 (Batc  (None, None, 20, 64)     256
+ hNormalization)
+
+ re_lu_3 (ReLU)              (None, None, 20, 64)      0
+
+ max_pooling2d_1 (MaxPooling  (None, None, 10, 64)     0
+ 2D)
+
+ conv2d_4 (Conv2D)           (None, None, 10, 64)      36928
+
+ batch_normalization_4 (Batc  (None, None, 10, 64)     256
+ hNormalization)
+
+ re_lu_4 (ReLU)              (None, None, 10, 64)      0
+
+ conv2d_5 (Conv2D)           (None, None, 10, 64)      36928
+
+ batch_normalization_5 (Batc  (None, None, 10, 64)     256
+ hNormalization)
+
+ re_lu_5 (ReLU)              (None, None, 10, 64)      0
+
+ max_pooling2d_2 (MaxPooling  (None, None, 5, 64)      0
+ 2D)
+
+ tf.math.reduce_max (TFOpLam  (None, None, 64)         0
+ bda)
+
+ bidirectional (Bidirectiona  (None, None, 128)        49920
+ l)
+
+ bidirectional_1 (Bidirectio  (None, None, 128)        74496
+ nal)
+
+ time_distributed (TimeDistr  (None, None, 64)         8256
+ ibuted)
+
+ time_distributed_1 (TimeDis  (None, None, 1)          65
+ tributed)
+
+ tf.math.reduce_max_1 (TFOpL  (None, 1)                0
+ ambda)
+
+=================================================================
+Total params: 319,553
+Trainable params: 318,785
+Non-trainable params: 768
+_________________________________________________________________

@@ -1,0 +1,83 @@
+_________________________________________________________________
+ Layer (type)                Output Shape              Param #
+=================================================================
+ zero_padding2d (ZeroPadding  (None, 44, 504, 1)       0
+ 2D)
+
+ conv2d (Conv2D)             (None, 40, 500, 16)       416
+
+ batch_normalization (BatchN  (None, 40, 500, 16)      64
+ ormalization)
+
+ dropout (Dropout)           (None, 40, 500, 16)       0
+
+ max_pooling2d (MaxPooling2D  (None, 8, 500, 16)       0
+ )
+
+ dropout_1 (Dropout)         (None, 8, 500, 16)        0
+
+ zero_padding2d_1 (ZeroPaddi  (None, 12, 504, 16)      0
+ ng2D)
+
+ conv2d_1 (Conv2D)           (None, 8, 500, 16)        6416
+
+ batch_normalization_1 (Batc  (None, 8, 500, 16)       64
+ hNormalization)
+
+ dropout_2 (Dropout)         (None, 8, 500, 16)        0
+
+ max_pooling2d_1 (MaxPooling  (None, 4, 500, 16)       0
+ 2D)
+
+ dropout_3 (Dropout)         (None, 4, 500, 16)        0
+
+ zero_padding2d_2 (ZeroPaddi  (None, 8, 504, 16)       0
+ ng2D)
+
+ conv2d_2 (Conv2D)           (None, 4, 500, 16)        6416
+
+ batch_normalization_2 (Batc  (None, 4, 500, 16)       64
+ hNormalization)
+
+ dropout_4 (Dropout)         (None, 4, 500, 16)        0
+
+ max_pooling2d_2 (MaxPooling  (None, 2, 500, 16)       0
+ 2D)
+
+ dropout_5 (Dropout)         (None, 2, 500, 16)        0
+
+ zero_padding2d_3 (ZeroPaddi  (None, 6, 504, 16)       0
+ ng2D)
+
+ conv2d_3 (Conv2D)           (None, 2, 500, 16)        6416
+
+ batch_normalization_3 (Batc  (None, 2, 500, 16)       64
+ hNormalization)
+
+ dropout_6 (Dropout)         (None, 2, 500, 16)        0
+
+ max_pooling2d_3 (MaxPooling  (None, 1, 500, 16)       0
+ 2D)
+
+ dropout_7 (Dropout)         (None, 1, 500, 16)        0
+
+ reshape (Reshape)           (None, 500, 16)           0
+
+ max_pooling1d (MaxPooling1D  (None, 1, 16)            0
+ )
+
+ dropout_8 (Dropout)         (None, 1, 16)             0
+
+ flatten (Flatten)           (None, 16)                0
+
+ dense (Dense)               (None, 196)               3332
+
+ dropout_9 (Dropout)         (None, 196)               0
+
+ predictions (Dense)         (None, 2)                 394
+
+=================================================================
+Total params: 23,646
+Trainable params: 23,518
+Non-trainable params: 128
+_________________________________________________________________
