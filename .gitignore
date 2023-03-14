@@ -3,3 +3,4 @@ __pycache__/
  *.npy
 /python_quantization/cnn_rnn/feature_extracted/BAD_wblr_feature.npy
 /python_quantization/cnn_rnn/test_data/ff1010bird_feature.npy
+*.wav
