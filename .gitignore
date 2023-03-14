@@ -1,2 +1,4 @@
 __pycache__/
  *.pyc
+ *.npy
+/python_quantization/cnn_rnn/feature_extracted/BAD_wblr_feature.npy
