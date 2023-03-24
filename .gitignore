@@ -5,8 +5,9 @@ __pycache__/
 /python_quantization/cnn_rnn/test_data/ff1010bird_feature.npy
 *.wav
 /1_vitis_hls/cnn_rnn/.vitis_hls_log_all.xml
-/1_vitis_hls/cnn_rnn/cnn_rnn/.autopilot/
+/1_vitis_hls/cnn_rnn/cnn_rnn/.autopilot
 /1_vitis_hls/cnn_rnn/cnn_rnn/cnn_rnn.log
 /1_vitis_hls/cnn_rnn/cnn_rnn/csim/build
 /1_vitis_hls/cnn_rnn/cnn_rnn/csim/report
 /1_vitis_hls/vitis_hls.log
+/1_vitis_hls/cnn_rnn/.apc

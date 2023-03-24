@@ -20,4 +20,4 @@ obj/tb_cnn_rnn.o: ../../test_bench/tb_cnn_rnn.cpp \
  E:/Xilinx/Vitis_HLS/2022.2/include/ap_fixed_base.h \
  E:/Xilinx/Vitis_HLS/2022.2/include/ap_fixed_ref.h \
  E:/Xilinx/Vitis_HLS/2022.2/include/ap_fixed_special.h \
- ../../test_bench/../Source/settings.h
+ ../../test_bench/data.h ../../test_bench/../Source/settings.h
