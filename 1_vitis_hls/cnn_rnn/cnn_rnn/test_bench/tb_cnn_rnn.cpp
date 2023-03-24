@@ -27,21 +27,22 @@ typedef ap_uint<I_BIT_WIDTH> imap_t;
 typedef ap_uint<I_BIT_WIDTH> omap_t;
 typedef ap_int<B_BIT_WIDTH> bias_t;
 
+
 // The top-level function
+void predict(
+        imap_t input_values[IHEIGHT * IWIDTH * ICHANNELS],
+        weigth_t weights[IC2D_1_KSIZE * IC2D_1_KSIZE],
+        bias_t bias[IC2D_1_BSIZE],
+        omap_t output[IC2D_1_IHEIGHT * IC2D_1_IWIDTH * IC2D_1_ICHANNELS]
+    );
 /*
 void conv2D_1(
         imap_t img_in[IC2D_1_IHEIGHT * IC2D_1_IWIDTH * IC2D_1_ICHANNELS],
-		omap_t img_out[IC2D_1_OHEIGHT * IC2D_1_OWIDTH * IC2D_1_OCHANNELS],
         weigth_t weights[IC2D_1_KSIZE * IC2D_1_KSIZE],
-		bias_t bias[IC2D_1_BSIZE]
+		bias_t bias[IC2D_1_BSIZE],
+		omap_t img_out[IC2D_1_OHEIGHT * IC2D_1_OWIDTH * IC2D_1_OCHANNELS]
     );
 */
-
-void predict(
-        imap_t input_values[IHEIGHT * IWIDTH * ICHANNELS],
-        imap_t input[IC2D_1_IHEIGHT * IC2D_1_IWIDTH * IC2D_1_ICHANNELS],
-        bias_t bias[IC2D_1_BSIZE]
-    );
 
 int main() {
 	int i, j, c, err_cnt = 0;
@@ -57,15 +58,16 @@ int main() {
 
 	predict(
 			(imap_t*) img_in,
-			(imap_t*) img_out,
-            (bias_t*) bias
+            (weigth_t*) kernel,
+            (bias_t*) bias,
+			(omap_t*) img_out
 	    );
 	/*
 	conv2D_1(
         (imap_t*) img_in,
-        (omap_t*) img_out,
         (weigth_t*) kernel,
-        (bias_t*) bias
+        (bias_t*) bias,
+        (omap_t*) img_out
     );
     */
 
