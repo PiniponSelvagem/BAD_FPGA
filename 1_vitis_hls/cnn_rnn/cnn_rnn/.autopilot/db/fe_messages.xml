@@ -1,0 +1,6 @@
+<xilinx:hls_fe_msgs>
+    <msg msg_groups="" msg_id="207-813" msg_severity="ERROR" msg_loc="cnn_rnn/cnn_rnn/source/cnn_rnn.cpp:2:10" msg_body="'settings.h' file not found with &lt;angled&gt; include; use &quot;quotes&quot; instead">
+        <args/>
+    </msg>
+</xilinx:hls_fe_msgs>
+

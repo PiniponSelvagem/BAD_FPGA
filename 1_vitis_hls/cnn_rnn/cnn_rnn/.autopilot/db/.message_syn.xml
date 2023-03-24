@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Messages>
+	<Message severity="INFO" prefix="[HLS 200-111]" key="HLS_111_966" tag="RUNTIME" content="Finished File checks and directory preparation: CPU user time: 0 seconds. CPU system time: 0 seconds. Elapsed time: 10.042 seconds; current allocated memory: 97.875 MB." resolution=""/>
+	<Message severity="INFO" prefix="[HLS 200-10]" key="HLS_10_1312" tag="" content="Analyzing design file &apos;cnn_rnn/cnn_rnn/source/cnn_rnn.cpp&apos; ..." resolution=""/>
+	<Message severity="ERROR" prefix="[HLS 207-813]" key="HLS 207-813" tag="" content="&apos;settings.h&apos; file not found with &lt;angled&gt; include; use &quot;quotes&quot; instead (cnn_rnn/cnn_rnn/source/cnn_rnn.cpp:2:10)" resolution=""/>
+	<Message severity="INFO" prefix="[HLS 200-111]" key="HLS_111_966" tag="RUNTIME" content="Finished Command csynth_design CPU user time: 0 seconds. CPU system time: 0 seconds. Elapsed time: 0.192 seconds; current allocated memory: 0.199 MB." resolution=""/>
+</Messages>

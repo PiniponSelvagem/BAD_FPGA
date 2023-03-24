@@ -1,0 +1,5 @@
+cnn_rnn/cnn_rnn/source/cnn_rnn.cpp:2:10: error: 'settings.h' file not found with <angled> include; use "quotes" instead
+#include <settings.h>
+         ^~~~~~~~~~~~
+         "settings.h"
+1 error generated.

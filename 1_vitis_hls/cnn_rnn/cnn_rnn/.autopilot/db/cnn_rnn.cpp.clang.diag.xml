@@ -1,0 +1,21 @@
+<dict>
+  <key>main-file</key>
+  <string>cnn_rnn/cnn_rnn/source/cnn_rnn.cpp</string>
+  <key>diagnostics</key>
+  <array>
+    <dict>
+      <key>level</key>
+      <string>error</string>
+      <key>filename</key>
+      <string>cnn_rnn/cnn_rnn/source/cnn_rnn.cpp</string>
+      <key>line</key>
+      <integer>2</integer>
+      <key>column</key>
+      <integer>10</integer>
+      <key>message</key>
+      <string>&apos;settings.h&apos; file not found with &lt;angled&gt; include; use &quot;quotes&quot; instead</string>
+      <key>ID</key>
+      <integer>813</integer>
+    </dict>
+  </array>
+</dict>

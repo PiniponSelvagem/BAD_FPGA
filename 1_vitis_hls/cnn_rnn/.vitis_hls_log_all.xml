@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<vivadoHLSLog:LogRoot xmlns:vivadoHLSLog="www.xilinx.com/vivadoHLSLog">
+  <errorLogs>
+    <logs>
+      <synLog>
+        <logs message="ERROR: [HLS 207-813] 'settings.h' file not found with &lt;angled> include; use &quot;quotes&quot; instead (cnn_rnn/cnn_rnn/source/cnn_rnn.cpp:2:10)" projectName="cnn_rnn" solutionName="cnn_rnn" date="2023-03-23T20:28:21.116+0000"/>
+      </synLog>
+      <simLog/>
+      <mgLog/>
+      <packageLog/>
+      <csimLog>
+        <logs message="ERROR: [SIM 211-100] CSim failed with errors." projectName="cnn_rnn" solutionName="cnn_rnn" date="2023-03-24T19:10:43.738+0000"/>
+        <logs message="ERROR: [SIM 211-100] 'csim_design' failed: compilation error(s)." projectName="cnn_rnn" solutionName="cnn_rnn" date="2023-03-24T18:39:11.191+0000"/>
+        <logs message="ERROR: [SIM 211-100] 'csim_design' failed: compilation error(s)." projectName="cnn_rnn" solutionName="cnn_rnn" date="2023-03-24T18:38:30.998+0000"/>
+        <logs message="ERROR: [SIM 211-100] 'csim_design' failed: compilation error(s)." projectName="cnn_rnn" solutionName="cnn_rnn" date="2023-03-24T18:36:03.211+0000"/>
+        <logs message="ERROR: [SIM 211-100] CSim failed with errors." projectName="cnn_rnn" solutionName="cnn_rnn" date="2023-03-24T18:30:21.401+0000"/>
+        <logs message="ERROR: [SIM 211-100] 'csim_design' failed: compilation error(s)." projectName="cnn_rnn" solutionName="cnn_rnn" date="2023-03-24T18:29:17.214+0000"/>
+        <logs message="ERROR: [SIM 211-100] CSim failed with errors." projectName="cnn_rnn" solutionName="cnn_rnn" date="2023-03-24T18:25:46.348+0000"/>
+        <logs message="ERROR: [SIM 211-100] CSim failed with errors." projectName="cnn_rnn" solutionName="cnn_rnn" date="2023-03-24T18:16:19.052+0000"/>
+        <logs message="ERROR: [SIM 211-100] CSim failed with errors." projectName="cnn_rnn" solutionName="cnn_rnn" date="2023-03-24T18:14:19.316+0000"/>
+        <logs message="ERROR: [SIM 211-100] CSim failed with errors." projectName="cnn_rnn" solutionName="cnn_rnn" date="2023-03-24T18:08:32.690+0000"/>
+        <logs message="ERROR: [SIM 211-100] CSim failed with errors." projectName="cnn_rnn" solutionName="cnn_rnn" date="2023-03-24T18:07:18.301+0000"/>
+        <logs message="ERROR: [SIM 211-100] CSim failed with errors." projectName="cnn_rnn" solutionName="cnn_rnn" date="2023-03-24T18:06:26.683+0000"/>
+        <logs message="ERROR: [SIM 211-100] CSim failed with errors." projectName="cnn_rnn" solutionName="cnn_rnn" date="2023-03-24T18:04:34.020+0000"/>
+        <logs message="ERROR: [SIM 211-100] CSim failed with errors." projectName="cnn_rnn" solutionName="cnn_rnn" date="2023-03-24T18:01:38.855+0000"/>
+        <logs message="ERROR: [SIM 211-100] 'csim_design' failed: compilation error(s)." projectName="cnn_rnn" solutionName="cnn_rnn" date="2023-03-24T17:59:41.812+0000"/>
+        <logs message="ERROR: [SIM 211-100] 'csim_design' failed: compilation error(s)." projectName="cnn_rnn" solutionName="cnn_rnn" date="2023-03-23T23:10:40.590+0000"/>
+        <logs message="ERROR: [SIM 211-100] 'csim_design' failed: nonzero return value." projectName="cnn_rnn" solutionName="cnn_rnn" date="2023-03-23T22:45:14.666+0000"/>
+        <logs message="ERROR: [SIM 211-100] 'csim_design' failed: compilation error(s)." projectName="cnn_rnn" solutionName="cnn_rnn" date="2023-03-23T22:43:34.556+0000"/>
+        <logs message="ERROR: [SIM 211-100] 'csim_design' failed: compilation error(s)." projectName="cnn_rnn" solutionName="cnn_rnn" date="2023-03-23T22:43:02.394+0000"/>
+        <logs message="ERROR: [SIM 211-100] 'csim_design' failed: compilation error(s)." projectName="cnn_rnn" solutionName="cnn_rnn" date="2023-03-23T22:42:30.106+0000"/>
+        <logs message="ERROR: [SIM 211-100] 'csim_design' failed: compilation error(s)." projectName="cnn_rnn" solutionName="cnn_rnn" date="2023-03-23T22:41:44.735+0000"/>
+        <logs message="ERROR: [SIM 211-100] 'csim_design' failed: compilation error(s)." projectName="cnn_rnn" solutionName="cnn_rnn" date="2023-03-23T22:39:27.815+0000"/>
+        <logs message="ERROR: [SIM 211-100] 'csim_design' failed: compilation error(s)." projectName="cnn_rnn" solutionName="cnn_rnn" date="2023-03-23T22:36:08.582+0000"/>
+        <logs message="ERROR: [SIM 211-100] 'csim_design' failed: compilation error(s)." projectName="cnn_rnn" solutionName="cnn_rnn" date="2023-03-23T22:32:26.290+0000"/>
+        <logs message="ERROR: [SIM 211-100] 'csim_design' failed: compilation error(s)." projectName="cnn_rnn" solutionName="cnn_rnn" date="2023-03-23T22:31:54.896+0000"/>
+        <logs message="ERROR: [SIM 211-100] 'csim_design' failed: compilation error(s)." projectName="cnn_rnn" solutionName="cnn_rnn" date="2023-03-23T22:31:20.507+0000"/>
+        <logs message="ERROR: [SIM 211-100] 'csim_design' failed: compilation error(s)." projectName="cnn_rnn" solutionName="cnn_rnn" date="2023-03-23T22:28:06.505+0000"/>
+        <logs message="ERROR: [SIM 211-100] 'csim_design' failed: compilation error(s)." projectName="cnn_rnn" solutionName="cnn_rnn" date="2023-03-23T22:27:24.290+0000"/>
+        <logs message="ERROR: [SIM 211-100] 'csim_design' failed: compilation error(s)." projectName="cnn_rnn" solutionName="cnn_rnn" date="2023-03-23T22:26:19.591+0000"/>
+        <logs message="ERROR: [SIM 211-100] 'csim_design' failed: compilation error(s)." projectName="cnn_rnn" solutionName="cnn_rnn" date="2023-03-23T22:25:40.373+0000"/>
+        <logs message="ERROR: [SIM 211-100] 'csim_design' failed: compilation error(s)." projectName="cnn_rnn" solutionName="cnn_rnn" date="2023-03-23T22:23:36.242+0000"/>
+        <logs message="ERROR: [SIM 211-100] 'csim_design' failed: compilation error(s)." projectName="cnn_rnn" solutionName="cnn_rnn" date="2023-03-23T20:57:30.459+0000"/>
+        <logs message="ERROR: [SIM 211-100] 'csim_design' failed: compilation error(s)." projectName="cnn_rnn" solutionName="cnn_rnn" date="2023-03-23T20:41:20.101+0000"/>
+        <logs message="ERROR: [SIM 211-100] 'csim_design' failed: compilation error(s)." projectName="cnn_rnn" solutionName="cnn_rnn" date="2023-03-23T20:38:48.940+0000"/>
+        <logs message="ERROR: [SIM 211-100] 'csim_design' failed: compilation error(s)." projectName="cnn_rnn" solutionName="cnn_rnn" date="2023-03-23T20:38:13.093+0000"/>
+        <logs message="ERROR: [SIM 211-100] 'csim_design' failed: compilation error(s)." projectName="cnn_rnn" solutionName="cnn_rnn" date="2023-03-23T20:37:32.836+0000"/>
+        <logs message="ERROR: [SIM 211-100] 'csim_design' failed: compilation error(s)." projectName="cnn_rnn" solutionName="cnn_rnn" date="2023-03-23T20:36:41.262+0000"/>
+        <logs message="ERROR: [SIM 211-100] 'csim_design' failed: compilation error(s)." projectName="cnn_rnn" solutionName="cnn_rnn" date="2023-03-23T20:35:58.105+0000"/>
+        <logs message="ERROR: [SIM 211-100] 'csim_design' failed: compilation error(s)." projectName="cnn_rnn" solutionName="cnn_rnn" date="2023-03-23T20:35:08.910+0000"/>
+        <logs message="ERROR: [SIM 211-100] 'csim_design' failed: compilation error(s)." projectName="cnn_rnn" solutionName="cnn_rnn" date="2023-03-23T20:34:32.887+0000"/>
+        <logs message="ERROR: [SIM 211-100] 'csim_design' failed: compilation error(s)." projectName="cnn_rnn" solutionName="cnn_rnn" date="2023-03-23T20:30:45.744+0000"/>
+        <logs message="ERROR: [SIM 211-100] 'csim_design' failed: compilation error(s)." projectName="cnn_rnn" solutionName="cnn_rnn" date="2023-03-23T20:28:51.357+0000"/>
+      </csimLog>
+    </logs>
+  </errorLogs>
+  <warningLogs>
+    <logs>
+      <synLog/>
+      <simLog/>
+      <mgLog/>
+      <packageLog/>
+      <csimLog/>
+    </logs>
+  </warningLogs>
+</vivadoHLSLog:LogRoot>
