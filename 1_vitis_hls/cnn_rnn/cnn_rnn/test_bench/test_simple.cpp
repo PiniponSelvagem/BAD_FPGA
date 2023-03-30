@@ -57,7 +57,7 @@ void test_predict() {
 	}
 }
 
-static unsigned char s_imgC_in[C2D_1_IHEIGHT * C2D_1_IWIDTH * C2D_1_ICHANNELS];
+static unsigned char imgC_in[C2D_1_IHEIGHT * C2D_1_IWIDTH * C2D_1_ICHANNELS];
 void test_conv2D() {
     int i, j, c, err_cnt = 0;
     printf("Input Image\n");
@@ -77,11 +77,11 @@ void test_conv2D() {
                 const int index = (orow * C2D_1_IWIDTH + ocol) + channel_offset;
                 if (orow < C2D_OFFSET || orow >= C2D_OFFSET+IHEIGHT ||
                     ocol < C2D_OFFSET || ocol >= C2D_OFFSET+IWIDTH) {
-                    s_imgC_in[index] = 0;
+                    imgC_in[index] = 0;
                 }
                 else {
                     char value = img_in[(orow-C2D_OFFSET) * IWIDTH + (ocol-C2D_OFFSET)];
-                    s_imgC_in[index] = value;
+                    imgC_in[index] = value;
                     //printf("c %2d -> %2d -> %d\n", channel, input[index], index);
                 }
             }
@@ -89,7 +89,7 @@ void test_conv2D() {
     }
     
 	conv2D_1(
-        (imap_t*) s_imgC_in,
+        (imap_t*) imgC_in,
         (weigth_t*) kernel,
         (bias_t*) bias,
         (omap_t*) img_out

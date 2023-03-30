@@ -1,11 +1,16 @@
-#include "test_simple.cpp"
-#include "test_w_real_data.cpp"
+//#define TEST_WITH_SIMPLE_DATA
+
+#ifdef  TEST_WITH_SIMPLE_DATA
+    #include "test_simple.cpp"
+#else
+    #include "test_w_real_data.cpp"
+#endif
 
 
 int main() {
-
-    //test_conv2D();
-    test_maxpooling2D();
+    
+    test_conv2D();
+    //test_maxpooling2D();
 
 	/*
 	printf("\nOutput Image\n");

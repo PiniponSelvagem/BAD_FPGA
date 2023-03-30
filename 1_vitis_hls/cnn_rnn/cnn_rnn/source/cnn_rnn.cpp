@@ -33,14 +33,14 @@ void conv2D_1(
                         count_t weight_1d_loc = ((krow) * C2D_1_KSIZE + (kcol)) + weight_offset;
                         count_t image_1d_loc = ((orow + krow-C2D_OFFSET) * C2D_1_IWIDTH + (ocol + kcol-C2D_OFFSET)) + in_channel_offset;
                         acc += weights[weight_1d_loc] * input[image_1d_loc];
-                        
+                        /*
                         printf("input=%d\n", input[image_1d_loc]);
                         printf("weights=%d\n", weights[weight_1d_loc]);
                         printf("acc=%d\n", acc);
-                        
+                        */
                     }
                 }
-                printf("\n");
+                //printf("\n");
 
                 if (acc > 255)
                     acc_sat = 255;
