@@ -3,8 +3,8 @@
 
 
 typedef ap_int<W_BIT_WIDTH> weigth_t;
-typedef ap_uint<I_BIT_WIDTH> imap_t;
-typedef ap_uint<I_BIT_WIDTH> omap_t;
+typedef ap_int<I_BIT_WIDTH> imap_t;
+typedef ap_int<I_BIT_WIDTH> omap_t;
 typedef ap_int<B_BIT_WIDTH> bias_t;
 
 typedef ap_int<16> count_t;
@@ -13,34 +13,34 @@ typedef ap_int<21> accum_t;  // I_BIT_WIDTH+W_BIT_WIDTH + 5
 
 // conv2D_1, input/output with padding
 void conv2D_1(
-        imap_t input[IC2D_1_IHEIGHT * IC2D_1_IWIDTH * IC2D_1_ICHANNELS],
-        weigth_t weights[IC2D_1_KSIZE * IC2D_1_KSIZE * IC2D_1_ICHANNELS],
-        bias_t bias[IC2D_1_BSIZE],
-        omap_t output[IC2D_1_OHEIGHT * IC2D_1_OWIDTH * IC2D_1_OCHANNELS]
+        imap_t input[C2D_1_IHEIGHT * C2D_1_IWIDTH * C2D_1_ICHANNELS],
+        weigth_t weights[C2D_1_KSIZE * C2D_1_KSIZE * C2D_1_ICHANNELS],
+        bias_t bias[C2D_1_BSIZE],
+        omap_t output[C2D_1_OHEIGHT * C2D_1_OWIDTH * C2D_1_OCHANNELS]
     ) {
     
-    for (count_t channel = 0; channel < IC2D_1_ICHANNELS; ++channel) {
-        accum_t in_channel_offset  = channel * IC2D_1_IWIDTH * IC2D_1_IHEIGHT;
-        accum_t out_channel_offset = channel * IC2D_1_OWIDTH * IC2D_1_OHEIGHT;
-        accum_t weight_offset      = channel * IC2D_1_KSIZE  * IC2D_1_KSIZE;
+    for (count_t channel = 0; channel < C2D_1_ICHANNELS; ++channel) {
+        accum_t in_channel_offset  = channel * C2D_1_IWIDTH * C2D_1_IHEIGHT;
+        accum_t out_channel_offset = channel * C2D_1_OWIDTH * C2D_1_OHEIGHT;
+        accum_t weight_offset      = channel * C2D_1_KSIZE  * C2D_1_KSIZE;
 
-        for (count_t orow = 1; orow < (IC2D_1_OHEIGHT-C2D_OFFSET); ++orow) {
-            for (count_t ocol = C2D_OFFSET; ocol < (IC2D_1_OWIDTH-C2D_OFFSET); ++ocol) {
+        for (count_t orow = 1; orow < (C2D_1_OHEIGHT-C2D_OFFSET); ++orow) {
+            for (count_t ocol = C2D_OFFSET; ocol < (C2D_1_OWIDTH-C2D_OFFSET); ++ocol) {
                 accum_t acc = (accum_t) bias[channel];
                 omap_t acc_sat;
-                for (count_t krow = 0; krow < IC2D_1_KSIZE; ++krow) {
-                    for (count_t kcol = 0; kcol < IC2D_1_KSIZE; ++kcol) {
-                        count_t weight_1d_loc = ((krow) * IC2D_1_KSIZE + (kcol)) + weight_offset;
-                        count_t image_1d_loc = ((orow + krow-C2D_OFFSET) * IC2D_1_IWIDTH + (ocol + kcol-C2D_OFFSET)) + in_channel_offset;
+                for (count_t krow = 0; krow < C2D_1_KSIZE; ++krow) {
+                    for (count_t kcol = 0; kcol < C2D_1_KSIZE; ++kcol) {
+                        count_t weight_1d_loc = ((krow) * C2D_1_KSIZE + (kcol)) + weight_offset;
+                        count_t image_1d_loc = ((orow + krow-C2D_OFFSET) * C2D_1_IWIDTH + (ocol + kcol-C2D_OFFSET)) + in_channel_offset;
                         acc += weights[weight_1d_loc] * input[image_1d_loc];
-                        /*
+                        
                         printf("input=%d\n", input[image_1d_loc]);
                         printf("weights=%d\n", weights[weight_1d_loc]);
                         printf("acc=%d\n", acc);
-                        */
+                        
                     }
                 }
-                //printf("\n");
+                printf("\n");
 
                 if (acc > 255)
                     acc_sat = 255;
@@ -48,7 +48,42 @@ void conv2D_1(
                     acc_sat = 0;    // ReLu
                 else
                     acc_sat = acc;
-                output[(orow * IC2D_1_OWIDTH + ocol) + out_channel_offset] = acc_sat;
+                output[(orow * C2D_1_OWIDTH + ocol) + out_channel_offset] = acc_sat;
+            }
+        }
+    }
+}
+
+void maxpooling2D_1(
+        imap_t input[MP2D_1_IHEIGHT * MP2D_1_IWIDTH * MP2D_1_CHANNELS],
+        omap_t output[MP2D_1_OHEIGHT * MP2D_1_OWIDTH * MP2D_1_CHANNELS]
+    ) {
+    
+    for (count_t channel = 0; channel < MP2D_1_CHANNELS; ++channel) {
+        accum_t in_channel_offset  = channel * MP2D_1_IWIDTH * MP2D_1_IHEIGHT;
+        accum_t out_channel_offset = channel * MP2D_1_OWIDTH * MP2D_1_OHEIGHT;
+
+        for (count_t orow = 0; orow < MP2D_1_OHEIGHT; ++orow) {
+            for (count_t ocol = 0; ocol < MP2D_1_OWIDTH; ++ocol) {
+                count_t irow_start = orow * MP2D_1_HSTRIDE;
+                count_t irow_end = irow_start + MP2D_1_HSTRIDE;
+
+                count_t icol_start = ocol * (MP2D_1_WSTRIDE-1);
+                count_t icol_end = icol_start + MP2D_1_WSTRIDE;
+
+                omap_t maxval = (omap_t) MIN_VALUE_I;
+
+                for (count_t irow = irow_start; irow < irow_end; ++irow) {
+                    for (count_t icol = icol_start; icol < icol_end; ++icol) {
+                        count_t image_1d_loc = ((orow + irow) * MP2D_1_IWIDTH + (ocol + icol)) + in_channel_offset;
+                        omap_t val = input[image_1d_loc];
+                        //printf(" %2d", val);
+                        if (val > maxval)
+                            maxval = val;
+                    }
+                }
+
+                output[(orow * MP2D_1_OWIDTH + ocol) + out_channel_offset] = maxval;
             }
         }
     }
@@ -58,20 +93,20 @@ void conv2D_1(
 // The top-level function
 void predict(
         imap_t input_values[IHEIGHT * IWIDTH * ICHANNELS],
-        weigth_t weights[IC2D_1_KSIZE * IC2D_1_KSIZE * IC2D_1_ICHANNELS],
-        bias_t bias[IC2D_1_BSIZE],
-        omap_t output[IC2D_1_OHEIGHT * IC2D_1_OWIDTH * IC2D_1_OCHANNELS]
+        weigth_t weights[C2D_1_KSIZE * C2D_1_KSIZE * C2D_1_ICHANNELS],
+        bias_t bias[C2D_1_BSIZE],
+        omap_t output[C2D_1_OHEIGHT * C2D_1_OWIDTH * C2D_1_OCHANNELS]
         //omap_t output[OHEIGHT * OWIDTH * OCHANNELS]
     ) {
 
-    imap_t input[IC2D_1_IHEIGHT * IC2D_1_IWIDTH * IC2D_1_ICHANNELS];
+    imap_t input[C2D_1_IHEIGHT * C2D_1_IWIDTH * C2D_1_ICHANNELS];
 
     // prepare
-    for (count_t channel = 0; channel < IC2D_1_ICHANNELS; ++channel) {
-        const int channel_offset = channel * IC2D_1_IWIDTH * IC2D_1_IHEIGHT;
-        for (count_t orow = 0; orow < IC2D_1_IHEIGHT; ++orow) {
-            for (count_t ocol = 0; ocol < IC2D_1_IWIDTH; ++ocol) {
-                const int index = (orow * IC2D_1_IWIDTH + ocol) + channel_offset;
+    for (count_t channel = 0; channel < C2D_1_ICHANNELS; ++channel) {
+        count_t channel_offset = channel * C2D_1_IWIDTH * C2D_1_IHEIGHT;
+        for (count_t orow = 0; orow < C2D_1_IHEIGHT; ++orow) {
+            for (count_t ocol = 0; ocol < C2D_1_IWIDTH; ++ocol) {
+                count_t index = (orow * C2D_1_IWIDTH + ocol) + channel_offset;
                 if (orow < C2D_OFFSET || orow >= C2D_OFFSET+IHEIGHT ||
                     ocol < C2D_OFFSET || ocol >= C2D_OFFSET+IWIDTH) {
                     input[index] = 0;
@@ -166,7 +201,7 @@ void predict(
 
     filter:
             height:           1
-            width:            3
+            width:            2
 
     output: (1*1*20*64)
             batch_size:       1
@@ -226,7 +261,7 @@ void predict(
 
     filter:
             height:           1
-            width:            3
+            width:            2
 
     output: (1*1*10*64)
             batch_size:       1
@@ -286,7 +321,7 @@ void predict(
 
     filter:
             height:           1
-            width:            3
+            width:            2
 
     output: (1*1*5*64)
             batch_size:       1

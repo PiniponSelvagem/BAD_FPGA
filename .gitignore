@@ -11,3 +11,5 @@ __pycache__/
 /1_vitis_hls/cnn_rnn/cnn_rnn/csim/report
 /1_vitis_hls/vitis_hls.log
 /1_vitis_hls/cnn_rnn/.apc
+/python_quantization/cnn_rnn/dump_io
+/python_quantization/cnn_rnn/train_notebook.ipynb

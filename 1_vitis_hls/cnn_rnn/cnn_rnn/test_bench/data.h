@@ -1,11 +1,14 @@
 #include "../Source/settings.h"
 
-static unsigned char img_in[IHEIGHT * IWIDTH] = {
+#ifndef DATA_H
+#define DATA_H
+
+
+static char img_in[IHEIGHT * IWIDTH] = {
 	//1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
 };
-
-static signed char bias[IC2D_1_BSIZE] = {
+static char bias[C2D_1_BSIZE] = {
 	 1,  2,  3,  4,  5,  6,  7,  8,  9, 10,
 	11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
 	21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
@@ -14,8 +17,7 @@ static signed char bias[IC2D_1_BSIZE] = {
 	51, 52, 53, 54, 55, 56, 57, 58, 59, 60,
 	61, 62, 63, 64,
 };
-
-static signed char kernel[IC2D_1_KSIZE * IC2D_1_KSIZE * IC2D_1_ICHANNELS] = {
+static char kernel[C2D_1_KSIZE * C2D_1_KSIZE * C2D_1_ICHANNELS] = {
     0, 0, 0, 0, 1, 0, 0, 0, 0,
     0, 0, 0, 0, 2, 0, 0, 0, 0,
     0, 0, 0, 0, 3, 0, 0, 0, 0,
@@ -81,5 +83,16 @@ static signed char kernel[IC2D_1_KSIZE * IC2D_1_KSIZE * IC2D_1_ICHANNELS] = {
     0, 0, 0, 0,63, 0, 0, 0, 0,
     0, 0, 0, 0,64, 0, 0, 0, 0,
 };
+static char img_out[C2D_1_IHEIGHT * C2D_1_IWIDTH * C2D_1_ICHANNELS];
 
-static unsigned char img_out[IC2D_1_IHEIGHT * IC2D_1_IWIDTH * IC2D_1_ICHANNELS];
+
+
+
+
+static char maxp_in[MP2D_1_IHEIGHT * MP2D_1_IWIDTH * MP2D_1_CHANNELS] = {
+	-1, -2, -3, 4, 5, 6, 7, 8,  9, -10, -11, -12, -13, 14, 15, 16, 17, 18, 19, -20, -21, -22, -23, 24, 25, 26, 27, 28, 29, -30, -31, -32, -33, 34, 35, 36, 37, 38, 39, -40
+};
+static char maxp_out[MP2D_1_OHEIGHT * MP2D_1_OWIDTH * MP2D_1_CHANNELS];
+
+
+#endif

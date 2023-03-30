@@ -5,7 +5,8 @@
     <originFiles name="cnn_rnn.cpp" path="E:\Rodrigo\ISEL\2_Mestrado\2-ANO_1-sem\TFM\BAD_FPGA\1_vitis_hls\cnn_rnn\cnn_rnn\source\cnn_rnn.cpp"/>
   </source>
   <testbench>
-    <originFiles name="tb_cnn_rnn.cpp" path="E:\Rodrigo\ISEL\2_Mestrado\2-ANO_1-sem\TFM\BAD_FPGA\1_vitis_hls\cnn_rnn\cnn_rnn\test_bench\tb_cnn_rnn.cpp"/>
     <originFiles name="data.h" path="E:\Rodrigo\ISEL\2_Mestrado\2-ANO_1-sem\TFM\BAD_FPGA\1_vitis_hls\cnn_rnn\cnn_rnn\test_bench\data.h"/>
+    <originFiles name="tb_cnn_rnn.cpp" path="E:\Rodrigo\ISEL\2_Mestrado\2-ANO_1-sem\TFM\BAD_FPGA\1_vitis_hls\cnn_rnn\cnn_rnn\test_bench\tb_cnn_rnn.cpp"/>
+    <originFiles name="data_dump.h" path="E:\Rodrigo\ISEL\2_Mestrado\2-ANO_1-sem\TFM\BAD_FPGA\1_vitis_hls\cnn_rnn\cnn_rnn\test_bench\data_dump.h"/>
   </testbench>
 </autopilotfilemapping:AutoPilotFileMapping>

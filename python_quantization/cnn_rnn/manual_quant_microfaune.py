@@ -31,6 +31,9 @@ model = detector.model
 start = time.time()
 #########################################################
 
+if not os.path.isdir("model_json"):
+    os.makedirs("model_json")
+
 # DUMP get_config
 layersConfig = []
 for m in model.layers:

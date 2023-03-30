@@ -191,6 +191,8 @@
                         					
                     </fileInfo>
                     					
+                    <fileInfo id="cdt.managedbuild.config.gnu.exe.debug.1317211988.832825677" name="data.h" rcbsApplicability="disable" resourcePath="testbench/data.h" toolsToInvoke=""/>
+                    					
                     <sourceEntries>
                         						
                         <entry excluding=".apc|.settings|cnn_rnn|*.c*|*.C*" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
@@ -372,6 +374,8 @@
                         </tool>
                         					
                     </fileInfo>
+                    					
+                    <fileInfo id="cdt.managedbuild.config.gnu.exe.release.2042485163.83362606" name="data.h" rcbsApplicability="disable" resourcePath="testbench/data.h" toolsToInvoke=""/>
                     					
                     <sourceEntries>
                         						

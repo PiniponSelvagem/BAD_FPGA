@@ -1,4 +1,5 @@
 obj/tb_cnn_rnn.o: ../../test_bench/tb_cnn_rnn.cpp \
+ ../../test_bench/test_simple.cpp \
  E:/Xilinx/Vitis_HLS/2022.2/include/ap_int.h \
  E:/Xilinx/Vitis_HLS/2022.2/include/ap_common.h \
  E:/Xilinx/Vitis_HLS/2022.2/include/ap_decl.h \
@@ -20,4 +21,5 @@ obj/tb_cnn_rnn.o: ../../test_bench/tb_cnn_rnn.cpp \
  E:/Xilinx/Vitis_HLS/2022.2/include/ap_fixed_base.h \
  E:/Xilinx/Vitis_HLS/2022.2/include/ap_fixed_ref.h \
  E:/Xilinx/Vitis_HLS/2022.2/include/ap_fixed_special.h \
- ../../test_bench/data.h ../../test_bench/../Source/settings.h
+ ../../test_bench/../Source/settings.h ../../test_bench/data.h \
+ ../../test_bench/test_w_real_data.cpp ../../test_bench/data_dump.h

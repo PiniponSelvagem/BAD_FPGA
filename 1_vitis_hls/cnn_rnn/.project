@@ -57,6 +57,11 @@
 			<location>E:/Rodrigo/ISEL/2_Mestrado/2-ANO_1-sem/TFM/BAD_FPGA/1_vitis_hls/cnn_rnn/cnn_rnn/test_bench/data.h</location>
 		</link>
 		<link>
+			<name>testbench/data_dump.h</name>
+			<type>1</type>
+			<location>E:/Rodrigo/ISEL/2_Mestrado/2-ANO_1-sem/TFM/BAD_FPGA/1_vitis_hls/cnn_rnn/cnn_rnn/test_bench/data_dump.h</location>
+		</link>
+		<link>
 			<name>testbench/tb_cnn_rnn.cpp</name>
 			<type>1</type>
 			<location>E:/Rodrigo/ISEL/2_Mestrado/2-ANO_1-sem/TFM/BAD_FPGA/1_vitis_hls/cnn_rnn/cnn_rnn/test_bench/tb_cnn_rnn.cpp</location>
