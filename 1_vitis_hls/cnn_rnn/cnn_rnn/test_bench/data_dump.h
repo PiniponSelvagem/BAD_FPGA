@@ -14,8 +14,11 @@ static char c_conv2d_bias__first[C2D_1_BSIZE];
 // TODO: REVER "dump_weights_bias_quant.json", parece estar errado VS netron.app
 // TODO: REVER "dump_weights_bias_quant.json", parece estar errado VS netron.app
 // TODO: REVER "dump_weights_bias_quant.json", parece estar errado VS netron.app
-// parecde haver arredondamentos onde não devia
+// parece haver arredondamentos onde não devia
 
+// OS VALORES OUTPUT tambem estao errados, tomar atencao aos channels.
+// ex: 40 arrays, cada um com 64 posicoes, cada posicao � um channel e nao um output de um channel
+// verificar os OUTPUT json assim como os weights/bias etc...
 
 static float input_1__first[IHEIGHT * IWIDTH] = {
 		0.4088122546672821,
