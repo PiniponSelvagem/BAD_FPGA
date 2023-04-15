@@ -13,3 +13,6 @@ __pycache__/
 /1_vitis_hls/cnn_rnn/.apc
 /python_quantization/cnn_rnn/dump_io
 /python_quantization/cnn_rnn/train_notebook.ipynb
+/python_quantization/cnn_rnn/dump_io__channel_last/
+/python_quantization/cnn_rnn/model_json__channel_last/
+/python_quantization/cnn_rnn/model_json/

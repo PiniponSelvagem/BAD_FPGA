@@ -109,6 +109,15 @@ i = 0
 for layer_name in layers_names:
     print(layer_name)
     out = getOutputOfLayer(layer_name)
+    sdim = len(out.shape)
+    # rearrange for channel first, ex: [1, 40, 10, 64] -> [1, 64, 40, 10]
+    if sdim == 4:
+        out = tf.transpose(out, perm=[0, 3, 1, 2])
+    elif sdim == 3:
+        out = tf.transpose(out, perm=[0, 2, 1])
+    #elif sdim == 2:
+    #    out = tf.transpose(out, perm=[1, 0])
+    #
     layer = Layer(
         str(layer_name),
         out.shape.as_list(),

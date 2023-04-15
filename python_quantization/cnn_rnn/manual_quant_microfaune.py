@@ -61,31 +61,38 @@ class ArrayWB:
         return self.__dict__
 
 class Layer:
-    def __init__(self, name, input, output, weights, bias):
+    def __init__(self, name, input, output, variables):
         self.name = name
         self.input = input
         self.output = output
-        self.weights = weights
-        self.bias = bias
+        self.variables = variables
     def encode(self):
         return self.__dict__
 
 
 layersWeightBias = []
 for m in model.layers:
-    weights = []
-    for w in m.weights:
-        weights.append(ArrayWB(w.name, w.shape.as_list(), str(w.dtype.name), w.numpy().tolist()))
-    #
     variables = []
-    for v in m.variables:
-        variables.append(ArrayWB(v.name, v.shape.as_list(), str(v.dtype.name), v.numpy().tolist()))
-    #
+    for v in m.weights:
+        shape = v.shape
+        sdim = len(shape)
+        data = v.numpy()
+        # rearrange for channel first, ex: [1, 40, 10, 64] -> [1, 64, 40, 10]
+        # NOTE: Currently i have no idea if this is OK for the RNN part
+        if sdim == 4:
+            [shape[i] for i in (2, 3, 0, 1)]
+            data = data.transpose((2, 3, 0, 1))
+        elif sdim == 3:
+            [shape[i] for i in (0, 2, 1)]
+            data = data.transpose((0, 2, 1))
+        elif sdim == 2:
+            [shape[i] for i in (1, 0)]
+            data = data.transpose((1, 0))
+        variables.append(ArrayWB(v.name, shape.as_list(), str(v.dtype.name), data.tolist()))
     layer = Layer(
         str(m.name),
         InOut(m.input.shape.as_list(), str(m.input.dtype.name)),   # input
         InOut(m.output.shape.as_list(), str(m.output.dtype.name)), # output
-        weights,
         variables,
     )
     layersWeightBias.append(layer)
@@ -117,20 +124,11 @@ def quantitizeData(list_):
 
 
 for layer in layersWeightBias:
-    for w in layer.weights:
+    for w in layer.variables:
         index = 0
         for d in w.data:
             if isinstance(d, float):
                 w.data[index] = quantitize(w.data[index])
-            else:
-                quantitizeData(d)
-            index += 1
-    #
-    for b in layer.bias:
-        index = 0
-        for d in b.data:
-            if isinstance(d, float):
-                b.data[index] = quantitize(b.data[index])
             else:
                 quantitizeData(d)
             index += 1
