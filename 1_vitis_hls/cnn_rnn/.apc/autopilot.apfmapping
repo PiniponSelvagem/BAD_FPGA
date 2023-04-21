@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <autopilotfilemapping:AutoPilotFileMapping xmlns:autopilotfilemapping="www.autoesl.com/autopilotfilemapping">
   <source>
-    <originFiles name="settings.h" path="E:\Rodrigo\ISEL\2_Mestrado\2-ANO_1-sem\TFM\BAD_FPGA\1_vitis_hls\cnn_rnn\cnn_rnn\source\settings.h"/>
     <originFiles name="cnn_rnn.cpp" path="E:\Rodrigo\ISEL\2_Mestrado\2-ANO_1-sem\TFM\BAD_FPGA\1_vitis_hls\cnn_rnn\cnn_rnn\source\cnn_rnn.cpp"/>
+    <originFiles name="settings.h" path="E:\Rodrigo\ISEL\2_Mestrado\2-ANO_1-sem\TFM\BAD_FPGA\1_vitis_hls\cnn_rnn\cnn_rnn\source\settings.h"/>
   </source>
   <testbench>
     <originFiles name="data.h" path="E:\Rodrigo\ISEL\2_Mestrado\2-ANO_1-sem\TFM\BAD_FPGA\1_vitis_hls\cnn_rnn\cnn_rnn\test_bench\data.h"/>

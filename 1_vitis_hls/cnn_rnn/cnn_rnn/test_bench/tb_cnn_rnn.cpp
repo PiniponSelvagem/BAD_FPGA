@@ -6,10 +6,19 @@
     #include "test_w_real_data.cpp"
 #endif
 
+#include "gru.cpp"
+
+#define OUTPUT_SIZE     128
+float output[OUTPUT_SIZE];
 
 int main() {
-    
-    test_conv2D();
+	test_gru(output);
+
+	for (int i = 0; i < OUTPUT_SIZE; ++i) {
+		printf("%3d > %.16f\n", i, output[i]);
+	}
+
+    //test_conv2D();
     //test_maxpooling2D();
 
 	/*

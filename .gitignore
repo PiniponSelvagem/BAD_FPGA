@@ -16,3 +16,7 @@ __pycache__/
 /python_quantization/cnn_rnn/dump_io__channel_last/
 /python_quantization/cnn_rnn/model_json__channel_last/
 /python_quantization/cnn_rnn/model_json/
+/playground/C_playground/GRU/.vs/
+/playground/C_playground/GRU/GRU/x64/
+/playground/C_playground/GRU/x64/
+/playground/python_playground/gru/model_simple_gru.h5
