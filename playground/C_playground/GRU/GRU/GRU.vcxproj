@@ -135,6 +135,7 @@
   <ItemGroup>
     <ClInclude Include="data.h" />
     <ClInclude Include="data_simple.h" />
+    <ClInclude Include="debug_rrnoise.h" />
     <ClInclude Include="gru_chatgpt.h" />
     <ClInclude Include="gru_rnnoise.h" />
     <ClInclude Include="sigmoid.h" />

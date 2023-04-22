@@ -44,5 +44,8 @@
     <ClInclude Include="sigmoid.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="debug_rrnoise.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

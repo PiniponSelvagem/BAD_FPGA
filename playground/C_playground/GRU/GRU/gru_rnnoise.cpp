@@ -3,6 +3,11 @@
 #include "gru_rnnoise.h"
 #include "sigmoid.h"
 
+#include <stdio.h>
+
+#define DEBUG
+#include "debug_rrnoise.h"
+
 
 #define celt_isnan(x) ((x)!=(x))
 
@@ -74,39 +79,81 @@ void compute_gru(const GRULayer* gru, float* state, const float* input) {
     M = gru->nb_inputs;
     N = gru->nb_neurons;
     stride = 3 * N;
+    PRINT_M_N_STRIDE(M, N, stride);
+    PRINT_SEPARATOR;
+
+    PRINT_UG_TITLE(N);
     for (i = 0; i < N; i++) {
         /* Compute update gate. */
         float sum = gru->bias[i];
-        for (j = 0; j < M; j++)
-            sum += gru->input_weights[j * stride + i] * input[j];
-        for (j = 0; j < N; j++)
-            sum += gru->recurrent_weights[j * stride + i] * state[j];
+        PRINT_K_LOOP(M);
+        for (j = 0; j < M; j++) {
+            int idx = j * stride + i;
+            sum += gru->input_weights[idx] * input[j];
+            PRINT_K(j, sum, idx, gru->input_weights[idx], input[j]);
+        }
+        PRINT_RK_LOOP(N);
+        for (j = 0; j < N; j++) {
+            int idx = j * stride + i;
+            sum += gru->recurrent_weights[idx] * state[j];
+            PRINT_RK(j, sum, idx, gru->recurrent_weights[idx], state[j]);
+        }
         z[i] = sigmoid_approx(WEIGHTS_SCALE * sum);
+        PRINT_Z(i, sum, z[i]);
     }
+
+    PRINT_SEPARATOR;
+    PRINT_RG_TITLE(N);
     for (i = 0; i < N; i++) {
         /* Compute reset gate. */
         float sum = gru->bias[N + i];
-        for (j = 0; j < M; j++)
-            sum += gru->input_weights[N + j * stride + i] * input[j];
-        for (j = 0; j < N; j++)
+        PRINT_K_LOOP(M);
+        for (j = 0; j < M; j++) {
+            int idx = N + j * stride + i;
+            sum += gru->input_weights[idx] * input[j];
+            PRINT_K(j, sum, idx, gru->input_weights[idx], input[j]);
+        }
+        PRINT_RK_LOOP(N);
+        for (j = 0; j < N; j++) {
+            int idx = N + j * stride + i;
             sum += gru->recurrent_weights[N + j * stride + i] * state[j];
+            PRINT_RK(j, sum, idx, gru->recurrent_weights[idx], state[j]);
+        }
         r[i] = sigmoid_approx(WEIGHTS_SCALE * sum);
+        PRINT_R(i, sum, r[i]);
     }
+
+    PRINT_SEPARATOR;
+    PRINT_CO_TITLE(N);
     for (i = 0; i < N; i++) {
         /* Compute output. */
         float sum = gru->bias[2 * N + i];
-        for (j = 0; j < M; j++)
-            sum += gru->input_weights[2 * N + j * stride + i] * input[j];
-        for (j = 0; j < N; j++)
-            sum += gru->recurrent_weights[2 * N + j * stride + i] * state[j] * r[j];
+        PRINT_K_LOOP(M);
+        for (j = 0; j < M; j++) {
+            int idx = 2 * N + j * stride + i;
+            sum += gru->input_weights[idx] * input[j];
+            PRINT_K(j, sum, idx, gru->input_weights[idx], input[j]);
+        }
+        PRINT_RK_LOOP(N);
+        for (j = 0; j < N; j++) {
+            int idx = 2 * N + j * stride + i;
+            sum += gru->recurrent_weights[idx] * state[j] * r[j];
+            PRINT_RK(j, sum, idx, gru->recurrent_weights[idx], state[j]);
+        }
+        /*
         if (gru->activation == ACTIVATION_SIGMOID) sum = sigmoid_approx(WEIGHTS_SCALE * sum);
         else if (gru->activation == ACTIVATION_TANH) sum = tansig_approx(WEIGHTS_SCALE * sum);
         else if (gru->activation == ACTIVATION_RELU) sum = relu(WEIGHTS_SCALE * sum);
         else *(int*)0 = 0;
+        */
+        sum = tansig_approx(WEIGHTS_SCALE * sum);   // ACTIVATION_TANH
         h[i] = z[i] * state[i] + (1 - z[i]) * sum;
+        PRINT_H(i, sum, h[i]);
     }
     for (i = 0; i < N; i++)
         state[i] = h[i];
+
+    printf("\n");
 }
 
 
