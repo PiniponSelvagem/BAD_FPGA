@@ -200,8 +200,33 @@ void gru_rnnoise(float* output) {
 
     compute_gru(&gruLayer, output, input);
 
+
+
+
+    float x_z = 1.f;
+    float x_r = 1.f;
+    float x_h = 1.f;
+
+    float recurrent_z = 1.f;
+    float recurrent_r = 1.f;
+    float recurrent_h = 1.f;
+
+    float z = sigmoid_approx(x_z + recurrent_z);
+    float r = sigmoid_approx(x_r + recurrent_r);
+    float hh = tansig_approx(x_h + r * recurrent_h);
+    //output[6] = hh;
+
+    float h_tm1 = 0;
+    float h = z * h_tm1 + (1 - z) * hh;
+    //output[7] = h;
+
+    //float z = sigmoid_approx(WEIGHTS_SCALE * 0);
+    //float sum = sigmoid_approx(WEIGHTS_SCALE * 0);
+    //float res = z * 0 + (1 - z) * sum;
+    //output[7] = res;
+    
     float sig = sigmoid_approx(WEIGHTS_SCALE * 2);
-    //output[6] = sig;
+    output[6] = sig;
     float tanh = tansig_approx(WEIGHTS_SCALE * 2);
-    //output[7] = tanh;
+    output[7] = tanh;
 }
