@@ -18,34 +18,40 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="gru_chatgpt.cpp">
+    <ClCompile Include="rrnoise\gru_rnnoise.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="gru_rnnoise.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="sigmoid.cpp">
+    <ClCompile Include="tensorflow\gru_tensorflow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="data.h">
+    <ClInclude Include="rrnoise\data.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="gru_chatgpt.h">
+    <ClInclude Include="rrnoise\gru_rnnoise.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="gru_rnnoise.h">
+    <ClInclude Include="rrnoise\data_simple.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="data_simple.h">
+    <ClInclude Include="utils\sigmoid.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="sigmoid.h">
+    <ClInclude Include="rrnoise\debug_rrnoise.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="debug_rrnoise.h">
+    <ClInclude Include="tensorflow\gru_tensorflow.h">
       <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tensorflow\data_tensorflow.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tensorflow\data_input.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\tanh.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

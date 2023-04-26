@@ -1,7 +1,7 @@
 #include "data.h"
 #include "data_simple.h"
 #include "gru_rnnoise.h"
-#include "sigmoid.h"
+#include "../utils/sigmoid.h"
 
 #include <stdio.h>
 

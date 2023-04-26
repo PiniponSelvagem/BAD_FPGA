@@ -102,7 +102,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>OPTION_1;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
@@ -127,18 +127,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="gru_chatgpt.cpp" />
-    <ClCompile Include="gru_rnnoise.cpp" />
+    <ClCompile Include="rrnoise\gru_rnnoise.cpp" />
+    <ClCompile Include="tensorflow\gru_tensorflow.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="sigmoid.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="data.h" />
-    <ClInclude Include="data_simple.h" />
-    <ClInclude Include="debug_rrnoise.h" />
-    <ClInclude Include="gru_chatgpt.h" />
-    <ClInclude Include="gru_rnnoise.h" />
-    <ClInclude Include="sigmoid.h" />
+    <ClInclude Include="rrnoise\data.h" />
+    <ClInclude Include="rrnoise\data_simple.h" />
+    <ClInclude Include="tensorflow\data_input.h" />
+    <ClInclude Include="tensorflow\data_tensorflow.h" />
+    <ClInclude Include="rrnoise\debug_rrnoise.h" />
+    <ClInclude Include="rrnoise\gru_rnnoise.h" />
+    <ClInclude Include="tensorflow\gru_tensorflow.h" />
+    <ClInclude Include="utils\sigmoid.h" />
+    <ClInclude Include="utils\tanh.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

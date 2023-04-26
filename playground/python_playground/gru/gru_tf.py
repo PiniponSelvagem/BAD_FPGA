@@ -29,9 +29,7 @@ def step(cell_inputs, cell_states):
     matrix_inner = backend.dot(h_tm1, recurrent_kernel)
     matrix_inner = backend.bias_add(matrix_inner, recurrent_bias)
 
-    recurrent_z, recurrent_r, recurrent_h = tf.split(
-        matrix_inner, 3, axis=1
-    )
+    recurrent_z, recurrent_r, recurrent_h = tf.split(matrix_inner, 3, axis=1)
     z = tf.sigmoid(x_z + recurrent_z)
     r = tf.sigmoid(x_r + recurrent_r)
     hh = tf.tanh(x_h + r * recurrent_h)
