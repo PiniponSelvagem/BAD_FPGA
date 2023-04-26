@@ -26,13 +26,13 @@ model = keras.Model(inputs=spec, outputs=[x])
 
 kernel = np.array([[1, 2, 3, 4, 5, 6], [7, 8, 9, 10, 11, 12]])
 recurrent_kernel = np.array([[-1, -2, -3, -4, -5, -6], [-7, -8, -9, -10, -11, -12]])
-bias = np.array([[-100, -100, -100, -100, -100, -100], [-110, -110, -110, -110, -110, -110]])
+bias = np.array([[1, 1, 1, 1, 1, 1], [2, 2, 2, 2, 2, 2]])
 
 model.set_weights([kernel, recurrent_kernel, bias])
 model.save("model_simple_gru.h5", save_format="h5")
 
 
-input = np.array([[[20, 30]]])
+input = np.array([[[-2, 1]]])
 
 predict = model.predict(input)
 print(predict)

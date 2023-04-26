@@ -53,5 +53,8 @@
     <ClInclude Include="utils\tanh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="tensorflow\debug_print.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

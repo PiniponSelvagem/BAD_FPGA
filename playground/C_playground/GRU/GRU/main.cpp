@@ -21,12 +21,12 @@ int main() {
     gru_tensorflow(input, state, output);
 
     // Print the output values
-    printf("    OUTPUT      --VS--      EXPECTED\n");
+    printf("      OUTPUT           --VS--          EXPECTED\n");
     for (int i = 0; i < INPUT_SIZE; i++) {
         float out = output[i];
         float exp = output_expected[i];
         float difference = out - exp;
-        printf(" %.8f | %0.8f | %.8f\n", out, difference, exp);
+        printf(" %.12f | %15.12f | %.12f\n", out, difference, exp);
     }
     printf("\n");
 

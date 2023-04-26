@@ -102,7 +102,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>OPTION_1;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>OPTION_3;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
@@ -138,6 +138,7 @@
     <ClInclude Include="tensorflow\data_tensorflow.h" />
     <ClInclude Include="rrnoise\debug_rrnoise.h" />
     <ClInclude Include="rrnoise\gru_rnnoise.h" />
+    <ClInclude Include="tensorflow\debug_print.h" />
     <ClInclude Include="tensorflow\gru_tensorflow.h" />
     <ClInclude Include="utils\sigmoid.h" />
     <ClInclude Include="utils\tanh.h" />
