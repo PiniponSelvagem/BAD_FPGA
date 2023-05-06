@@ -50,10 +50,19 @@
     <ClInclude Include="tensorflow\data_input.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="utils\tanh.h">
+    <ClInclude Include="utils\tanh_rnnoise.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="tensorflow\debug_print.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tensorflow\data_real.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tensorflow\settings.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tensorflow\data_real_simple.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

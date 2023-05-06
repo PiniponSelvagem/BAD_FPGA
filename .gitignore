@@ -19,4 +19,10 @@ __pycache__/
 /playground/C_playground/GRU/.vs/
 /playground/C_playground/GRU/GRU/x64/
 /playground/C_playground/GRU/x64/
-/playground/python_playground/gru/model_simple_gru.h5
+*.h5
+/playground/python_playground/gru/debug_sigmoid_r_input.txt
+/playground/python_playground/gru/debug_sigmoid_r_output.txt
+/playground/python_playground/gru/debug_sigmoid_z_input.txt
+/playground/python_playground/gru/debug_sigmoid_z_output.txt
+/playground/python_playground/gru/debug_tanh_hh_input.txt
+/playground/python_playground/gru/debug_tanh_hh_output.txt

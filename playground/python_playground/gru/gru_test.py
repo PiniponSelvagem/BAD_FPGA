@@ -83,16 +83,20 @@ h =  [[0.113786682]]
 sig = tf.sigmoid([2.0])
 print(sig)
 
-""
+
 for i in range(12):
     sig = tf.sigmoid([float(i)])
     print(i, sig)
-""
+
     
     
 #testing tanh
 tanh = tf.math.tanh([2.0])
 print(tanh)
+
+for i in range(20):
+    tanh = tf.math.tanh([float(i/10)])
+    print(i/10, tanh)
 
 
 

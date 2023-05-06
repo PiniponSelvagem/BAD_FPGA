@@ -102,7 +102,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>OPTION_3;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>OPTION_REAL;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
@@ -133,15 +133,18 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="rrnoise\data.h" />
+    <ClInclude Include="tensorflow\data_real_simple.h" />
     <ClInclude Include="rrnoise\data_simple.h" />
     <ClInclude Include="tensorflow\data_input.h" />
+    <ClInclude Include="tensorflow\data_real.h" />
     <ClInclude Include="tensorflow\data_tensorflow.h" />
     <ClInclude Include="rrnoise\debug_rrnoise.h" />
     <ClInclude Include="rrnoise\gru_rnnoise.h" />
     <ClInclude Include="tensorflow\debug_print.h" />
     <ClInclude Include="tensorflow\gru_tensorflow.h" />
+    <ClInclude Include="tensorflow\settings.h" />
     <ClInclude Include="utils\sigmoid.h" />
-    <ClInclude Include="utils\tanh.h" />
+    <ClInclude Include="utils\tanh_rnnoise.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

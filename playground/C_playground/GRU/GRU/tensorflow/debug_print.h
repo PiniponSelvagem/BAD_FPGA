@@ -1,6 +1,6 @@
 #pragma once
 
-#ifdef DEBUG
+#ifdef DEBUG_PRINT
     #include <stdio.h>
     #define PRINT_SEPARATOR      printf("\n")
     #define PRINT_STRING(str)    printf("%s\n", str);
@@ -12,7 +12,7 @@
             } \
             printf("]\n"); \
         } while(0)
-    #define PRINT_ARRAY_1D(title, arr, size)    PRINT_ARRAY_1D_X(title, arr, size, "%.0f ")
+    #define PRINT_ARRAY_1D(title, arr, size)    PRINT_ARRAY_1D_X(title, arr, size, "%.10f ")
     #define PRINT_ARRAY_2D_X(title, arr, rows, cols, format) \
         do { \
             printf("%s = [", title); \
@@ -31,7 +31,7 @@
             } \
             printf(" ]\n"); \
         } while(0)
-    #define PRINT_ARRAY_2D(title, arr, rows, cols)    PRINT_ARRAY_2D_X(title, arr, rows, cols, "%.0f ")
+    #define PRINT_ARRAY_2D(title, arr, rows, cols)    PRINT_ARRAY_2D_X(title, arr, rows, cols, "%.10f ")
 #else
     #define PRINT_SEPARATOR ;
     #define PRINT_STRING(str) ;
