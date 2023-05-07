@@ -1,4 +1,4 @@
-file = "file.txt"
+file = "filename.csv"
 
 with open(file, 'r+') as file:
     # read the values from the input file
