@@ -64,7 +64,7 @@ void test_sig_r_values() {
 }
 void test_tanh_hh_values() {
     compare("      HH INPUT          --VS--           EXPECTED\n", hh_in, tanh_hh_input);
-    compare("      HH OUTPUT         --VS--           EXPECTED\n", r, tanh_hh_output);
+    compare("      HH OUTPUT         --VS--           EXPECTED\n", hh, tanh_hh_output);
 }
 
 

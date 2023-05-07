@@ -22,7 +22,7 @@ tansig_table = tf.tanh(tansig_table)
 
 tansig_table = tansig_table.numpy().reshape(1,-1)
 
-with open('tansig_table.txt', 'w') as f:
+with open('tansig_table_python.txt', 'w') as f:
     for i, x in enumerate(tansig_table.flatten()):
         if i % columns_per_line == columns_per_line - 1 and i != n - 1:
             f.write('%.*f,\n' % (decimal_places, x))
