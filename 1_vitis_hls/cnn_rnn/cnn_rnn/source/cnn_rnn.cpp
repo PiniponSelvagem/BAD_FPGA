@@ -18,6 +18,15 @@ void conv2D_1(
         bias_t bias[C2D_1_BSIZE],
         omap_t output[C2D_1_OHEIGHT * C2D_1_OWIDTH * C2D_1_OCHANNELS]
     ) {
+
+	/*
+	 *
+	 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	 * THIS IS NOT WORKING AS INTENDED
+	 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	 *
+	 *
+	 */
     
     for (count_t channel = 0; channel < C2D_1_ICHANNELS; ++channel) {
         accum_t in_channel_offset  = channel * C2D_1_IWIDTH * C2D_1_IHEIGHT;

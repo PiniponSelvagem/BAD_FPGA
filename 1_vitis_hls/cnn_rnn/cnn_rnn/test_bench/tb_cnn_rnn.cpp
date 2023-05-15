@@ -12,16 +12,18 @@
 float output[OUTPUT_SIZE];
 
 int main() {
-	test_gru(output);
-
+	//test_gru(output);
+	/*
 	for (int i = 0; i < OUTPUT_SIZE; ++i) {
 		printf("%3d > %.16f\n", i, output[i]);
 	}
+	*/
 
-    //test_conv2D();
+    test_conv2D();
     //test_maxpooling2D();
 
-	/*
+    int i = 0;
+    int j = 0;
 	printf("\nOutput Image\n");
 	for (i = 0; i < OHEIGHT; i++) {
 		for (j = 0; j < OWIDTH; j++) {

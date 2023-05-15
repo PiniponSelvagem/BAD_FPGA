@@ -26,3 +26,5 @@ __pycache__/
 /playground/python_playground/gru/debug_sigmoid_z_output.txt
 /playground/python_playground/gru/debug_tanh_hh_input.txt
 /playground/python_playground/gru/debug_tanh_hh_output.txt
+/1_vitis_hls/cnn_rnn/.apc/
+/1_vitis_hls/cnn_rnn/.settings/
