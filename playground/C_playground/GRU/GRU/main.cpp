@@ -7,6 +7,7 @@
 #include "utils/gru_settings.h"
 
 #include "data/data_input.h"
+#include "data/data_output.h"
 
 /*
 To set OPTION_X of data_tensorflow.h:
@@ -47,14 +48,17 @@ void test_tanh() {
 
 
 
-gruval tf_state[128] = { 0.0 };
-gruval output[128] = { 0.0 };
 
-gruval cell_state[128] = { 0.0 };
-gruval output_cell[128] = { 0.0 };
+gruval output[OUTPUT_SIZE_OUTTER][OUTPUT_SIZE] = { 0.0 };
+gruval output_cell[OUTPUT_SIZE_OUTTER][OUTPUT_SIZE] = { 0.0 };
+
+#define OUT_MAX_PRINT 2
 
 void tensorflow_gru() {
-    gru_tensorflow(input, tf_state, output);
+    gru_tf_clearState();
+
+    for (int i=0; i<INPUT_SIZE_OUTTER; ++i)
+        gru_tensorflow(input[i], output[i]);
 
     /*
     test_sig_z_values();
@@ -64,28 +68,40 @@ void tensorflow_gru() {
 
     // Print the output values
     printf("      OUTPUT            --VS--            EXPECTED\n");
-    for (int i = 0; i < INPUT_SIZE; i++) {
-        gruval out = output[i];
-        gruval exp = output_expected[i];
-        gruval difference = out - exp;
-        //printf(" %15.12f | %7.4f | %15.12f\n", out, difference, exp);
-        special_print(out, difference, exp);
+    for (int outter = 0; outter < OUT_MAX_PRINT; ++outter) {
+        printf("[%3d] ##############################################\n", outter);
+        for (int i = 0; i < INPUT_SIZE; i++) {
+            gruval out = output[outter][i];
+            gruval exp = output_expected[outter][i];
+            gruval difference = out - exp;
+            //printf(" %15.12f | %7.4f | %15.12f\n", out, difference, exp);
+            special_print(out, difference, exp);
+        }
+        printf("\n");
     }
-    printf("\n");
 }
 
 void hls_gru() {
-    for (int idx = 0; idx < INPUT_SIZE; ++idx) {
-        gru(idx, input, cell_state, &output_cell[idx]);
+    gru_clearState();
+
+    for (int i = 0; i < INPUT_SIZE_OUTTER; ++i) {
+        for (int idx = 0; idx < INPUT_SIZE; ++idx) {
+            gru(idx, input[i], &output_cell[i][idx]);
+        }
+        gru_syncState();
     }
 
     printf("    OUTPUT CELL         --VS--            EXPECTED\n");
-    for (int i = 0; i < INPUT_SIZE; i++) {
-        gruval out = output_cell[i];
-        gruval exp = output[i];
-        gruval difference = out - exp;
-        //printf(" %15.12f | %7.4f | %15.12f\n", out, difference, exp);
-        special_print(out, difference, exp);
+    for (int outter = 0; outter < OUT_MAX_PRINT; ++outter) {
+        printf("[%3d] ##############################################\n", outter);
+        for (int i = 0; i < INPUT_SIZE; i++) {
+            gruval out = output_cell[outter][i];
+            gruval exp = output[outter][i];
+            gruval difference = out - exp;
+            //printf(" %15.12f | %7.4f | %15.12f\n", out, difference, exp);
+            special_print(out, difference, exp);
+        }
+        printf("\n");
     }
 }
 

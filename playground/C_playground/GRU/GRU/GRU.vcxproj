@@ -133,6 +133,7 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="data\data_output.h" />
     <ClInclude Include="data\data_static.h" />
     <ClInclude Include="gru\gru.h" />
     <ClInclude Include="utils\gru_settings.h" />

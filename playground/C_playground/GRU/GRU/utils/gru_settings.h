@@ -5,12 +5,16 @@
 
 #include "../utils/types.h"
 
-#define INPUT_SIZE  64
-#define KERNEL_ROWS INPUT_SIZE
-#define KERNEL_COLS (INPUT_SIZE*3)
-#define BIAS_COLS   KERNEL_COLS
-#define SPLIT_SIZE  (KERNEL_COLS/3)
-#define OUTPUT_SIZE INPUT_SIZE
+#define STATE_SIZE          64
+
+#define INPUT_SIZE          64
+#define INPUT_SIZE_OUTTER   431
+#define KERNEL_ROWS         INPUT_SIZE
+#define KERNEL_COLS         (INPUT_SIZE*3)
+#define BIAS_COLS           KERNEL_COLS
+#define SPLIT_SIZE          (KERNEL_COLS/3)
+#define OUTPUT_SIZE         INPUT_SIZE
+#define OUTPUT_SIZE_OUTTER  INPUT_SIZE_OUTTER
 
    //#define TANH_RRNOISE
 #ifdef TANH_RRNOISE
