@@ -24,6 +24,9 @@
     <ClCompile Include="tensorflow\gru_tensorflow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="gru\gru.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="rrnoise\data.h">
@@ -44,25 +47,25 @@
     <ClInclude Include="tensorflow\gru_tensorflow.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="tensorflow\data_tensorflow.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="tensorflow\data_input.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="utils\tanh_rnnoise.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="tensorflow\debug_print.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="tensorflow\data_real.h">
+    <ClInclude Include="gru\gru.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="tensorflow\settings.h">
+    <ClInclude Include="utils\gru_settings.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="tensorflow\data_real_simple.h">
+    <ClInclude Include="data\data_static.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="data\data_input.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\types.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,21 +1,7 @@
 #pragma once
-#include "settings.h"
+#include "../utils/gru_settings.h"
 
-#ifdef OPTION_DEBUG
-float input[2] = { 10, 11 };
-
-#elif OPTION_1
-float input[2] = { 1, 1 };
-
-#elif OPTION_2
-float input[2] = { -2, 1 };
-
-#elif OPTION_3
-float input[4] = { 0.01, 0.02, 0.03, 0.04 };
-
-#elif OPTION_REAL
-// 1_a_bird_22_tf_math_reduce_max.json (just the 1st iteration) (channel last)
-gruval input[64] = {
+gruval input[INPUT_SIZE] = {
     2.9400522708892822,
     1.5934033393859863,
     0.6511431932449341,
@@ -81,18 +67,3 @@ gruval input[64] = {
     0.7425892949104309,
     1.2389354705810547
 };
-
-#elif OPTION_REAL_SIMPLE
-// 1_a_bird_22_tf_math_reduce_max.json (just the 1st iteration) (channel last)
-gruval input[64] = {
-    2.9400522708892822,
-    1.5934033393859863,
-    0.6511431932449341,
-    0.0
-};
-
-
-#else
-gruval input[2] = { 1, 1 };
-
-#endif

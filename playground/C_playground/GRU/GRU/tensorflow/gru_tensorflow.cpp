@@ -68,6 +68,62 @@ void test_tanh_hh_values() {
 }
 
 
+void gru_cell(int idx, gruval* input, gruval* state, gruval* output) {
+    // state = (h_tm1 = cell_states[0])
+
+    /* inputs projected by all gate matrices at once */
+    // matrix_x = backend.dot(cell_inputs, tf_kernel)
+    gruval matrix_x[3];
+
+    // x_z, x_r, x_h
+    for (int i = 0; i < 3; ++i) {
+        matrix_x[i] = 0;
+        for (int j = 0; j < KERNEL_ROWS; ++j) {
+            gruval iVal = input[j];
+            gruval kVal = kernel[j][(i*64) + idx];
+            matrix_x[i] += iVal * kVal;
+        }
+    }
+    // x_z, x_r, x_h  -> add bias
+    for (int i = 0; i < 3; ++i) {
+        matrix_x[i] += bias[(i*64) + idx];
+    }
+    // x_z, x_r, x_h = tf.split(matrix_x, 3, axis=1)
+    //gruval x_z = matrix_x[0];
+    //gruval x_r = matrix_x[1];
+    //gruval x_h = matrix_x[2];
+
+
+
+    gruval matrix_inner[3];
+
+    // recurrent_z, recurrent_r, recurrent_h
+    for (int i = 0; i < 3; ++i) {
+        matrix_inner[i] = 0;
+        for (int j = 0; j < KERNEL_ROWS; ++j) {
+            gruval iVal = state[j];
+            gruval kVal = recurrent_kernel[j][(i * 64) + idx];
+            matrix_inner[i] += iVal * kVal;
+        }
+    }
+    // matrix_x = backend.bias_add(matrix_inner, recurrent_bias)
+    for (int i = 0; i < 3; ++i) {
+        matrix_inner[i] += recurrent_bias[(i*64) + idx];
+    }
+    // recurrent_z, recurrent_r, recurrent_h = tf.split(matrix_inner, 3, axis=1
+    //gruval recurrent_z = matrix_inner[0];
+    //gruval recurrent_r = matrix_inner[1];
+    //gruval recurrent_h = matrix_inner[2];
+
+
+    gruval z  = SIGMOID(matrix_x[0] + matrix_inner[0]);    // z = tf.sigmoid(x_z + recurrent_z)
+    gruval r  = SIGMOID(matrix_x[1] + matrix_inner[1]);    // r = tf.sigmoid(x_r + recurrent_r)
+    gruval hh = TANH(matrix_x[2] + (r * matrix_inner[2])); // hh = tf.tanh(x_h + r * recurrent_h)
+
+    *output = z * state[idx] + (1 - z) * hh;
+}
+
+
 void gru_tensorflow(gruval* input, gruval* state, gruval* output) {
     PRINT_STRING("################ STEP START ################");
     PRINT_ARRAY_2D("kernel", kernel, KERNEL_ROWS, KERNEL_COLS);
@@ -80,7 +136,7 @@ void gru_tensorflow(gruval* input, gruval* state, gruval* output) {
     // state = (h_tm1 = cell_states[0])
 
     /* inputs projected by all gate matrices at once */
-    // matrix_x = backend.dot(cell_inputs, kernel)
+    // matrix_x = backend.dot(cell_inputs, tf_kernel)
     for (int i = 0; i < KERNEL_COLS; ++i) {
         matrix_x[i] = 0;
         for (int j = 0; j < KERNEL_ROWS; ++j) {
@@ -105,7 +161,7 @@ void gru_tensorflow(gruval* input, gruval* state, gruval* output) {
     PRINT_ARRAY_1D("x_h", x_h, SPLIT_SIZE);
 
     /* hidden state projected by all gate matrices at once */
-    // matrix_inner = backend.dot(h_tm1, recurrent_kernel)
+    // matrix_inner = backend.dot(h_tm1, tf_recurrent_kernel)
     for (int i = 0; i < KERNEL_COLS; ++i) {
         matrix_inner[i] = 0;
         for (int j = 0; j < KERNEL_ROWS; ++j) {
@@ -165,59 +221,6 @@ void gru_tensorflow(gruval* input, gruval* state, gruval* output) {
 
 
 
-
-
-void gru_tensorflow(gruval* input, gruval* state, gruval* output) {
-    // state = (h_tm1 = cell_states[0])
-
-    /* inputs projected by all gate matrices at once */
-    // matrix_x = backend.dot(cell_inputs, kernel)
-    for (int i = 0; i < KERNEL_COLS; ++i) {
-        matrix_x[i] = 0;
-        for (int j = 0; j < KERNEL_ROWS; ++j) {
-            gruval iVal = input[j];
-            gruval kVal = kernel[j][i];
-            matrix_x[i] += iVal * kVal;
-        }
-    }
-    // matrix_x = backend.bias_add(matrix_x, input_bias)
-    for (int i = 0; i < KERNEL_COLS; ++i) { matrix_x[i] += bias[i]; }
-
-    // x_z, x_r, x_h = tf.split(matrix_x, 3, axis=1)
-    gruval* x_z = matrix_x + (SPLIT_SIZE * 0);
-    gruval* x_r = matrix_x + (SPLIT_SIZE * 1);
-    gruval* x_h = matrix_x + (SPLIT_SIZE * 2);
-
-    /* hidden state projected by all gate matrices at once */
-    // matrix_inner = backend.dot(h_tm1, recurrent_kernel)
-    for (int i = 0; i < KERNEL_COLS; ++i) {
-        matrix_inner[i] = 0;
-        for (int j = 0; j < KERNEL_ROWS; ++j) {
-            gruval iVal = state[j];
-            gruval kVal = recurrent_kernel[j][i];
-            matrix_inner[i] += iVal * kVal;
-        }
-    }
-    // matrix_x = backend.bias_add(matrix_inner, recurrent_bias)
-    for (int i = 0; i < KERNEL_COLS; ++i) { matrix_inner[i] += recurrent_bias[i]; }
-
-    // recurrent_z, recurrent_r, recurrent_h = tf.split(matrix_inner, 3, axis=1
-    gruval* recurrent_z = matrix_inner + (SPLIT_SIZE * 0);
-    gruval* recurrent_r = matrix_inner + (SPLIT_SIZE * 1);
-    gruval* recurrent_h = matrix_inner + (SPLIT_SIZE * 2);
-
-    // z = tf.sigmoid(x_z + recurrent_z)
-    for (int i = 0; i < SPLIT_SIZE; ++i) { z[i] = sigmoid(x_z[i] + recurrent_z[i]); }
-    // r = tf.sigmoid(x_r + recurrent_r)
-    for (int i = 0; i < SPLIT_SIZE; ++i) { r[i] = sigmoid(x_r[i] + recurrent_r[i]); }
-    // hh = tf.tanh(x_h + r * recurrent_h)
-    for (int i = 0; i < SPLIT_SIZE; ++i) { hh[i] = tanh(x_h[i] + (r[i] * recurrent_h[i])); }
-
-    // previous and candidate state mixed by update gate
-    for (int i = 0; i < OUTPUT_SIZE; ++i) { output[i] = z[i] * state[i] + (1 - z[i]) * hh[i]; }
-}
-
-
 /**
  * ONLY FOR BETTER VISUALIZATION!!!
  * CHANGES SHOULD ONLY BE MADE IN: gru_tensorflow
@@ -227,7 +230,7 @@ void gru_tensorflow_clean(gruval* input, gruval* state, gruval* output) {
     // state = (h_tm1 = cell_states[0])
 
     /* inputs projected by all gate matrices at once */
-    // matrix_x = backend.dot(cell_inputs, kernel)
+    // matrix_x = backend.dot(cell_inputs, tf_kernel)
     for (int i = 0; i < KERNEL_COLS; ++i) {
         matrix_x[i] = 0;
         for (int j = 0; j < KERNEL_ROWS; ++j) {
@@ -247,7 +250,7 @@ void gru_tensorflow_clean(gruval* input, gruval* state, gruval* output) {
     gruval* x_h = matrix_x + (SPLIT_SIZE * 2);
 
     /* hidden state projected by all gate matrices at once */
-    // matrix_inner = backend.dot(h_tm1, recurrent_kernel)
+    // matrix_inner = backend.dot(h_tm1, tf_recurrent_kernel)
     for (int i = 0; i < KERNEL_COLS; ++i) {
         matrix_inner[i] = 0;
         for (int j = 0; j < KERNEL_ROWS; ++j) {
@@ -289,14 +292,14 @@ void gru_tensorflow_clean(gruval* input, gruval* state, gruval* output) {
     // state == h_tm1
 
     //# inputs projected by all gate matrices at once
-    float* matrix_x = backend.dot(cell_inputs, kernel);
+    float* matrix_x = backend.dot(cell_inputs, tf_kernel);
     matrix_x = backend.bias_add(matrix_x, input_bias);
 
     x_z, x_r, x_h = tf.split(matrix_x, 3, axis = 1);
 
     // hidden state projected by all gate matrices at once
-    float* matrix_inner = backend.dot(state, recurrent_kernel);
-    matrix_inner = backend.bias_add(matrix_inner, recurrent_bias);
+    float* matrix_inner = backend.dot(state, tf_recurrent_kernel);
+    matrix_inner = backend.bias_add(matrix_inner, tf_recurrent_bias);
 
     recurrent_z, recurrent_r, recurrent_h = tf.split(
         matrix_inner, 3, axis = 1

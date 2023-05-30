@@ -1,16 +1,16 @@
 #pragma once
 
-#ifndef SETTINGS_H
-#define SETTINGS_H
+#ifndef GRU_SETTINGS_H
+#define GRU_SETTINGS_H
 
+#include "../utils/types.h"
 
-#define FLOAT
-#ifdef FLOAT
-    typedef float gruval;
-#else
-    typedef double gruval;
-#endif
-
+#define INPUT_SIZE  64
+#define KERNEL_ROWS INPUT_SIZE
+#define KERNEL_COLS (INPUT_SIZE*3)
+#define BIAS_COLS   KERNEL_COLS
+#define SPLIT_SIZE  (KERNEL_COLS/3)
+#define OUTPUT_SIZE INPUT_SIZE
 
    //#define TANH_RRNOISE
 #ifdef TANH_RRNOISE

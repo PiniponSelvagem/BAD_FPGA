@@ -127,24 +127,24 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="gru\gru.cpp" />
     <ClCompile Include="rrnoise\gru_rnnoise.cpp" />
     <ClCompile Include="tensorflow\gru_tensorflow.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="data\data_static.h" />
+    <ClInclude Include="gru\gru.h" />
+    <ClInclude Include="utils\gru_settings.h" />
     <ClInclude Include="rrnoise\data.h" />
-    <ClInclude Include="tensorflow\data_real_simple.h" />
     <ClInclude Include="rrnoise\data_simple.h" />
-    <ClInclude Include="tensorflow\data_input.h" />
-    <ClInclude Include="tensorflow\data_real.h" />
-    <ClInclude Include="tensorflow\data_tensorflow.h" />
     <ClInclude Include="rrnoise\debug_rrnoise.h" />
     <ClInclude Include="rrnoise\gru_rnnoise.h" />
     <ClInclude Include="tensorflow\debug_print.h" />
     <ClInclude Include="tensorflow\gru_tensorflow.h" />
-    <ClInclude Include="tensorflow\settings.h" />
     <ClInclude Include="utils\sigmoid.h" />
     <ClInclude Include="utils\tanh_rnnoise.h" />
+    <ClInclude Include="utils\types.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

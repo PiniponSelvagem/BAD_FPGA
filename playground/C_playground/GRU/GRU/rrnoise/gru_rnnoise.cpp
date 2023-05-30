@@ -25,7 +25,7 @@
 //typedef signed char rnn_weight;
 
 typedef struct {
-    const float* bias;
+    const float* tf_bias;
     const float* input_weights;
     const float* recurrent_weights;
     int nb_inputs;
@@ -85,7 +85,7 @@ void compute_gru(const GRULayer* gru, float* state, const float* input) {
     PRINT_UG_TITLE(N);
     for (i = 0; i < N; i++) {
         /* Compute update gate. */
-        float sum = gru->bias[i];
+        float sum = gru->tf_bias[i];
         PRINT_K_LOOP(M);
         for (j = 0; j < M; j++) {
             int idx = j * stride + i;
@@ -106,7 +106,7 @@ void compute_gru(const GRULayer* gru, float* state, const float* input) {
     PRINT_RG_TITLE(N);
     for (i = 0; i < N; i++) {
         /* Compute reset gate. */
-        float sum = gru->bias[N + i];
+        float sum = gru->tf_bias[N + i];
         PRINT_K_LOOP(M);
         for (j = 0; j < M; j++) {
             int idx = N + j * stride + i;
@@ -127,7 +127,7 @@ void compute_gru(const GRULayer* gru, float* state, const float* input) {
     PRINT_CO_TITLE(N);
     for (i = 0; i < N; i++) {
         /* Compute output. */
-        float sum = gru->bias[2 * N + i];
+        float sum = gru->tf_bias[2 * N + i];
         PRINT_K_LOOP(M);
         for (j = 0; j < M; j++) {
             int idx = 2 * N + j * stride + i;
