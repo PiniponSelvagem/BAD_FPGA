@@ -62,13 +62,13 @@
     <ClInclude Include="data\data_static.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="data\data_input.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="utils\types.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="data\data_output.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="data\data_input.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

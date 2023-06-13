@@ -48,7 +48,7 @@ for i in range(len(predict_flat)):
         print(f"Values at index {i} are not equal: {predict_flat[i]} and {outexpc_flat[i]}")
         warn = True
 
-if (~warn):
+if (warn == False):
     print("predict values are equal to expected output values")
 
 

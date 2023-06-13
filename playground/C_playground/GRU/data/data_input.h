@@ -68,7 +68,7 @@ const gruval input_single[INPUT_SIZE] = {
     1.2389354705810547
 };
 
-const gruval input[431][INPUT_SIZE] = {
+const gruval input[INPUT_SIZE_OUTTER][INPUT_SIZE] = {
     {
         2.9400522708892822,
         1.5934033393859863,

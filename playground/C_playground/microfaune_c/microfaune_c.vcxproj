@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{7f5e472c-caa6-4db3-8e74-995fc5de7d57}</ProjectGuid>
-    <RootNamespace>GRU</RootNamespace>
+    <ProjectGuid>{d5fce237-b42a-4303-bc24-0d98f6a089f1}</ProjectGuid>
+    <RootNamespace>microfaunec</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -102,7 +102,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>OPTION_REAL;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
@@ -127,25 +127,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="gru\gru.cpp" />
-    <ClCompile Include="rrnoise\gru_rnnoise.cpp" />
-    <ClCompile Include="tensorflow\gru_tensorflow.cpp" />
+    <ClCompile Include="conv2d\conv2d.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="data\data_output.h" />
-    <ClInclude Include="data\data_static.h" />
-    <ClInclude Include="gru\gru.h" />
-    <ClInclude Include="utils\gru_settings.h" />
-    <ClInclude Include="rrnoise\data.h" />
-    <ClInclude Include="rrnoise\data_simple.h" />
-    <ClInclude Include="rrnoise\debug_rrnoise.h" />
-    <ClInclude Include="rrnoise\gru_rnnoise.h" />
-    <ClInclude Include="tensorflow\debug_print.h" />
-    <ClInclude Include="tensorflow\gru_tensorflow.h" />
-    <ClInclude Include="utils\sigmoid.h" />
-    <ClInclude Include="utils\tanh_rnnoise.h" />
-    <ClInclude Include="utils\types.h" />
+    <ClInclude Include="conv2d\conv2d.h" />
+    <ClInclude Include="conv2d\data\conv2d_0.h" />
+    <ClInclude Include="conv2d\conv2d_settings.h" />
+    <ClInclude Include="conv2d\data\conv2d_0_outex.h" />
+    <ClInclude Include="input\input.h" />
+    <ClInclude Include="types.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

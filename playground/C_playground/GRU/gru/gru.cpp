@@ -4,11 +4,11 @@
 #include <string.h>
 
 
-#define GRU_IDX_MAX STATE_SIZE      // requires to be equal to STATE_SIZE, for gru_syncState to work
-gruval state[STATE_SIZE][STATE_SIZE];
+#define MAX_STATE 2                     // requires to be equal to STATE_SIZE, for gru_syncState to work
+gruval state[MAX_STATE][STATE_SIZE];    // 0 -> current, 1 -> next
 
 void gru_clearState() {
-    for (int i = 0; i < GRU_IDX_MAX; ++i) {
+    for (int i = 0; i < MAX_STATE; ++i) {
         for (int j = 0; j < STATE_SIZE; ++j) {
             state[i][j] = 0;
         }
@@ -16,10 +16,8 @@ void gru_clearState() {
 }
 
 void gru_syncState() {
-    for (int j = 0; j < STATE_SIZE; ++j) {
-        for (int i = 0; i < GRU_IDX_MAX; ++i) {
-            state[i][j] = state[j][j];
-        }
+    for (int i = 0; i < STATE_SIZE; ++i) {
+        state[0][i] = state[1][i];
     }
 }
 
@@ -43,7 +41,7 @@ void gru(int idx, const gruval* input, gruval* output) {
     for (int i = 0; i < 3; ++i) {
         matrix_inner[i] = 0;
         for (int j = 0; j < KERNEL_ROWS; ++j) {
-            gruval iVal = state[idx][j];
+            gruval iVal = state[0][j];
             gruval kVal = recurrent_kernel[j][(i * 64) + idx];
             matrix_inner[i] += iVal * kVal;
         }
@@ -57,7 +55,7 @@ void gru(int idx, const gruval* input, gruval* output) {
     gruval r = SIGMOID(matrix_x[1] + matrix_inner[1]); 
     gruval hh = TANH(matrix_x[2] + (r * matrix_inner[2]));
 
-    gruval out = z * state[idx][idx] + (1 - z) * hh;
-    state[idx][idx] = out;
+    gruval out = z * state[0][idx] + (1 - z) * hh;
+    state[1][idx] = out;
     *output = out;
 }
