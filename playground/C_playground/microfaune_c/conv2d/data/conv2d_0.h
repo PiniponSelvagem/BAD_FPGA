@@ -1,4 +1,5 @@
 #pragma once
+#include "../../global_settings.h"
 #include "../conv2d_settings.h"
 #include "../../input/input.h"
 
@@ -10,8 +11,8 @@
 #define C2D_0__RAW_OUT_LINES    C2D_0__RAW_IN_LINES
 #define C2D_0__RAW_OUT_COLS     C2D_0__RAW_IN_COLS
 
-#define C2D_0__IN_LINES         (INPUT_LINES + C2D_PADDING)
-#define C2D_0__IN_COLS          (INPUT_COLS + C2D_PADDING)
+#define C2D_0__IN_LINES         (INPUT_LINES + PADDING)
+#define C2D_0__IN_COLS          (INPUT_COLS + PADDING)
 
 #define C2D_0__OUT_LINES        C2D_0__IN_LINES
 #define C2D_0__OUT_COLS         C2D_0__IN_COLS
@@ -20,7 +21,7 @@
 /**
  * @brief This was taken from "model_json/dump_weights_bias.json". (Channels first)
 */
-const conv_t kernel_0[C2D_CHANNELS][C2D_KERNEL_LINES][C2D_KERNEL_COLS] = {
+const conv_t kernel_0[CHANNELS][C2D_KERNEL_LINES][C2D_KERNEL_COLS] = {
     {
         {
             0.029623493552207947,

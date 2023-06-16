@@ -6,9 +6,8 @@
 #define CONV2D_0_OUTEX_H
 
 
-
 /**
- * @brief This was taken from "model_json/dump_weights_bias.json". (Channels first)
+ * @brief This was taken from "dump_io/1_a_bird__1__conv2d.json". (Channels first)
 */
 const conv_t c2d_output_expected_channel0[C2D_0__RAW_OUT_LINES][C2D_0__RAW_OUT_COLS] = {
         {

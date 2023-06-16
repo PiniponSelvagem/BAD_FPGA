@@ -128,13 +128,21 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="conv2d\conv2d.cpp" />
+    <ClCompile Include="input\input.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="bnorm\bnorm.h" />
+    <ClInclude Include="bnorm\data\bnorm_1.h" />
+    <ClInclude Include="bnorm\bnorm_settings.h" />
+    <ClInclude Include="bnorm\data\bnorm_0.h" />
+    <ClInclude Include="bnorm\data\bnorm_0_outex.h" />
     <ClInclude Include="conv2d\conv2d.h" />
     <ClInclude Include="conv2d\data\conv2d_0.h" />
     <ClInclude Include="conv2d\conv2d_settings.h" />
     <ClInclude Include="conv2d\data\conv2d_0_outex.h" />
+    <ClInclude Include="conv2d\data\conv2d_1.h" />
+    <ClInclude Include="global_settings.h" />
     <ClInclude Include="input\input.h" />
     <ClInclude Include="types.h" />
   </ItemGroup>

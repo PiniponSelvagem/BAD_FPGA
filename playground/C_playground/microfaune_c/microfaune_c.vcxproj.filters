@@ -21,6 +21,9 @@
     <ClCompile Include="conv2d\conv2d.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="input\input.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="input\input.h">
@@ -39,6 +42,27 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="conv2d\data\conv2d_0_outex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="bnorm\data\bnorm_0.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="bnorm\data\bnorm_0_outex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="bnorm\bnorm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="bnorm\bnorm_settings.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="global_settings.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="conv2d\data\conv2d_1.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="bnorm\data\bnorm_1.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

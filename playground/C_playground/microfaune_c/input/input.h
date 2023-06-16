@@ -1,4 +1,5 @@
 #pragma once
+#include "../global_settings.h"
 #include "../types.h"
 
 #ifndef INPUT_H
@@ -6,6 +7,13 @@
 
 #define INPUT_LINES  431
 #define INPUT_COLS   40
+
+#define INPUT_PAD_LINES  (INPUT_LINES + PADDING)
+#define INPUT_PAD_COLS   (INPUT_COLS + PADDING)
+
+
+void input_preconv2d(const input_t input[INPUT_LINES][INPUT_COLS], conv_t inputPad[INPUT_PAD_LINES][INPUT_PAD_COLS]);
+
 
 /**
  * @brief This was taken from "dump_io/1_a_bird__0_input_1.json". (Channels first)
