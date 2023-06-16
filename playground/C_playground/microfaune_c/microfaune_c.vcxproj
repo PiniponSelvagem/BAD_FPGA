@@ -144,6 +144,8 @@
     <ClInclude Include="conv2d\data\conv2d_1.h" />
     <ClInclude Include="global_settings.h" />
     <ClInclude Include="input\input.h" />
+    <ClInclude Include="mpool2d\data\maxpool2d_0.h" />
+    <ClInclude Include="mpool2d\maxpool2d.h" />
     <ClInclude Include="types.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

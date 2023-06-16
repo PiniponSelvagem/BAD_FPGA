@@ -65,5 +65,11 @@
     <ClInclude Include="bnorm\data\bnorm_1.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="mpool2d\maxpool2d.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="mpool2d\data\maxpool2d_0.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

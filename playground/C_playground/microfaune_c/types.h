@@ -8,6 +8,7 @@
     typedef float input_t;
     typedef float conv_t;
     typedef float bnorm_t;
+    typedef float mpool_t;
     typedef float gru_t;
 
     typedef float output_t;

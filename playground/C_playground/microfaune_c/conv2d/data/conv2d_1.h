@@ -11,8 +11,8 @@
 #define C2D_1__RAW_OUT_LINES    C2D_1__RAW_IN_LINES
 #define C2D_1__RAW_OUT_COLS     C2D_1__RAW_IN_COLS
 
-#define C2D_1__IN_LINES         (BNORM_0__RAW_IN_LINES + PADDING)
-#define C2D_1__IN_COLS          (BNORM_0__RAW_IN_COLS + PADDING)
+#define C2D_1__IN_LINES         (C2D_1__RAW_IN_LINES + PADDING)
+#define C2D_1__IN_COLS          (C2D_1__RAW_IN_COLS + PADDING)
 
 #define C2D_1__OUT_LINES        C2D_1__IN_LINES
 #define C2D_1__OUT_COLS         C2D_1__IN_COLS
