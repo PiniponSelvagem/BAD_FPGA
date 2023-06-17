@@ -59,7 +59,7 @@
     <ClInclude Include="global_settings.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="conv2d\data\conv2d_1.h">
+    <ClInclude Include="conv2d\data\conv2d_2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="bnorm\data\bnorm_1.h">
@@ -69,6 +69,21 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="mpool2d\data\maxpool2d_0.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="conv2d\data\conv2d_1.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="bnorm\data\bnorm_2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="conv2d\data\conv2d_3.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="bnorm\data\bnorm_3.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="mpool2d\data\maxpool2d_1.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

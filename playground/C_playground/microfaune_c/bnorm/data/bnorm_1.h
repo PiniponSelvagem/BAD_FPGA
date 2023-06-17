@@ -1,7 +1,6 @@
 #pragma once
 #include "../../global_settings.h"
 #include "../bnorm_settings.h"
-#include "../../input/input.h"
 #include "../../conv2d/data/conv2d_1.h"
 
 #ifndef BNORM_1_H
@@ -300,4 +299,4 @@ const bnorm_t movingvariance_1[CHANNELS] = {
 };
 
 
-#endif // BNORM_0_H
+#endif // BNORM_1_H

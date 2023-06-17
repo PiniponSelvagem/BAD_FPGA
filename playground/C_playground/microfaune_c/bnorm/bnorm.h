@@ -1,6 +1,5 @@
 #pragma once
 #include "bnorm_settings.h"
-#include "data/bnorm_0.h"
 
 #include <math.h>
 

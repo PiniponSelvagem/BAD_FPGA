@@ -1,7 +1,7 @@
 #pragma once
 #include "../../global_settings.h"
 #include "../conv2d_settings.h"
-#include "../../bnorm/bnorm.h"
+#include "../../bnorm/data/bnorm_0.h"
 
 #ifndef CONV2D_1_H
 #define CONV2D_1_H
