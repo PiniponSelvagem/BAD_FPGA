@@ -1,9 +1,9 @@
 #pragma once
-#include "types.h"
 
 #ifndef GLOBAL_SETTINGS_H
 #define GLOBAL_SETTINGS_H
 
+#include "types.h"
 
 #define CHANNELS        64
 #define FILTERS         64

@@ -24,6 +24,9 @@
     <ClCompile Include="input\input.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="gru\gru.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="input\input.h">
@@ -84,6 +87,57 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="mpool2d\data\maxpool2d_1.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="conv2d\data\conv2d_4.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="bnorm\data\bnorm_4.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="conv2d\data\conv2d_5.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="bnorm\data\bnorm_5.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="mpool2d\data\maxpool2d_2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="reducemax\data\reducemax_0.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="reducemax\reducemax.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gru\gru.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gru\data\gru_0_forward.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gru\gru_settings.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gru\utils\tanh_rnnoise.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gru\utils\sigmoid.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gru\data\gru_0_backward.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gru\data\gru_1_forward.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gru\data\gru_1_backward.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gru\data\gru_0.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gru\data\gru_1.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

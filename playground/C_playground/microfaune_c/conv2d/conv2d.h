@@ -1,9 +1,10 @@
 #pragma once
-#include "conv2d_settings.h"
-#include "data/conv2d_0.h"
 
 #ifndef CONV2D_H
 #define CONV2D_H
+
+#include "conv2d_settings.h"
+#include "data/conv2d_0.h"
 
 
 template <int C_IN_LINES, int C_IN_COLS, int C_OUT_LINES, int C_OUT_COLS>

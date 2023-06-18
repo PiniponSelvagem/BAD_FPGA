@@ -1,10 +1,10 @@
 #pragma once
-#include "bnorm_settings.h"
-
-#include <math.h>
 
 #ifndef BNORM_H
 #define BNORM_H
+
+#include "bnorm_settings.h"
+#include <math.h>
 
 template <int BN_LINES, int BN_COLS>
 void bnorm(

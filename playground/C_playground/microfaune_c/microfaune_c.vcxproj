@@ -128,11 +128,20 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="conv2d\conv2d.cpp" />
+    <ClCompile Include="gru\gru.cpp" />
     <ClCompile Include="input\input.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="gru\data\gru_0.h" />
+    <ClInclude Include="gru\data\gru_0_backward.h" />
+    <ClInclude Include="gru\data\gru_1.h" />
+    <ClInclude Include="gru\data\gru_1_forward.h" />
+    <ClInclude Include="gru\data\gru_1_backward.h" />
+    <ClInclude Include="gru\gru_settings.h" />
     <ClInclude Include="bnorm\bnorm.h" />
+    <ClInclude Include="bnorm\data\bnorm_5.h" />
+    <ClInclude Include="bnorm\data\bnorm_4.h" />
     <ClInclude Include="bnorm\data\bnorm_3.h" />
     <ClInclude Include="bnorm\data\bnorm_2.h" />
     <ClInclude Include="bnorm\data\bnorm_1.h" />
@@ -140,6 +149,8 @@
     <ClInclude Include="bnorm\data\bnorm_0.h" />
     <ClInclude Include="bnorm\data\bnorm_0_outex.h" />
     <ClInclude Include="conv2d\conv2d.h" />
+    <ClInclude Include="conv2d\data\conv2d_5.h" />
+    <ClInclude Include="conv2d\data\conv2d_4.h" />
     <ClInclude Include="conv2d\data\conv2d_3.h" />
     <ClInclude Include="conv2d\data\conv2d_1.h" />
     <ClInclude Include="conv2d\data\conv2d_0.h" />
@@ -147,10 +158,17 @@
     <ClInclude Include="conv2d\data\conv2d_0_outex.h" />
     <ClInclude Include="conv2d\data\conv2d_2.h" />
     <ClInclude Include="global_settings.h" />
+    <ClInclude Include="gru\data\gru_0_forward.h" />
+    <ClInclude Include="gru\gru.h" />
+    <ClInclude Include="gru\utils\sigmoid.h" />
+    <ClInclude Include="gru\utils\tanh_rnnoise.h" />
     <ClInclude Include="input\input.h" />
     <ClInclude Include="mpool2d\data\maxpool2d_0.h" />
     <ClInclude Include="mpool2d\maxpool2d.h" />
     <ClInclude Include="mpool2d\data\maxpool2d_1.h" />
+    <ClInclude Include="mpool2d\data\maxpool2d_2.h" />
+    <ClInclude Include="reducemax\data\reducemax_0.h" />
+    <ClInclude Include="reducemax\reducemax.h" />
     <ClInclude Include="types.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

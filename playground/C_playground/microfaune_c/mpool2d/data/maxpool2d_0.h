@@ -1,9 +1,10 @@
 #pragma once
-#include "../../global_settings.h"
-#include "../../bnorm/data/bnorm_1.h"
 
 #ifndef MP2D_0_H
 #define MP2D_0_H
+
+#include "../../global_settings.h"
+#include "../../bnorm/data/bnorm_1.h"
 
 #define MP2D_0__RAW_IN_LINES     BNORM_1__RAW_OUT_LINES
 #define MP2D_0__RAW_IN_COLS      BNORM_1__RAW_OUT_COLS

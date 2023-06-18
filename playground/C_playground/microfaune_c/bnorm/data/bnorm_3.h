@@ -1,13 +1,14 @@
 #pragma once
-#include "../../global_settings.h"
-#include "../bnorm_settings.h"
-#include "../../conv2d/data/conv2d_3.h"
 
 #ifndef BNORM_3_H
 #define BNORM_3_H
 
-#define BNORM_3__RAW_IN_LINES     C2D_2__RAW_IN_LINES
-#define BNORM_3__RAW_IN_COLS      C2D_2__RAW_IN_COLS
+#include "../../global_settings.h"
+#include "../bnorm_settings.h"
+#include "../../conv2d/data/conv2d_3.h"
+
+#define BNORM_3__RAW_IN_LINES     C2D_3__RAW_IN_LINES
+#define BNORM_3__RAW_IN_COLS      C2D_3__RAW_IN_COLS
 #define BNORM_3__RAW_OUT_LINES    BNORM_3__RAW_IN_LINES
 #define BNORM_3__RAW_OUT_COLS     BNORM_3__RAW_IN_COLS
 

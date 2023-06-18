@@ -1,11 +1,12 @@
 #pragma once
+
+#ifndef BNORM_0_H
+#define BNORM_0_H
+
 #include "../../global_settings.h"
 #include "../bnorm_settings.h"
 #include "../../input/input.h"
 #include "../../conv2d/data/conv2d_0.h"
-
-#ifndef BNORM_0_H
-#define BNORM_0_H
 
 #define BNORM_0__RAW_IN_LINES     C2D_0__RAW_IN_LINES
 #define BNORM_0__RAW_IN_COLS      C2D_0__RAW_IN_COLS

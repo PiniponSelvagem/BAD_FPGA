@@ -1,10 +1,10 @@
 #pragma once
-#include "../conv2d_settings.h"
-#include "conv2d_0.h"
 
 #ifndef CONV2D_0_OUTEX_H
 #define CONV2D_0_OUTEX_H
 
+#include "../conv2d_settings.h"
+#include "conv2d_0.h"
 
 /**
  * @brief This was taken from "dump_io/1_a_bird__1__conv2d.json". (Channels first)

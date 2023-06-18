@@ -1,10 +1,10 @@
 #pragma once
-#include "../bnorm_settings.h"
-#include "bnorm_0.h"
 
 #ifndef BNORM_0_OUTEX_H
 #define BNORM_0_OUTEX_H
 
+#include "../bnorm_settings.h"
+#include "bnorm_0.h"
 
 /**
  * @brief This was taken from "dump_io/1_a_bird__3__re_lu.json". (Channels first)

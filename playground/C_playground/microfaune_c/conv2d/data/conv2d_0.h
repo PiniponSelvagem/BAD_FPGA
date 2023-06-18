@@ -1,10 +1,11 @@
 #pragma once
-#include "../../global_settings.h"
-#include "../conv2d_settings.h"
-#include "../../input/input.h"
 
 #ifndef CONV2D_0_H
 #define CONV2D_0_H
+
+#include "../../global_settings.h"
+#include "../conv2d_settings.h"
+#include "../../input/input.h"
 
 #define C2D_0__RAW_IN_LINES     INPUT_LINES
 #define C2D_0__RAW_IN_COLS      INPUT_COLS

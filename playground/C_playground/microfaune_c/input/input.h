@@ -1,9 +1,10 @@
 #pragma once
-#include "../global_settings.h"
-#include "../types.h"
 
 #ifndef INPUT_H
 #define INPUT_H
+
+#include "../global_settings.h"
+#include "../types.h"
 
 #define INPUT_LINES  431
 #define INPUT_COLS   40
