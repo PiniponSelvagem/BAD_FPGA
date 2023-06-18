@@ -5,8 +5,9 @@
 
 #include "gru_0.h"
 
-// dump_weights_bias.json (channel last)
-
+/**
+ * @brief This was taken from "model_json__channel_last/dump_weights_bias.json". (Channels last)
+*/
 const gru_t kernel_gru0_f[GRU_0__KERNEL_LINES][GRU_0__KERNEL_COLS] = {
     {
         0.09328797459602356,
@@ -12425,6 +12426,9 @@ const gru_t kernel_gru0_f[GRU_0__KERNEL_LINES][GRU_0__KERNEL_COLS] = {
         -0.009667876176536083
     }
 };
+/**
+ * @brief This was taken from "model_json__channel_last/dump_weights_bias.json". (Channels last)
+*/
 const gru_t recurrent_kernel_gru0_f[GRU_0__KERNEL_LINES][GRU_0__KERNEL_COLS] = {
     {
         0.02673882246017456,
@@ -24844,6 +24848,9 @@ const gru_t recurrent_kernel_gru0_f[GRU_0__KERNEL_LINES][GRU_0__KERNEL_COLS] = {
     }
 };
 
+/**
+ * @brief This was taken from "model_json__channel_last/dump_weights_bias.json". (Channels last)
+*/
 const gru_t bias_gru0_f[GRU_0__KERNEL_COLS] = {
     -0.0007574477349407971,
     -0.013307561166584492,
@@ -25038,6 +25045,9 @@ const gru_t bias_gru0_f[GRU_0__KERNEL_COLS] = {
     -0.0165081899613142,
     -0.034136753529310226
 };
+/**
+ * @brief This was taken from "model_json__channel_last/dump_weights_bias.json". (Channels last)
+*/
 const gru_t recurrent_bias_gru0_f[GRU_0__KERNEL_COLS] = {
     -0.0007574477349407971,
     -0.013307561166584492,

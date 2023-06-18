@@ -24,12 +24,12 @@ void reducemax_0(
     }
 }
 
-template <int RM_IN_COLS>
-void reducemax_1(reducemax_t input[RM_IN_COLS], reducemax_t output[1]) {
+template <int RM_IN_LINES>
+void reducemax_1(reducemax_t input[RM_IN_LINES], reducemax_t output[1]) {
     reducemax_t maxval = INT_MIN;
-    for (int col = 0; col < RM_IN_COLS; ++col) {
-        if (input[col] > maxval) {
-            maxval = input[col];
+    for (int row = 0; row < RM_IN_LINES; ++row) {
+        if (input[row] > maxval) {
+            maxval = input[row];
         }
     }
     output[0] = maxval;

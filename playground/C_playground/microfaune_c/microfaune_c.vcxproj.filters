@@ -27,6 +27,9 @@
     <ClCompile Include="gru\gru.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="timedist\timedist.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="input\input.h">
@@ -44,13 +47,7 @@
     <ClInclude Include="conv2d\conv2d.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="conv2d\data\conv2d_0_outex.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="bnorm\data\bnorm_0.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="bnorm\data\bnorm_0_outex.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="bnorm\bnorm.h">
@@ -119,10 +116,10 @@
     <ClInclude Include="gru\gru_settings.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="gru\utils\tanh_rnnoise.h">
+    <ClInclude Include="utils\tanh_rnnoise.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="gru\utils\sigmoid.h">
+    <ClInclude Include="utils\sigmoid.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="gru\data\gru_0_backward.h">
@@ -138,6 +135,27 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="gru\data\gru_1.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="timedist\data\timedist_0.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="timedist\timedist.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="timedist\timedist_settings.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="timedist\data\timedist_1.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\activation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="reducemax\data\reducemax_1.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="z_outputexpected\dataout_0.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

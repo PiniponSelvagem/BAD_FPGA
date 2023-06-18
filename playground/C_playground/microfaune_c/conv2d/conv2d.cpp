@@ -5,7 +5,7 @@
 template <int C_IN_LINES, int C_IN_COLS, int C_OUT_LINES, int C_OUT_COLS>
 void conv2d(
     const conv_t input[C_IN_LINES][C_IN_COLS],
-    const conv_t weights[C2D_KERNEL_LINES][C2D_KERNEL_COLS],
+    const conv_t kernel[C2D_KERNEL_LINES][C2D_KERNEL_COLS],
     const conv_t bias,
     conv_t output[C_OUT_LINES][C_OUT_COLS]
 ) {
@@ -15,7 +15,7 @@ void conv2d(
             conv_t acc_sat;
             for (int krow = 0; krow < C2D_KERNEL_LINES; ++krow) {
                 for (int kcol = 0; kcol < C2D_KERNEL_COLS; ++kcol) {
-                    acc += weights[krow][kcol] * input[orow + krow - PADDING_OFFSET][ocol + kcol - PADDING_OFFSET];
+                    acc += kernel[krow][kcol] * input[orow + krow - PADDING_OFFSET][ocol + kcol - PADDING_OFFSET];
                 }
             }
 

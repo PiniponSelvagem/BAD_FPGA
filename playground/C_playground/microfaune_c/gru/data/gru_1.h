@@ -8,8 +8,10 @@
 
 #define GRU_1__IN_LINES         GRU_0__OUT_LINES
 #define GRU_1__IN_COLS          GRU_0__OUT_COLS
+#define GRU_1__IN_COLS_BACK     (GRU_0__OUT_COLS/2)
 #define GRU_1__OUT_LINES        GRU_1__IN_LINES
-#define GRU_1__OUT_COLS         GRU_1__IN_COLS          // mantains the output size of 128
+#define GRU_1__OUT_COLS         GRU_1__IN_COLS       // mantains the output size of 128
+#define GRU_1__OUT_COLS_BACK    GRU_1__IN_COLS_BACK  // stops after 64
 
 #define GRU_1__KERNEL_LINES     GRU_1__IN_COLS
 #define GRU_1__KERNEL_COLS      ((GRU_1__IN_COLS/2)*3)

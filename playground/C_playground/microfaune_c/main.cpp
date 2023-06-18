@@ -8,6 +8,7 @@
 #include "mpool2d/maxpool2d.h"
 #include "reducemax/reducemax.h"
 #include "gru/gru.h"
+#include "timedist/timedist.h"
 
 
 /* 0 */
@@ -48,6 +49,13 @@
 #include "gru/data/gru_1_forward.h"
 #include "gru/data/gru_1_backward.h"
 
+/* 9 */
+#include "timedist/data/timedist_0.h"
+#include "timedist/data/timedist_1.h"
+
+/* 10 */
+#include "reducemax/data/reducemax_1.h"
+
 
 
 void special_print(float out, float difference, float exp) {
@@ -66,10 +74,6 @@ void special_print(float out, float difference, float exp) {
     printf(" %15.12f | %15s | %15.12f\n", out, difference_str, exp);
 }
 
-
-#define OUT_MAX_PRINT   3
-#include "conv2d/data/conv2d_0_outex.h"
-#include "bnorm/data/bnorm_0_outex.h"
 
 /* 0,1 */
 float inputpad[C2D_0__IN_LINES][C2D_0__IN_COLS] = { 0 };
@@ -97,6 +101,12 @@ float outgru_0[GRU_0__OUT_LINES][GRU_0__OUT_COLS] = { 0.0 };
 /* 8 */
 float outgru_1[GRU_1__OUT_LINES][GRU_1__OUT_COLS] = { 0.0 };
 
+/* 9 */
+float outtd_0[INPUT_LINES][TD_0__OUT_COLS] = { 0.0 };
+float outtd_1[INPUT_LINES][TD_1__OUT_COLS] = { 0.0 };
+
+/* 10 */
+float output[] = { 0 };
 
 
 void predict(const input_t input[INPUT_LINES][INPUT_COLS]/*, output_t output*/) {
@@ -263,68 +273,52 @@ void predict(const input_t input[INPUT_LINES][INPUT_COLS]/*, output_t output*/) 
     // GRU 1 (backward)
     gru_clearState();
     for (int i = GRU_1__IN_LINES-1; i >= 0; --i) {
-        for (int idx = 0; idx < GRU_1__IN_COLS; ++idx) {
+        for (int idx = 0; idx < GRU_1__IN_COLS_BACK; ++idx) {
             gru<GRU_1__IN_COLS, GRU_1__KERNEL_LINES, GRU_1__KERNEL_COLS, GRU_1__KERNEL_R_LINES, GRU_1__KERNEL_R_COLS, GRU_1__BIAS_SIZE>
                 (idx, outgru_0[i], kernel_gru1_b, bias_gru1_b, recurrent_kernel_gru1_b, recurrent_bias_gru1_b, &outgru_1[i][idx+64]);
         }
         gru_syncState();
     }
 
-
+    /* 9 */
+    // TimeDistribution 0 (Dense)
+    for (int i = 0; i < INPUT_LINES; ++i) {
+        timedistributed_dense<TD_0__IN_LINES, TD_0__IN_COLS, TD_0__KERNEL_LINES, TD_0__KERNEL_COLS, TD_0__BIAS_SIZE, TD_0__OUT_LINES, TD_0__OUT_COLS>
+            (outgru_1[i], kernel_td0, bias_td0, outtd_0[i]);
+    }
+    // TimeDistribution 1 (Dense)
+    for (int i = 0; i < INPUT_LINES; ++i) {
+        timedistributed_dense<TD_1__IN_LINES, TD_1__IN_COLS, TD_1__KERNEL_LINES, TD_1__KERNEL_COLS, TD_1__BIAS_SIZE, TD_1__OUT_LINES, TD_1__OUT_COLS>
+            (outtd_0[i], kernel_td1, bias_td1, outtd_1[i]);
+    }
     
-
-
-
-    printf("      OUTPUT\n");
-    for (int outter = 63; outter < 64; ++outter) {
-        printf("[%3d] ##############################################\n", outter);
-        for (int i = 0; i < 431; ++i) {
-            bnorm_t out = out_rmax0[outter][i];
-            special_print(out, 0, 0);
-        }
-        printf("\n");
-    }
-
-
-    /*
-    // Print the output values
-    printf("      OUTPUT            --VS--            EXPECTED\n");
-    for (int i = 1; i < (40+1); ++i) {
-        bnorm_t out = outpad_c[0][1][i];
-        bnorm_t exp = expt[i - 1];
-        bnorm_t difference = out - exp;
-        //printf(" %15.12f | %7.4f | %15.12f\n", out, difference, exp);
-        special_print(out, difference, exp);
-    }
-    */
-
-    /*
-    // Print the output values
-    printf("      OUTPUT            --VS--            EXPECTED\n");
-    for (int outter = 1; outter < OUT_MAX_PRINT; ++outter) {
-        printf("[%3d] ##############################################\n", outter);
-        for (int i = 1; i < INPUT_COLS; ++i) {
-            bnorm_t out = outputpad[0][outter][i];
-            bnorm_t exp = bnorm_output_expected_channel0[outter - 1][i - 1];
-            bnorm_t difference = out - exp;
-            //printf(" %15.12f | %7.4f | %15.12f\n", out, difference, exp);
-            special_print(out, difference, exp);
-        }
-        printf("\n");
-    }
-    */
+    /* 10 */
+    reducemax_1<RMAX_1__IN_LINES>(*outtd_1, output);
 }
 
 
 
-
-
-
-
-
+#include "z_outputexpected/dataout_0.h"
 int main() {
 
     predict(input);
-        
+    
+    printf("LOCAL SCORE:\n");
+    printf("      OUTPUT            --VS--            EXPECTED\n");
+    for (int i = 0; i < INPUT_LINES; ++i) {
+        for (int j = 0; j < 1; ++j) {
+            bnorm_t out = outtd_1[i][j];
+            bnorm_t exp = dataoutexp_0_local[i][j];
+            bnorm_t difference = out - exp;
+            special_print(out, difference, exp);
+        }
+    }
+
+    printf("GLOBAL SCORE:\n");
+    output_t out = output[0];
+    output_t exp = dataoutexp_0_global[0];
+    output_t difference = out - exp;
+    special_print(out, difference, exp);
+
     return 0;
 }

@@ -11,4 +11,4 @@
 #define RMAX_0__OUT_LINES    CHANNELS
 #define RMAX_0__OUT_COLS     RMAX_0__IN_LINES
 
-#endif // MPV2D_0_H
+#endif // RMAX_0_H

@@ -11,6 +11,7 @@
     typedef float mpool_t;
     typedef float reducemax_t;
     typedef float gru_t;
+    typedef float timedist_t;
 
     typedef float output_t;
 #else
