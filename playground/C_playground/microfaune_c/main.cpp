@@ -127,13 +127,13 @@ void predict(const input_t input[INPUT_LINES][INPUT_COLS]/*, output_t output*/) 
 
     /* 1 */
     // Conv2D
-    for (int c = 0; c < CHANNELS; ++c) {
-        conv_t biasVal = bias_1[c];
-        int f = 0;
-        conv2d<C2D_1__IN_LINES, C2D_1__IN_COLS, C2D_1__OUT_LINES, C2D_1__OUT_COLS>(outpad_01_b[f], kernel_1[f][c], biasVal, outpad_01_a[c]);
-        ++f;
-        for (; f < FILTERS; ++f) {
-            conv2d_multi<C2D_1__IN_LINES, C2D_1__IN_COLS, C2D_1__OUT_LINES, C2D_1__OUT_COLS>(outpad_01_b[f], outpad_01_a[c], kernel_1[f][c], 0, outpad_01_a[c]);
+    for (int f = 0; f < FILTERS; ++f) {
+        conv_t biasVal = bias_1[f];
+        int c = 0;
+        conv2d<C2D_1__IN_LINES, C2D_1__IN_COLS, C2D_1__OUT_LINES, C2D_1__OUT_COLS>(outpad_01_b[c], kernel_1[c][f], biasVal, outpad_01_a[f]);
+        ++c;
+        for (; c < CHANNELS; ++c) {
+            conv2d_multi<C2D_1__IN_LINES, C2D_1__IN_COLS, C2D_1__OUT_LINES, C2D_1__OUT_COLS>(outpad_01_b[c], outpad_01_a[f], kernel_1[c][f], 0, outpad_01_a[f]);
         }
     }
     // BatchNormalization
@@ -147,13 +147,13 @@ void predict(const input_t input[INPUT_LINES][INPUT_COLS]/*, output_t output*/) 
 
     /* 2 */
     // Conv2D
-    for (int c = 0; c < CHANNELS; ++c) {
-        conv_t biasVal = bias_2[c];
-        int f = 0;
-        conv2d<C2D_2__IN_LINES, C2D_2__IN_COLS, C2D_2__OUT_LINES, C2D_2__OUT_COLS>(outpad_23_a[f], kernel_2[f][c], biasVal, outpad_23_b[c]);
-        ++f;
-        for (; f < FILTERS; ++f) {
-            conv2d_multi<C2D_2__IN_LINES, C2D_2__IN_COLS, C2D_2__OUT_LINES, C2D_2__OUT_COLS>(outpad_23_a[f], outpad_23_b[c], kernel_2[f][c], 0, outpad_23_b[c]);
+    for (int f = 0; f < FILTERS; ++f) {
+        conv_t biasVal = bias_2[f];
+        int c = 0;
+        conv2d<C2D_2__IN_LINES, C2D_2__IN_COLS, C2D_2__OUT_LINES, C2D_2__OUT_COLS>(outpad_23_a[c], kernel_2[c][f], biasVal, outpad_23_b[f]);
+        ++c;
+        for (; c < CHANNELS; ++c) {
+            conv2d_multi<C2D_2__IN_LINES, C2D_2__IN_COLS, C2D_2__OUT_LINES, C2D_2__OUT_COLS>(outpad_23_a[c], outpad_23_b[f], kernel_2[c][f], 0, outpad_23_b[f]);
         }
     }
     // BatchNormalization
@@ -163,13 +163,13 @@ void predict(const input_t input[INPUT_LINES][INPUT_COLS]/*, output_t output*/) 
 
     /* 3 */
     // Conv2D
-    for (int c = 0; c < CHANNELS; ++c) {
-        conv_t biasVal = bias_3[c];
-        int f = 0;
-        conv2d<C2D_3__IN_LINES, C2D_3__IN_COLS, C2D_3__OUT_LINES, C2D_3__OUT_COLS>(outpad_23_a[f], kernel_3[f][c], biasVal, outpad_23_b[c]);
-        ++f;
-        for (; f < FILTERS; ++f) {
-            conv2d_multi<C2D_3__IN_LINES, C2D_3__IN_COLS, C2D_3__OUT_LINES, C2D_3__OUT_COLS>(outpad_23_a[f], outpad_23_b[c], kernel_3[f][c], 0, outpad_23_b[c]);
+    for (int f = 0; f < FILTERS; ++f) {
+        conv_t biasVal = bias_3[f];
+        int c = 0;
+        conv2d<C2D_3__IN_LINES, C2D_3__IN_COLS, C2D_3__OUT_LINES, C2D_3__OUT_COLS>(outpad_23_a[c], kernel_3[c][f], biasVal, outpad_23_b[f]);
+        ++c;
+        for (; c < CHANNELS; ++c) {
+            conv2d_multi<C2D_3__IN_LINES, C2D_3__IN_COLS, C2D_3__OUT_LINES, C2D_3__OUT_COLS>(outpad_23_a[c], outpad_23_b[f], kernel_3[c][f], 0, outpad_23_b[f]);
         }
     }
     // BatchNormalization
@@ -183,13 +183,13 @@ void predict(const input_t input[INPUT_LINES][INPUT_COLS]/*, output_t output*/) 
 
     /* 4 */
     // Conv2D
-    for (int c = 0; c < CHANNELS; ++c) {
-        conv_t biasVal = bias_4[c];
-        int f = 0;
-        conv2d<C2D_4__IN_LINES, C2D_4__IN_COLS, C2D_4__OUT_LINES, C2D_4__OUT_COLS>(outpad_45_a[f], kernel_4[f][c], biasVal, outpad_45_b[c]);
-        ++f;
-        for (; f < FILTERS; ++f) {
-            conv2d_multi<C2D_4__IN_LINES, C2D_4__IN_COLS, C2D_4__OUT_LINES, C2D_4__OUT_COLS>(outpad_45_a[f], outpad_45_b[c], kernel_4[f][c], 0, outpad_45_b[c]);
+    for (int f = 0; f < FILTERS; ++f) {
+        conv_t biasVal = bias_4[f];
+        int c = 0;
+        conv2d<C2D_4__IN_LINES, C2D_4__IN_COLS, C2D_4__OUT_LINES, C2D_4__OUT_COLS>(outpad_45_a[c], kernel_4[c][f], biasVal, outpad_45_b[f]);
+        ++c;
+        for (; c < CHANNELS; ++c) {
+            conv2d_multi<C2D_4__IN_LINES, C2D_4__IN_COLS, C2D_4__OUT_LINES, C2D_4__OUT_COLS>(outpad_45_a[c], outpad_45_b[f], kernel_4[c][f], 0, outpad_45_b[f]);
         }
     }
     // BatchNormalization
@@ -199,13 +199,13 @@ void predict(const input_t input[INPUT_LINES][INPUT_COLS]/*, output_t output*/) 
 
     /* 5 */
     // Conv2D
-    for (int c = 0; c < CHANNELS; ++c) {
-        conv_t biasVal = bias_5[c];
-        int f = 0;
-        conv2d<C2D_5__IN_LINES, C2D_5__IN_COLS, C2D_5__OUT_LINES, C2D_5__OUT_COLS>(outpad_45_a[f], kernel_5[f][c], biasVal, outpad_45_b[c]);
-        ++f;
-        for (; f < FILTERS; ++f) {
-            conv2d_multi<C2D_5__IN_LINES, C2D_5__IN_COLS, C2D_5__OUT_LINES, C2D_5__OUT_COLS>(outpad_45_a[f], outpad_45_b[c], kernel_5[f][c], 0, outpad_45_b[c]);
+    for (int f = 0; f < FILTERS; ++f) {
+        conv_t biasVal = bias_5[f];
+        int c = 0;
+        conv2d<C2D_5__IN_LINES, C2D_5__IN_COLS, C2D_5__OUT_LINES, C2D_5__OUT_COLS>(outpad_45_a[c], kernel_5[c][f], biasVal, outpad_45_b[f]);
+        ++c;
+        for (; c < CHANNELS; ++c) {
+            conv2d_multi<C2D_5__IN_LINES, C2D_5__IN_COLS, C2D_5__OUT_LINES, C2D_5__OUT_COLS>(outpad_45_a[c], outpad_45_b[f], kernel_5[c][f], 0, outpad_45_b[f]);
         }
     }
     // BatchNormalization

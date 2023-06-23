@@ -28,3 +28,9 @@ __pycache__/
 /playground/python_playground/gru/debug_tanh_hh_output.txt
 /1_vitis_hls/cnn_rnn/.apc/
 /1_vitis_hls/cnn_rnn/.settings/
+/1_vitis_hls/cnn_rnn/cnn_rnn/impl/
+/1_vitis_hls/cnn_rnn/cnn_rnn/.autopilot/
+/playground/C_playground/.vs
+/playground/C_playground/Conv2D/x64/
+/playground/C_playground/x64/
+/playground/C_playground/microfaune_c/x64/
