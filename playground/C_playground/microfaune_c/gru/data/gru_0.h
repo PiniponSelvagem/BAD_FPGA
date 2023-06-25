@@ -6,8 +6,8 @@
 #include "../gru_settings.h"
 #include "../../reducemax/data/reducemax_0.h"
 
-#define GRU_0__IN_LINES         RMAX_0__OUT_COLS
-#define GRU_0__IN_COLS          RMAX_0__OUT_LINES
+#define GRU_0__IN_LINES         RMAX_0__OUT_LINES
+#define GRU_0__IN_COLS          RMAX_0__OUT_COLS
 #define GRU_0__OUT_LINES        GRU_0__IN_LINES
 #define GRU_0__OUT_COLS         (GRU_0__IN_COLS*2)
 

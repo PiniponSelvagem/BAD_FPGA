@@ -14,7 +14,7 @@
 #define MP2D_2__IN_LINES         (MP2D_2__RAW_IN_LINES + PADDING)
 #define MP2D_2__IN_COLS          (MP2D_2__RAW_IN_COLS + PADDING)
 
-#define MP2D_2__OUT_LINES        (MP2D_2__RAW_OUT_LINES + PADDING)
-#define MP2D_2__OUT_COLS         (MP2D_2__RAW_OUT_COLS + PADDING)
+#define MP2D_2__OUT_LINES        (MP2D_2__RAW_OUT_LINES)
+#define MP2D_2__OUT_COLS         (MP2D_2__RAW_OUT_COLS)
 
 #endif // MPV2D_2_H

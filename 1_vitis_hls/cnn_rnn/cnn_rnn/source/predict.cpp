@@ -2,16 +2,38 @@
 
 #include "conv2d/conv2d.h"
 #include "bnorm/bnorm.h"
+#include "mpool2d/maxpool2d.h"
+#include "reducemax/reducemax.h"
 
 /* 0 */
 #include "conv2d/data/conv2d_0.h"
 #include "bnorm/data/bnorm_0.h"
-#include "mpool2d/maxpool2d.h"
 
 /* 1 */
 #include "conv2d/data/conv2d_1.h"
 #include "bnorm/data/bnorm_1.h"
 #include "mpool2d/data/maxpool2d_0.h"
+
+/* 2 */
+#include "conv2d/data/conv2d_2.h"
+#include "bnorm/data/bnorm_2.h"
+
+/* 3 */
+#include "conv2d/data/conv2d_3.h"
+#include "bnorm/data/bnorm_3.h"
+#include "mpool2d/data/maxpool2d_1.h"
+
+/* 4 */
+#include "conv2d/data/conv2d_4.h"
+#include "bnorm/data/bnorm_4.h"
+
+/* 5 */
+#include "conv2d/data/conv2d_5.h"
+#include "bnorm/data/bnorm_5.h"
+#include "mpool2d/data/maxpool2d_2.h"
+
+/* 6 */
+#include "reducemax/data/reducemax_0.h"
 
 
 /* 0,1 */
@@ -20,17 +42,28 @@ conv_t  outpad_01_a[CHANNELS][C2D_0__OUT_LINES][C2D_0__OUT_COLS] = { 0 };
 conv_t  outpad_01_b[CHANNELS][C2D_0__OUT_LINES][C2D_0__OUT_COLS] = { 0 };
 
 /* 2,3 */
-//conv_t  outpad_23_a[CHANNELS][MP2D_0__OUT_LINES][MP2D_0__OUT_COLS] = { 0 };
+conv_t  outpad_23_a[CHANNELS][MP2D_0__OUT_LINES][MP2D_0__OUT_COLS] = { 0 };
 conv_t  outpad_23_b[CHANNELS][MP2D_0__OUT_LINES][MP2D_0__OUT_COLS] = { 0 };
 
+/* 4,5 */
+conv_t  outpad_45_a[CHANNELS][MP2D_1__OUT_LINES][MP2D_1__OUT_COLS] = { 0 };
+conv_t  outpad_45_b[CHANNELS][MP2D_1__OUT_LINES][MP2D_1__OUT_COLS] = { 0 };
+// transition array with removed padding
+mpool_t outpad_45_nopad[CHANNELS][MP2D_2__OUT_LINES][MP2D_2__OUT_COLS] = { 0 };
 
-void predict(const input_t input[INPUT_LINES][INPUT_COLS], conv_t outpad_23_a[CHANNELS][MP2D_0__OUT_LINES][MP2D_0__OUT_COLS]) {
+/* 6 */
+float out_rmax0[RMAX_0__OUT_LINES][RMAX_0__OUT_COLS] = { 0 };
+
+
+void predict(const input_t input[INPUT_LINES][INPUT_COLS], conv_t out_rmax0[RMAX_0__OUT_LINES][RMAX_0__OUT_COLS]) {
 #pragma HLS INTERFACE s_axilite port=input bundle=BUS1
-#pragma HLS INTERFACE s_axilite port=outpad_23_a bundle=BUS1
+#pragma HLS INTERFACE s_axilite port=outpad_45_trans bundle=BUS1
 #pragma HLS INTERFACE s_axilite port=return bundle=BUS1
 
 #pragma HLS ARRAY_PARTITION variable=inputpad type=cyclic factor=4 DIM=0
 #pragma HLS ARRAY_PARTITION variable=outpad_01_b type=cyclic factor=4 DIM=0
+#pragma HLS ARRAY_PARTITION variable=outpad_23_a type=cyclic factor=4 DIM=0
+#pragma HLS ARRAY_PARTITION variable=outpad_45_a type=cyclic factor=4 DIM=0
 
     input_preconv2d(input, inputpad);
 
@@ -67,7 +100,6 @@ void predict(const input_t input[INPUT_LINES][INPUT_COLS], conv_t outpad_23_a[CH
 #pragma HLS PIPELINE off
             conv2d_multi<C2D_1__IN_LINES, C2D_1__IN_COLS, C2D_1__OUT_LINES, C2D_1__OUT_COLS>(outpad_01_b[c], outpad_01_a[f], kernel_1[c][f], outpad_01_a[f]);
         }
-        break;
     }
     // BatchNormalization
     P_BNORM_1: for (int c = 0; c < CHANNELS; ++c) {    // BATCH NORMALIZATION + RELU
@@ -75,8 +107,92 @@ void predict(const input_t input[INPUT_LINES][INPUT_COLS], conv_t outpad_23_a[CH
     }
     // MaxPool2D
     P_MAXPOOL_0: for (int c = 0; c < CHANNELS; ++c) {    /* 0 */
-        maxpool2d<MP2D_0__IN_LINES, MP2D_0__IN_COLS, MP2D_0__OUT_LINES, MP2D_0__OUT_COLS>(outpad_01_b[c], outpad_23_a[c]);
+        maxpool2d<MP2D_0__IN_LINES, MP2D_0__IN_COLS, MP2D_0__OUT_LINES, MP2D_0__OUT_COLS, PADDING_OFFSET>(outpad_01_b[c], outpad_23_a[c]);
     }
+
+     /* 2 */
+    // Conv2D
+    P_CONV_2: for (int f = 0; f < FILTERS; ++f) {
+#pragma HLS PIPELINE off
+        conv_t biasVal = bias_2[f];
+        int c = 0;
+        conv2d<C2D_2__IN_LINES, C2D_2__IN_COLS, C2D_2__OUT_LINES, C2D_2__OUT_COLS>(outpad_23_a[c], kernel_2[c][f], biasVal, outpad_23_b[f]);
+        ++c;
+        P_CONV_2_M: for (; c < CHANNELS; ++c) {
+#pragma HLS PIPELINE off
+            conv2d_multi<C2D_2__IN_LINES, C2D_2__IN_COLS, C2D_2__OUT_LINES, C2D_2__OUT_COLS>(outpad_23_a[c], outpad_23_b[f], kernel_2[c][f], outpad_23_b[f]);
+        }
+    }
+    // BatchNormalization
+    P_BNORM_2: for (int c = 0; c < CHANNELS; ++c) {    // BATCH NORMALIZATION + RELU
+        bnorm<BNORM_2__IN_LINES, BNORM_2__IN_COLS>(outpad_23_b[c], gamma_2[c], beta_2[c], movingmean_2[c], movingvariance_2[c], outpad_23_a[c]);
+    }
+
+    /* 3 */
+    // Conv2D
+    P_CONV_3: for (int f = 0; f < FILTERS; ++f) {
+#pragma HLS PIPELINE off
+        conv_t biasVal = bias_3[f];
+        int c = 0;
+        conv2d<C2D_3__IN_LINES, C2D_3__IN_COLS, C2D_3__OUT_LINES, C2D_3__OUT_COLS>(outpad_23_a[c], kernel_3[c][f], biasVal, outpad_23_b[f]);
+        ++c;
+        P_CONV_3_M: for (; c < CHANNELS; ++c) {
+#pragma HLS PIPELINE off
+            conv2d_multi<C2D_3__IN_LINES, C2D_3__IN_COLS, C2D_3__OUT_LINES, C2D_3__OUT_COLS>(outpad_23_a[c], outpad_23_b[f], kernel_3[c][f], outpad_23_b[f]);
+        }
+    }
+    // BatchNormalization
+    P_BNORM_3: for (int c = 0; c < CHANNELS; ++c) {    // BATCH NORMALIZATION + RELU
+        bnorm<BNORM_3__IN_LINES, BNORM_3__IN_COLS>(outpad_23_b[c], gamma_3[c], beta_3[c], movingmean_3[c], movingvariance_3[c], outpad_23_a[c]);
+    }
+    // MaxPool2D
+    P_MAXPOOL_1: for (int c = 0; c < CHANNELS; ++c) {    /* 1 */
+        maxpool2d<MP2D_1__IN_LINES, MP2D_1__IN_COLS, MP2D_1__OUT_LINES, MP2D_1__OUT_COLS, PADDING_OFFSET>(outpad_23_a[c], outpad_45_a[c]);
+    }
+
+    /* 4 */
+    // Conv2D
+    P_CONV_4: for (int f = 0; f < FILTERS; ++f) {
+#pragma HLS PIPELINE off
+        conv_t biasVal = bias_4[f];
+        int c = 0;
+        conv2d<C2D_4__IN_LINES, C2D_4__IN_COLS, C2D_4__OUT_LINES, C2D_4__OUT_COLS>(outpad_45_a[c], kernel_4[c][f], biasVal, outpad_45_b[f]);
+        ++c;
+        P_CONV_4_M: for (; c < CHANNELS; ++c) {
+#pragma HLS PIPELINE off
+            conv2d_multi<C2D_4__IN_LINES, C2D_4__IN_COLS, C2D_4__OUT_LINES, C2D_4__OUT_COLS>(outpad_45_a[c], outpad_45_b[f], kernel_4[c][f], outpad_45_b[f]);
+        }
+    }
+    // BatchNormalization
+    P_BNORM_4: for (int c = 0; c < CHANNELS; ++c) {    // BATCH NORMALIZATION + RELU
+        bnorm<BNORM_4__IN_LINES, BNORM_4__IN_COLS>(outpad_45_b[c], gamma_4[c], beta_4[c], movingmean_4[c], movingvariance_4[c], outpad_45_a[c]);
+    }
+
+    /* 5 */
+    // Conv2D
+    P_CONV_5: for (int f = 0; f < FILTERS; ++f) {
+#pragma HLS PIPELINE off
+        conv_t biasVal = bias_5[f];
+        int c = 0;
+        conv2d<C2D_5__IN_LINES, C2D_5__IN_COLS, C2D_5__OUT_LINES, C2D_5__OUT_COLS>(outpad_45_a[c], kernel_5[c][f], biasVal, outpad_45_b[f]);
+        ++c;
+        P_CONV_5_M: for (; c < CHANNELS; ++c) {
+#pragma HLS PIPELINE off
+            conv2d_multi<C2D_5__IN_LINES, C2D_5__IN_COLS, C2D_5__OUT_LINES, C2D_5__OUT_COLS>(outpad_45_a[c], outpad_45_b[f], kernel_5[c][f], outpad_45_b[f]);
+        }
+    }
+    // BatchNormalization
+    P_BNORM_5: for (int c = 0; c < CHANNELS; ++c) {    // BATCH NORMALIZATION + RELU
+        bnorm<BNORM_5__IN_LINES, BNORM_5__IN_COLS>(outpad_45_b[c], gamma_5[c], beta_5[c], movingmean_5[c], movingvariance_5[c], outpad_45_a[c]);
+    }
+    // MaxPool2D
+    P_MAXPOOL_2: for (int c = 0; c < CHANNELS; ++c) {    /* 2 */
+        maxpool2d<MP2D_2__IN_LINES, MP2D_2__IN_COLS, MP2D_2__OUT_LINES, MP2D_2__OUT_COLS, 0>(outpad_45_a[c], outpad_45_nopad[c]);
+    }
+
+    /* 6 */
+    // ReduceMax
+    reducemax_0_saveTranspose<RMAX_0__IN_LINES, RMAX_0__IN_COLS, RMAX_0__OUT_LINES, RMAX_0__OUT_COLS>(outpad_45_nopad, out_rmax0);
 }
 
 

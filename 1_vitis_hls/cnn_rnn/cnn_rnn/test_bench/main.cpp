@@ -13,8 +13,8 @@
 #define OUT_LINES   (IN_LINES+2)
 #define OUT_COLS    (IN_COLS+2)
 
-#define OUT_LINES_DEBUG   (IN_LINES+2)
-#define OUT_COLS_DEBUG    ((IN_COLS/2)+2)
+#define OUT_LINES_DEBUG   431
+#define OUT_COLS_DEBUG    64
 
 
 void special_print(float out, float difference, float exp) {
@@ -34,7 +34,7 @@ void special_print(float out, float difference, float exp) {
 }
 
 
-void predict(const input_t input[IN_LINES][IN_COLS], conv_t output[CHANNELS][OUT_LINES_DEBUG][OUT_COLS_DEBUG]);
+void predict(const input_t input[IN_LINES][IN_COLS], conv_t output[OUT_LINES_DEBUG][OUT_COLS_DEBUG]);
 
 void test_input_preconv2d(const input_t input[IN_LINES][IN_COLS], conv_t inputPad[OUT_LINES][OUT_COLS]);
 void test_conv2d_0_c0(const input_t inputPad[OUT_LINES][OUT_COLS], conv_t output[CHANNELS][OUT_LINES][OUT_COLS]);
@@ -71,9 +71,8 @@ void test_conv() {
 }
 
 
-conv_t output[CHANNELS][OUT_LINES_DEBUG][OUT_COLS_DEBUG];
+conv_t output[OUT_LINES_DEBUG][OUT_COLS_DEBUG];
 
-#define MAX_SHOW    1
 int main() {
 
     /*
@@ -85,14 +84,10 @@ int main() {
 	predict(input, output);
     printf("PREDICT END\n");
 
-    for (int c = 0; c < MAX_SHOW; ++c) {
-        printf("[%2d] ################################################\n", c);
-        for (int i = 0; i < OUT_LINES_DEBUG; ++i) {
-            printf("%3d > ", i);
-            for (int j = 0; j < OUT_COLS_DEBUG; ++j) {
-                printf(" %12.8f", output[c][i][j]);
-            }
-            printf("\n");
+    for (int i = 0; i < /*OUT_LINES_DEBUG*/3; ++i) {
+        printf("%3d > ", i);
+        for (int j = 0; j < OUT_COLS_DEBUG; ++j) {
+            printf(" %12.8f", output[i][j]);
         }
         printf("\n");
     }

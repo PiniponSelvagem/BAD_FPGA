@@ -89,12 +89,10 @@ float outpad_23_b[CHANNELS][MP2D_0__OUT_LINES][MP2D_0__OUT_COLS] = { 0 };
 float outpad_45_a[CHANNELS][MP2D_1__OUT_LINES][MP2D_1__OUT_COLS] = { 0 };
 float outpad_45_b[CHANNELS][MP2D_1__OUT_LINES][MP2D_1__OUT_COLS] = { 0 };
 // transition array to remove padding
-float outpad_45_trans[CHANNELS][MP2D_2__OUT_LINES][MP2D_2__OUT_COLS] = { 0 };
-float outpad_45_nopad[CHANNELS][MP2D_2__RAW_OUT_LINES][MP2D_2__RAW_OUT_COLS] = { 0 };
+float outpad_45_nopad[CHANNELS][MP2D_2__OUT_LINES][MP2D_2__OUT_COLS] = { 0 };
 
 /* 6 */
 float out_rmax0[RMAX_0__OUT_LINES][RMAX_0__OUT_COLS] = { 0 };
-float out_rmax0_transposed[RMAX_0__OUT_COLS][RMAX_0__OUT_LINES] = { 0.0 };
 
 /* 7 */
 float outgru_0[GRU_0__OUT_LINES][GRU_0__OUT_COLS] = { 0.0 };
@@ -140,7 +138,6 @@ void predict(
         for (; c < CHANNELS; ++c) {
             conv2d_multi<C2D_1__IN_LINES, C2D_1__IN_COLS, C2D_1__OUT_LINES, C2D_1__OUT_COLS>(outpad_01_b[c], outpad_01_a[f], kernel_1[c][f], outpad_01_a[f]);
         }
-        continue;
     }
     // BatchNormalization
     for (int c = 0; c < CHANNELS; ++c) {    // BATCH NORMALIZATION + RELU
@@ -148,7 +145,7 @@ void predict(
     }
     // MaxPool2D
     for (int c = 0; c < CHANNELS; ++c) {    /* 0 */
-        maxpool2d<MP2D_0__IN_LINES, MP2D_0__IN_COLS, MP2D_0__OUT_LINES, MP2D_0__OUT_COLS>(outpad_01_b[c], outpad_23_a[c]);
+        maxpool2d<MP2D_0__IN_LINES, MP2D_0__IN_COLS, MP2D_0__OUT_LINES, MP2D_0__OUT_COLS, PADDING_OFFSET>(outpad_01_b[c], outpad_23_a[c]);
     }
 
     /* 2 */
@@ -184,7 +181,7 @@ void predict(
     }
     // MaxPool2D
     for (int c = 0; c < CHANNELS; ++c) {    /* 1 */
-        maxpool2d<MP2D_1__IN_LINES, MP2D_1__IN_COLS, MP2D_1__OUT_LINES, MP2D_1__OUT_COLS>(outpad_23_a[c], outpad_45_a[c]);
+        maxpool2d<MP2D_1__IN_LINES, MP2D_1__IN_COLS, MP2D_1__OUT_LINES, MP2D_1__OUT_COLS, PADDING_OFFSET>(outpad_23_a[c], outpad_45_a[c]);
     }
 
     /* 4 */
@@ -219,29 +216,14 @@ void predict(
         bnorm<BNORM_5__IN_LINES, BNORM_5__IN_COLS>(outpad_45_b[c], gamma_5[c], beta_5[c], movingmean_5[c], movingvariance_5[c], outpad_45_a[c]);
     }
     // MaxPool2D
-    for (int c = 0; c < CHANNELS; ++c) {    /* 1 */
-        maxpool2d<MP2D_2__IN_LINES, MP2D_2__IN_COLS, MP2D_2__OUT_LINES, MP2D_2__OUT_COLS>(outpad_45_a[c], outpad_45_trans[c]);
-    }
-
-    /* REMOVE PADDING: Transition from CNN to RNN */
-    for (int c = 0; c < CHANNELS; ++c) {
-        for (int row = PADDING_OFFSET; row < MP2D_2__OUT_LINES; ++row) {
-            for (int col = PADDING_OFFSET; col < MP2D_2__OUT_COLS; ++col) {
-                outpad_45_nopad[c][row-1][col-1] = outpad_45_trans[c][row][col];
-            }
-        }
+    for (int c = 0; c < CHANNELS; ++c) {    /* 2 */
+        maxpool2d<MP2D_2__IN_LINES, MP2D_2__IN_COLS, MP2D_2__OUT_LINES, MP2D_2__OUT_COLS, 0>(outpad_45_a[c], outpad_45_nopad[c]);
     }
 
     /* 6 */
     // ReduceMax
-    reducemax_0<RMAX_0__IN_LINES, RMAX_0__IN_COLS, RMAX_0__OUT_LINES, RMAX_0__OUT_COLS>(outpad_45_nopad, out_rmax0);
+    reducemax_0_saveTranspose<RMAX_0__IN_LINES, RMAX_0__IN_COLS, RMAX_0__OUT_LINES, RMAX_0__OUT_COLS>(outpad_45_nopad, out_rmax0);
 
-    /* TRANSPOSE: From channel first to channel last */
-    for (int row = 0; row < RMAX_0__OUT_LINES; ++row) {
-        for (int col = 0; col < RMAX_0__OUT_COLS; ++col) {
-            out_rmax0_transposed[col][row] = out_rmax0[row][col];
-        }
-    }
 
     /*************************************/
     /**************** RNN ****************/
@@ -252,7 +234,7 @@ void predict(
     for (int i = 0; i < GRU_0__IN_LINES; ++i) {
         for (int idx = 0; idx < GRU_0__IN_COLS; ++idx) {
             gru<GRU_0__IN_COLS, GRU_0__KERNEL_LINES, GRU_0__KERNEL_COLS, GRU_0__KERNEL_R_LINES, GRU_0__KERNEL_R_COLS, GRU_0__BIAS_SIZE>
-                (idx, out_rmax0_transposed[i], kernel_gru0_f, bias_gru0_f, recurrent_kernel_gru0_f, recurrent_bias_gru0_f, &outgru_0[i][idx]);
+                (idx, out_rmax0[i], kernel_gru0_f, bias_gru0_f, recurrent_kernel_gru0_f, recurrent_bias_gru0_f, &outgru_0[i][idx]);
         }
         gru_syncState();
     }
@@ -261,7 +243,7 @@ void predict(
     for (int i = GRU_0__IN_LINES-1; i >= 0; --i) {
         for (int idx = 0; idx < GRU_0__IN_COLS; ++idx) {
             gru<GRU_0__IN_COLS, GRU_0__KERNEL_LINES, GRU_0__KERNEL_COLS, GRU_0__KERNEL_R_LINES, GRU_0__KERNEL_R_COLS, GRU_0__BIAS_SIZE>
-                (idx, out_rmax0_transposed[i], kernel_gru0_b, bias_gru0_b, recurrent_kernel_gru0_b, recurrent_bias_gru0_b, &outgru_0[i][idx+64]);
+                (idx, out_rmax0[i], kernel_gru0_b, bias_gru0_b, recurrent_kernel_gru0_b, recurrent_bias_gru0_b, &outgru_0[i][idx+64]);
         }
         gru_syncState();
     }

@@ -6,6 +6,9 @@
 #include "bnorm_settings.h"
 #include <math.h>
 
+typedef ap_uint<9> bnorm_row_t;
+typedef ap_uint<6> bnrom_col_t;
+
 template <int BN_LINES, int BN_COLS>
 void bnorm(
     const bnorm_t input[BN_LINES][BN_COLS],
@@ -15,8 +18,8 @@ void bnorm(
     const bnorm_t movingvariance,
     bnorm_t output[BN_LINES][BN_COLS]
 ) {
-    BNORM_loop_row: for (int row = PADDING_OFFSET; row < (BN_LINES - PADDING_OFFSET); ++row) {
-        BNORM_loop_col: for (int col = PADDING_OFFSET; col < (BN_COLS - PADDING_OFFSET); ++col) {
+    BNORM_loop_row: for (bnorm_row_t row = PADDING_OFFSET; row < (BN_LINES - PADDING_OFFSET); ++row) {
+        BNORM_loop_col: for (bnrom_col_t col = PADDING_OFFSET; col < (BN_COLS - PADDING_OFFSET); ++col) {
             bnorm_t normalized = (input[row][col] - movingmean) / sqrt(movingvariance + BNORM_EPSILON);
             bnorm_t out = gamma * normalized + beta;
 
