@@ -17,7 +17,7 @@ __SIM_DDS__ = 1
 
 ObjDir = obj
 
-HLS_SOURCES = ../../test_bench/tb_cnn_rnn.cpp ../../source/cnn_rnn.cpp
+HLS_SOURCES = ../../test_bench/main.cpp ../../source/predict.cpp
 
 override TARGET := csim.exe
 
@@ -73,14 +73,14 @@ all: $(TARGET)
 
 
 
-$(ObjDir)/tb_cnn_rnn.o: ../../test_bench/tb_cnn_rnn.cpp $(ObjDir)/.dir
-	$(Echo) "   Compiling ../../test_bench/tb_cnn_rnn.cpp in $(BuildMode) mode" $(AVE_DIR_DLOG)
-	$(Verb)  $(CC) ${CCFLAG} -c -MMD -Wno-unknown-pragmas -Wno-unknown-pragmas -Wno-unknown-pragmas -Wno-unknown-pragmas -Wno-unknown-pragmas -Wno-unknown-pragmas -Wno-unknown-pragmas -Wno-unknown-pragmas -Wno-unknown-pragmas -Wno-unknown-pragmas  $(IFLAG) $(DFLAG) $< -o $@ ; \
+$(ObjDir)/main.o: ../../test_bench/main.cpp $(ObjDir)/.dir
+	$(Echo) "   Compiling ../../test_bench/main.cpp in $(BuildMode) mode" $(AVE_DIR_DLOG)
+	$(Verb)  $(CC) ${CCFLAG} -c -MMD -Wno-unknown-pragmas -Wno-unknown-pragmas -Wno-unknown-pragmas  $(IFLAG) $(DFLAG) $< -o $@ ; \
 
--include $(ObjDir)/tb_cnn_rnn.d
+-include $(ObjDir)/main.d
 
-$(ObjDir)/cnn_rnn.o: ../../source/cnn_rnn.cpp $(ObjDir)/.dir
-	$(Echo) "   Compiling ../../source/cnn_rnn.cpp in $(BuildMode) mode" $(AVE_DIR_DLOG)
+$(ObjDir)/predict.o: ../../source/predict.cpp $(ObjDir)/.dir
+	$(Echo) "   Compiling ../../source/predict.cpp in $(BuildMode) mode" $(AVE_DIR_DLOG)
 	$(Verb)  $(CC) ${CCFLAG} -c -MMD  $(IFLAG) $(DFLAG) $< -o $@ ; \
 
--include $(ObjDir)/cnn_rnn.d
+-include $(ObjDir)/predict.d

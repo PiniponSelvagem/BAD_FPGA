@@ -34,3 +34,11 @@ __pycache__/
 /playground/C_playground/Conv2D/x64/
 /playground/C_playground/x64/
 /playground/C_playground/microfaune_c/x64/
+/1_vitis_hls/cnn_rnn/.settings/cnn_rnn.Debug.launch
+/1_vitis_hls/cnn_rnn/cnn_rnn/.debug
+/1_vitis_hls/cnn_rnn/cnn_rnn/.autopilot/
+/1_vitis_hls/cnn_rnn/cnn_rnn/.vscode/
+/1_vitis_hls/cnn_rnn/cnn_rnn/csim/
+/1_vitis_hls/cnn_rnn/cnn_rnn/syn/
+/1_vitis_hls/cnn_rnn/.vscode/
+/1_vitis_hls/cnn_rnn/.settings
