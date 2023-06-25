@@ -158,5 +158,8 @@
     <ClInclude Include="z_outputexpected\dataout_0.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="output\output.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

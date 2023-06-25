@@ -22,7 +22,7 @@
 /**
  * @brief This was taken from "model_json/dump_weights_bias.json". (Channels first)
 */
-const conv_t kernel_5[FILTERS][CHANNELS][C2D_KERNEL_LINES][C2D_KERNEL_COLS] = {
+const conv_t kernel_5[CHANNELS][FILTERS][C2D_KERNEL_LINES][C2D_KERNEL_COLS] = {
     {
         {
             {

@@ -2,6 +2,7 @@
 #include <string.h>
 
 #include "input/input.h"
+#include "output/output.h"
 
 #include "conv2d/conv2d.h"
 #include "bnorm/bnorm.h"
@@ -106,10 +107,14 @@ float outtd_0[INPUT_LINES][TD_0__OUT_COLS] = { 0.0 };
 float outtd_1[INPUT_LINES][TD_1__OUT_COLS] = { 0.0 };
 
 /* 10 */
-float output[] = { 0 };
+// outputLS
 
 
-void predict(const input_t input[INPUT_LINES][INPUT_COLS]/*, output_t output*/) {
+void predict(
+    const input_t input[INPUT_LINES][INPUT_COLS],
+    output_t outputLS[OUTPUT_LOCAL_SCORE_LINES][OUTPUT_LOCAL_SCORE_COLS],
+    output_t outputGS[OUTPUT_GLOBAL_SCORE])
+{
     input_preconv2d(input, inputpad);
 
     /*************************************/
@@ -133,8 +138,9 @@ void predict(const input_t input[INPUT_LINES][INPUT_COLS]/*, output_t output*/) 
         conv2d<C2D_1__IN_LINES, C2D_1__IN_COLS, C2D_1__OUT_LINES, C2D_1__OUT_COLS>(outpad_01_b[c], kernel_1[c][f], biasVal, outpad_01_a[f]);
         ++c;
         for (; c < CHANNELS; ++c) {
-            conv2d_multi<C2D_1__IN_LINES, C2D_1__IN_COLS, C2D_1__OUT_LINES, C2D_1__OUT_COLS>(outpad_01_b[c], outpad_01_a[f], kernel_1[c][f], 0, outpad_01_a[f]);
+            conv2d_multi<C2D_1__IN_LINES, C2D_1__IN_COLS, C2D_1__OUT_LINES, C2D_1__OUT_COLS>(outpad_01_b[c], outpad_01_a[f], kernel_1[c][f], outpad_01_a[f]);
         }
+        continue;
     }
     // BatchNormalization
     for (int c = 0; c < CHANNELS; ++c) {    // BATCH NORMALIZATION + RELU
@@ -153,7 +159,7 @@ void predict(const input_t input[INPUT_LINES][INPUT_COLS]/*, output_t output*/) 
         conv2d<C2D_2__IN_LINES, C2D_2__IN_COLS, C2D_2__OUT_LINES, C2D_2__OUT_COLS>(outpad_23_a[c], kernel_2[c][f], biasVal, outpad_23_b[f]);
         ++c;
         for (; c < CHANNELS; ++c) {
-            conv2d_multi<C2D_2__IN_LINES, C2D_2__IN_COLS, C2D_2__OUT_LINES, C2D_2__OUT_COLS>(outpad_23_a[c], outpad_23_b[f], kernel_2[c][f], 0, outpad_23_b[f]);
+            conv2d_multi<C2D_2__IN_LINES, C2D_2__IN_COLS, C2D_2__OUT_LINES, C2D_2__OUT_COLS>(outpad_23_a[c], outpad_23_b[f], kernel_2[c][f], outpad_23_b[f]);
         }
     }
     // BatchNormalization
@@ -169,7 +175,7 @@ void predict(const input_t input[INPUT_LINES][INPUT_COLS]/*, output_t output*/) 
         conv2d<C2D_3__IN_LINES, C2D_3__IN_COLS, C2D_3__OUT_LINES, C2D_3__OUT_COLS>(outpad_23_a[c], kernel_3[c][f], biasVal, outpad_23_b[f]);
         ++c;
         for (; c < CHANNELS; ++c) {
-            conv2d_multi<C2D_3__IN_LINES, C2D_3__IN_COLS, C2D_3__OUT_LINES, C2D_3__OUT_COLS>(outpad_23_a[c], outpad_23_b[f], kernel_3[c][f], 0, outpad_23_b[f]);
+            conv2d_multi<C2D_3__IN_LINES, C2D_3__IN_COLS, C2D_3__OUT_LINES, C2D_3__OUT_COLS>(outpad_23_a[c], outpad_23_b[f], kernel_3[c][f], outpad_23_b[f]);
         }
     }
     // BatchNormalization
@@ -189,7 +195,7 @@ void predict(const input_t input[INPUT_LINES][INPUT_COLS]/*, output_t output*/) 
         conv2d<C2D_4__IN_LINES, C2D_4__IN_COLS, C2D_4__OUT_LINES, C2D_4__OUT_COLS>(outpad_45_a[c], kernel_4[c][f], biasVal, outpad_45_b[f]);
         ++c;
         for (; c < CHANNELS; ++c) {
-            conv2d_multi<C2D_4__IN_LINES, C2D_4__IN_COLS, C2D_4__OUT_LINES, C2D_4__OUT_COLS>(outpad_45_a[c], outpad_45_b[f], kernel_4[c][f], 0, outpad_45_b[f]);
+            conv2d_multi<C2D_4__IN_LINES, C2D_4__IN_COLS, C2D_4__OUT_LINES, C2D_4__OUT_COLS>(outpad_45_a[c], outpad_45_b[f], kernel_4[c][f], outpad_45_b[f]);
         }
     }
     // BatchNormalization
@@ -205,7 +211,7 @@ void predict(const input_t input[INPUT_LINES][INPUT_COLS]/*, output_t output*/) 
         conv2d<C2D_5__IN_LINES, C2D_5__IN_COLS, C2D_5__OUT_LINES, C2D_5__OUT_COLS>(outpad_45_a[c], kernel_5[c][f], biasVal, outpad_45_b[f]);
         ++c;
         for (; c < CHANNELS; ++c) {
-            conv2d_multi<C2D_5__IN_LINES, C2D_5__IN_COLS, C2D_5__OUT_LINES, C2D_5__OUT_COLS>(outpad_45_a[c], outpad_45_b[f], kernel_5[c][f], 0, outpad_45_b[f]);
+            conv2d_multi<C2D_5__IN_LINES, C2D_5__IN_COLS, C2D_5__OUT_LINES, C2D_5__OUT_COLS>(outpad_45_a[c], outpad_45_b[f], kernel_5[c][f], outpad_45_b[f]);
         }
     }
     // BatchNormalization
@@ -289,11 +295,11 @@ void predict(const input_t input[INPUT_LINES][INPUT_COLS]/*, output_t output*/) 
     // TimeDistribution 1 (Dense)
     for (int i = 0; i < INPUT_LINES; ++i) {
         timedistributed_dense<TD_1__IN_LINES, TD_1__IN_COLS, TD_1__KERNEL_LINES, TD_1__KERNEL_COLS, TD_1__BIAS_SIZE, TD_1__OUT_LINES, TD_1__OUT_COLS>
-            (outtd_0[i], kernel_td1, bias_td1, outtd_1[i]);
+            (outtd_0[i], kernel_td1, bias_td1, outputLS[i]);
     }
     
     /* 10 */
-    reducemax_1<RMAX_1__IN_LINES>(*outtd_1, output);
+    reducemax_1<RMAX_1__IN_LINES>(*outputLS, outputGS);
 }
 
 
@@ -301,21 +307,24 @@ void predict(const input_t input[INPUT_LINES][INPUT_COLS]/*, output_t output*/) 
 #include "z_outputexpected/dataout_0.h"
 int main() {
 
-    predict(input);
+    output_t out_local[OUTPUT_LOCAL_SCORE_LINES][OUTPUT_LOCAL_SCORE_COLS] = { 0 };
+    output_t out_global[OUTPUT_GLOBAL_SCORE] = { 0 };
+
+    predict(input, out_local, out_global);
     
     printf("LOCAL SCORE:\n");
     printf("      OUTPUT            --VS--            EXPECTED\n");
-    for (int i = 0; i < INPUT_LINES; ++i) {
-        for (int j = 0; j < 1; ++j) {
-            bnorm_t out = outtd_1[i][j];
-            bnorm_t exp = dataoutexp_0_local[i][j];
-            bnorm_t difference = out - exp;
+    for (int i = 0; i < OUTPUT_LOCAL_SCORE_LINES; ++i) {
+        for (int j = 0; j < OUTPUT_LOCAL_SCORE_COLS; ++j) {
+            output_t out = out_local[i][j];
+            output_t exp = dataoutexp_0_local[i][j];
+            output_t difference = out - exp;
             special_print(out, difference, exp);
         }
     }
 
     printf("GLOBAL SCORE:\n");
-    output_t out = output[0];
+    output_t out = out_global[0];
     output_t exp = dataoutexp_0_global[0];
     output_t difference = out - exp;
     special_print(out, difference, exp);

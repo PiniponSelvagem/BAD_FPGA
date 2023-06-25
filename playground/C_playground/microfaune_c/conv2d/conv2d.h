@@ -18,11 +18,18 @@ void conv2d(
         for (int ocol = PADDING_OFFSET; ocol < (C_OUT_COLS - PADDING_OFFSET); ++ocol) {
             conv_t acc = bias;
             conv_t acc_sat;
+            for (int krow = 0, korow = orow - PADDING_OFFSET; krow < C2D_KERNEL_LINES; ++krow, korow++) {
+                for (int kcol = 0, kocol = ocol - PADDING_OFFSET; kcol < C2D_KERNEL_COLS; ++kcol, kocol++) {
+                    acc += kernel[krow][kcol] * input[korow][kocol];
+                }
+            }
+            /*
             for (int krow = 0; krow < C2D_KERNEL_LINES; ++krow) {
                 for (int kcol = 0; kcol < C2D_KERNEL_COLS; ++kcol) {
                     acc += kernel[krow][kcol] * input[orow + krow - PADDING_OFFSET][ocol + kcol - PADDING_OFFSET];
                 }
             }
+            */
 
             /*
             if (acc > 255)
@@ -42,12 +49,11 @@ void conv2d_multi(
     const conv_t input[C_IN_LINES][C_IN_COLS],
     const conv_t prev[C_IN_LINES][C_IN_COLS],
     const conv_t kernel[C2D_KERNEL_LINES][C2D_KERNEL_COLS],
-    const conv_t bias,
     conv_t output[C_OUT_LINES][C_OUT_COLS]
 ) {
     for (int orow = PADDING_OFFSET; orow < (C_OUT_LINES - PADDING_OFFSET); ++orow) {
         for (int ocol = PADDING_OFFSET; ocol < (C_OUT_COLS - PADDING_OFFSET); ++ocol) {
-            conv_t acc = bias;
+            conv_t acc = 0;
             conv_t acc_sat;
             for (int krow = 0; krow < C2D_KERNEL_LINES; ++krow) {
                 for (int kcol = 0; kcol < C2D_KERNEL_COLS; ++kcol) {

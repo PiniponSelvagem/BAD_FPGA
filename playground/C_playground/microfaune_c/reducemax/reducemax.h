@@ -25,7 +25,7 @@ void reducemax_0(
 }
 
 template <int RM_IN_LINES>
-void reducemax_1(reducemax_t input[RM_IN_LINES], reducemax_t output[1]) {
+void reducemax_1(const reducemax_t input[RM_IN_LINES], reducemax_t output[1]) {
     reducemax_t maxval = INT_MIN;
     for (int row = 0; row < RM_IN_LINES; ++row) {
         if (input[row] > maxval) {
