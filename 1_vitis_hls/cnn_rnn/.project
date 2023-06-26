@@ -27,6 +27,11 @@
 	</natures>
 	<linkedResources>
 		<link>
+			<name>ap_int_base.h</name>
+			<type>1</type>
+			<location>E:/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h</location>
+		</link>
+		<link>
 			<name>source</name>
 			<type>2</type>
 			<location>E:/Rodrigo/ISEL/2_Mestrado/2-ANO_1-sem/TFM/BAD_FPGA/1_vitis_hls/cnn_rnn/.apc/.src</location>
@@ -42,29 +47,24 @@
 			<location>E:/Rodrigo/ISEL/2_Mestrado/2-ANO_1-sem/TFM/BAD_FPGA/1_vitis_hls/cnn_rnn/cnn_rnn/.tcls</location>
 		</link>
 		<link>
-			<name>source/cnn_rnn.cpp</name>
+			<name>source/conv2d.h</name>
 			<type>1</type>
-			<location>E:/Rodrigo/ISEL/2_Mestrado/2-ANO_1-sem/TFM/BAD_FPGA/1_vitis_hls/cnn_rnn/cnn_rnn/source/cnn_rnn.cpp</location>
+			<location>E:/Rodrigo/ISEL/2_Mestrado/2-ANO_1-sem/TFM/BAD_FPGA/1_vitis_hls/cnn_rnn/cnn_rnn/source/conv2d/conv2d.h</location>
 		</link>
 		<link>
-			<name>source/settings.h</name>
+			<name>source/input.h</name>
 			<type>1</type>
-			<location>E:/Rodrigo/ISEL/2_Mestrado/2-ANO_1-sem/TFM/BAD_FPGA/1_vitis_hls/cnn_rnn/cnn_rnn/source/settings.h</location>
+			<location>E:/Rodrigo/ISEL/2_Mestrado/2-ANO_1-sem/TFM/BAD_FPGA/1_vitis_hls/cnn_rnn/cnn_rnn/source/input/input.h</location>
 		</link>
 		<link>
-			<name>testbench/data.h</name>
+			<name>source/predict.cpp</name>
 			<type>1</type>
-			<location>E:/Rodrigo/ISEL/2_Mestrado/2-ANO_1-sem/TFM/BAD_FPGA/1_vitis_hls/cnn_rnn/cnn_rnn/test_bench/data.h</location>
+			<location>E:/Rodrigo/ISEL/2_Mestrado/2-ANO_1-sem/TFM/BAD_FPGA/1_vitis_hls/cnn_rnn/cnn_rnn/source/predict.cpp</location>
 		</link>
 		<link>
-			<name>testbench/data_dump.h</name>
+			<name>testbench/main.cpp</name>
 			<type>1</type>
-			<location>E:/Rodrigo/ISEL/2_Mestrado/2-ANO_1-sem/TFM/BAD_FPGA/1_vitis_hls/cnn_rnn/cnn_rnn/test_bench/data_dump.h</location>
-		</link>
-		<link>
-			<name>testbench/tb_cnn_rnn.cpp</name>
-			<type>1</type>
-			<location>E:/Rodrigo/ISEL/2_Mestrado/2-ANO_1-sem/TFM/BAD_FPGA/1_vitis_hls/cnn_rnn/cnn_rnn/test_bench/tb_cnn_rnn.cpp</location>
+			<location>E:/Rodrigo/ISEL/2_Mestrado/2-ANO_1-sem/TFM/BAD_FPGA/1_vitis_hls/cnn_rnn/cnn_rnn/test_bench/main.cpp</location>
 		</link>
 		<link>
 			<name>cnn_rnn/constraints/.xml.directive</name>

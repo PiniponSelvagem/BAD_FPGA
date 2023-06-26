@@ -157,13 +157,13 @@
                         					
                     </folderInfo>
                     					
-                    <fileInfo id="cdt.managedbuild.config.gnu.exe.debug.1317211988.1510503055" name="tb_cnn_rnn.cpp" rcbsApplicability="disable" resourcePath="testbench/tb_cnn_rnn.cpp" toolsToInvoke="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.1414640204.961633790">
+                    <fileInfo id="cdt.managedbuild.config.gnu.exe.debug.1317211988.883306157" name="main.cpp" rcbsApplicability="disable" resourcePath="testbench/main.cpp" toolsToInvoke="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.1414640204.598942461">
                         						
-                        <tool id="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.1414640204.961633790" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.1414640204">
+                        <tool id="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.1414640204.598942461" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.1414640204">
                             							
-                            <option id="gnu.cpp.compiler.option.preprocessor.def.1379595665" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def"/>
+                            <option id="gnu.cpp.compiler.option.preprocessor.def.1136091908" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def"/>
                             							
-                            <option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="gnu.cpp.compiler.option.include.paths.1163753155" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
+                            <option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="gnu.cpp.compiler.option.include.paths.1857467358" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
                                 								
                                 <listOptionValue builtIn="false" value="E:/Xilinx/Vitis_HLS/2022.2/include/ap_sysc"/>
                                 								
@@ -179,21 +179,17 @@
                                 							
                             </option>
                             							
-                            <option id="gnu.cpp.compiler.option.other.other.359285559" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" value="-Wno-unknown-pragmas -c -fmessage-length=0" valueType="string"/>
+                            <option id="gnu.cpp.compiler.option.other.other.1812097547" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" value="-Wno-unknown-pragmas -c -fmessage-length=0" valueType="string"/>
                             							
-                            <inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1314898749" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
+                            <inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1983820561" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
                             						
                         </tool>
                         					
                     </fileInfo>
                     					
-                    <fileInfo id="cdt.managedbuild.config.gnu.exe.debug.1317211988.832825677" name="data.h" rcbsApplicability="disable" resourcePath="testbench/data.h" toolsToInvoke=""/>
-                    					
-                    <fileInfo id="cdt.managedbuild.config.gnu.exe.debug.1317211988.374949073" name="data_dump.h" rcbsApplicability="disable" resourcePath="testbench/data_dump.h" toolsToInvoke=""/>
-                    					
                     <sourceEntries>
                         						
-                        <entry excluding=".apc|.settings|cnn_rnn|*.c*|*.C*" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+                        <entry excluding=".apc|.reference|.settings|.vscode|cnn_rnn|*.c*|*.C*" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
                         					
                     </sourceEntries>
                     				
@@ -339,13 +335,13 @@
                         					
                     </folderInfo>
                     					
-                    <fileInfo id="cdt.managedbuild.config.gnu.exe.release.2042485163.1495180580" name="tb_cnn_rnn.cpp" rcbsApplicability="disable" resourcePath="testbench/tb_cnn_rnn.cpp" toolsToInvoke="cdt.managedbuild.tool.gnu.cpp.compiler.exe.release.2080531485.1382436550">
+                    <fileInfo id="cdt.managedbuild.config.gnu.exe.release.2042485163.497991260" name="main.cpp" rcbsApplicability="disable" resourcePath="testbench/main.cpp" toolsToInvoke="cdt.managedbuild.tool.gnu.cpp.compiler.exe.release.2080531485.1035201477">
                         						
-                        <tool id="cdt.managedbuild.tool.gnu.cpp.compiler.exe.release.2080531485.1382436550" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.exe.release.2080531485">
+                        <tool id="cdt.managedbuild.tool.gnu.cpp.compiler.exe.release.2080531485.1035201477" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.exe.release.2080531485">
                             							
-                            <option id="gnu.cpp.compiler.option.preprocessor.def.881235936" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def"/>
+                            <option id="gnu.cpp.compiler.option.preprocessor.def.1334663353" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def"/>
                             							
-                            <option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="gnu.cpp.compiler.option.include.paths.1343491379" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
+                            <option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="gnu.cpp.compiler.option.include.paths.640562325" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
                                 								
                                 <listOptionValue builtIn="false" value="E:/Xilinx/Vitis_HLS/2022.2/include/ap_sysc"/>
                                 								
@@ -361,21 +357,17 @@
                                 							
                             </option>
                             							
-                            <option id="gnu.cpp.compiler.option.other.other.1138443654" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" value="-Wno-unknown-pragmas -c -fmessage-length=0" valueType="string"/>
+                            <option id="gnu.cpp.compiler.option.other.other.1316602952" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" value="-Wno-unknown-pragmas -c -fmessage-length=0" valueType="string"/>
                             							
-                            <inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1115829579" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
+                            <inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.519113535" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
                             						
                         </tool>
                         					
                     </fileInfo>
                     					
-                    <fileInfo id="cdt.managedbuild.config.gnu.exe.release.2042485163.83362606" name="data.h" rcbsApplicability="disable" resourcePath="testbench/data.h" toolsToInvoke=""/>
-                    					
-                    <fileInfo id="cdt.managedbuild.config.gnu.exe.release.2042485163.707180776" name="data_dump.h" rcbsApplicability="disable" resourcePath="testbench/data_dump.h" toolsToInvoke=""/>
-                    					
                     <sourceEntries>
                         						
-                        <entry excluding=".apc|.settings|cnn_rnn|*.c*|*.C*" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+                        <entry excluding=".apc|.reference|.settings|.vscode|cnn_rnn|*.c*|*.C*" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
                         					
                     </sourceEntries>
                     				

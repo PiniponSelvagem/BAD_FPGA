@@ -5,6 +5,11 @@
                 <option name="name" value="predict"/>
             </pragma>
         </directive>
+        <directive functionName="predict" label="" functionLabel="">
+            <pragma name="TOP">
+                <option name="name" value="predict"/>
+            </pragma>
+        </directive>
     </sourceFile>
 </AutoPilot:ProjectResources>
 

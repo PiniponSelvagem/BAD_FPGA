@@ -1,9 +1,12 @@
 #include "input/input.h"
+#include "output/output.h"
 
 #include "conv2d/conv2d.h"
 #include "bnorm/bnorm.h"
 #include "mpool2d/maxpool2d.h"
 #include "reducemax/reducemax.h"
+#include "gru/gru.h"
+#include "timedist/timedist.h"
 
 /* 0 */
 #include "conv2d/data/conv2d_0.h"
@@ -35,6 +38,22 @@
 /* 6 */
 #include "reducemax/data/reducemax_0.h"
 
+/* 7 */
+#include "gru/data/gru_0_forward.h"
+#include "gru/data/gru_0_backward.h"
+
+/* 8 */
+#include "gru/data/gru_1_forward.h"
+#include "gru/data/gru_1_backward.h"
+
+/* 9 */
+#include "timedist/data/timedist_0.h"
+#include "timedist/data/timedist_1.h"
+
+/* 10 */
+#include "reducemax/data/reducemax_1.h"
+
+
 
 /* 0,1 */
 input_t inputpad[C2D_0__IN_LINES][C2D_0__IN_COLS] = { 0 };
@@ -52,18 +71,40 @@ conv_t  outpad_45_b[CHANNELS][MP2D_1__OUT_LINES][MP2D_1__OUT_COLS] = { 0 };
 mpool_t outpad_45_nopad[CHANNELS][MP2D_2__OUT_LINES][MP2D_2__OUT_COLS] = { 0 };
 
 /* 6 */
-float out_rmax0[RMAX_0__OUT_LINES][RMAX_0__OUT_COLS] = { 0 };
+reducemax_t out_rmax0[RMAX_0__OUT_LINES][RMAX_0__OUT_COLS] = { 0 };
+
+/* 7 */
+gru_t outgru_0[GRU_0__OUT_LINES][GRU_0__OUT_COLS] = { 0.0 };
+
+/* 8 */
+gru_t outgru_1[GRU_1__OUT_LINES][GRU_1__OUT_COLS] = { 0.0 };
+
+/* 9 */
+float outtd_0[INPUT_LINES][TD_0__OUT_COLS] = { 0.0 };
+float outtd_1[INPUT_LINES][TD_1__OUT_COLS] = { 0.0 };
+
+/* 10 */
+// outputLS
+// outputGS
 
 
-void predict(const input_t input[INPUT_LINES][INPUT_COLS], conv_t out_rmax0[RMAX_0__OUT_LINES][RMAX_0__OUT_COLS]) {
+
+void predict(
+    const input_t input[INPUT_LINES][INPUT_COLS],
+    output_t outputLS[OUTPUT_LOCAL_SCORE_LINES][OUTPUT_LOCAL_SCORE_COLS],
+    output_t outputGS[OUTPUT_GLOBAL_SCORE]
+) {
 #pragma HLS INTERFACE s_axilite port=input bundle=BUS1
-#pragma HLS INTERFACE s_axilite port=outpad_45_trans bundle=BUS1
+#pragma HLS INTERFACE s_axilite port=outputLS bundle=BUS1
+#pragma HLS INTERFACE s_axilite port=outputGS bundle=BUS1
 #pragma HLS INTERFACE s_axilite port=return bundle=BUS1
 
 #pragma HLS ARRAY_PARTITION variable=inputpad type=cyclic factor=4 DIM=0
 #pragma HLS ARRAY_PARTITION variable=outpad_01_b type=cyclic factor=4 DIM=0
 #pragma HLS ARRAY_PARTITION variable=outpad_23_a type=cyclic factor=4 DIM=0
 #pragma HLS ARRAY_PARTITION variable=outpad_45_a type=cyclic factor=4 DIM=0
+#pragma HLS ARRAY_PARTITION variable=outpad_45_nopad type=cyclic factor=3 DIM=0
+#pragma HLS ARRAY_PARTITION variable=outtd_0 type=cyclic factor=2 DIM=0
 
     input_preconv2d(input, inputpad);
 
@@ -193,6 +234,66 @@ void predict(const input_t input[INPUT_LINES][INPUT_COLS], conv_t out_rmax0[RMAX
     /* 6 */
     // ReduceMax
     reducemax_0_saveTranspose<RMAX_0__IN_LINES, RMAX_0__IN_COLS, RMAX_0__OUT_LINES, RMAX_0__OUT_COLS>(outpad_45_nopad, out_rmax0);
+
+
+    /*************************************/
+    /**************** RNN ****************/
+    /*************************************/
+    /* 7 */
+    // GRU 0 (forward)
+    gru_clearState();
+    P_GRU_0_F_LINES: for (int i = 0; i < GRU_0__IN_LINES; ++i) {
+        P_GRU_0_F_COLS: for (int idx = 0; idx < GRU_0__IN_COLS; ++idx) {
+            gru<GRU_0__IN_COLS, GRU_0__KERNEL_LINES, GRU_0__KERNEL_COLS, GRU_0__KERNEL_R_LINES, GRU_0__KERNEL_R_COLS, GRU_0__BIAS_SIZE>
+                (idx, out_rmax0[i], kernel_gru0_f, bias_gru0_f, recurrent_kernel_gru0_f, recurrent_bias_gru0_f, &outgru_0[i][idx]);
+        }
+        gru_syncState();
+    }
+    // GRU 0 (backward)
+    gru_clearState();
+    P_GRU_0_B_LINES: for (int i = GRU_0__IN_LINES-1; i >= 0; --i) {
+        P_GRU_0_B_COLS: for (gru_idx_t idx = 0; idx < GRU_0__IN_COLS; ++idx) {
+            gru<GRU_0__IN_COLS, GRU_0__KERNEL_LINES, GRU_0__KERNEL_COLS, GRU_0__KERNEL_R_LINES, GRU_0__KERNEL_R_COLS, GRU_0__BIAS_SIZE>
+                (idx, out_rmax0[i], kernel_gru0_b, bias_gru0_b, recurrent_kernel_gru0_b, recurrent_bias_gru0_b, &outgru_0[i][idx+64]);
+        }
+        gru_syncState();
+    }
+
+    /* 8 */
+    // GRU 1 (forward)
+    gru_clearState();
+    P_GRU_1_F_LINES: for (int i = 0; i < GRU_1__IN_LINES; ++i) {
+        P_GRU_1_F_COLS: for (int idx = 0; idx < GRU_1__IN_COLS; ++idx) {
+            gru<GRU_1__IN_COLS, GRU_1__KERNEL_LINES, GRU_1__KERNEL_COLS, GRU_1__KERNEL_R_LINES, GRU_1__KERNEL_R_COLS, GRU_1__BIAS_SIZE>
+                (idx, outgru_0[i], kernel_gru1_f, bias_gru1_f, recurrent_kernel_gru1_f, recurrent_bias_gru1_f, &outgru_1[i][idx]);
+        }
+        gru_syncState();
+    }
+    // GRU 1 (backward)
+    gru_clearState();
+    P_GRU_1_B_LINES: for (int i = GRU_1__IN_LINES-1; i >= 0; --i) {
+        P_GRU_1_B_COLS: for (int idx = 0; idx < GRU_1__IN_COLS_BACK; ++idx) {
+            gru<GRU_1__IN_COLS, GRU_1__KERNEL_LINES, GRU_1__KERNEL_COLS, GRU_1__KERNEL_R_LINES, GRU_1__KERNEL_R_COLS, GRU_1__BIAS_SIZE>
+                (idx, outgru_0[i], kernel_gru1_b, bias_gru1_b, recurrent_kernel_gru1_b, recurrent_bias_gru1_b, &outgru_1[i][idx+64]);
+        }
+        gru_syncState();
+    }
+
+    /* 9 */
+    // TimeDistribution 0 (Dense)
+    P_TDIST_0: for (int i = 0; i < INPUT_LINES; ++i) {
+        timedistributed_dense<TD_0__IN_LINES, TD_0__IN_COLS, TD_0__KERNEL_LINES, TD_0__KERNEL_COLS, TD_0__BIAS_SIZE, TD_0__OUT_LINES, TD_0__OUT_COLS>
+            (outgru_1[i], kernel_td0, bias_td0, outtd_0[i]);
+    }
+    // TimeDistribution 1 (Dense)
+    P_TDIST_1: for (int i = 0; i < INPUT_LINES; ++i) {
+#pragma HLS PIPELINE off
+        timedistributed_dense<TD_1__IN_LINES, TD_1__IN_COLS, TD_1__KERNEL_LINES, TD_1__KERNEL_COLS, TD_1__BIAS_SIZE, TD_1__OUT_LINES, TD_1__OUT_COLS>
+            (outtd_0[i], kernel_td1, bias_td1, outputLS[i]);
+    }
+    
+    /* 10 */
+    reducemax_1<RMAX_1__IN_LINES>(*outputLS, outputGS);
 }
 
 

@@ -14,7 +14,8 @@
 #define OUT_COLS    (IN_COLS+2)
 
 #define OUT_LINES_DEBUG   431
-#define OUT_COLS_DEBUG    64
+#define OUT_COLS_DEBUG    1
+#define OUT_SINGLE_DEBUG  1
 
 
 void special_print(float out, float difference, float exp) {
@@ -34,7 +35,11 @@ void special_print(float out, float difference, float exp) {
 }
 
 
-void predict(const input_t input[IN_LINES][IN_COLS], conv_t output[OUT_LINES_DEBUG][OUT_COLS_DEBUG]);
+void predict(
+    const input_t input[IN_LINES][IN_COLS],
+    output_t outputLS[OUT_LINES_DEBUG][OUT_COLS_DEBUG],
+    output_t outputGS[OUT_SINGLE_DEBUG]
+);
 
 void test_input_preconv2d(const input_t input[IN_LINES][IN_COLS], conv_t inputPad[OUT_LINES][OUT_COLS]);
 void test_conv2d_0_c0(const input_t inputPad[OUT_LINES][OUT_COLS], conv_t output[CHANNELS][OUT_LINES][OUT_COLS]);
@@ -71,26 +76,30 @@ void test_conv() {
 }
 
 
-conv_t output[OUT_LINES_DEBUG][OUT_COLS_DEBUG];
-
+#include "z_outputexpected/dataout_0.h"
 int main() {
 
-    /*
-    test_input_pad();
-    test_conv();
-    */
+    output_t out_local[OUT_LINES_DEBUG][OUT_COLS_DEBUG] = { 0 };
+    output_t out_global[OUT_SINGLE_DEBUG] = { 0 };
 
-    printf("PREDICT START\n");
-	predict(input, output);
-    printf("PREDICT END\n");
-
-    for (int i = 0; i < /*OUT_LINES_DEBUG*/3; ++i) {
-        printf("%3d > ", i);
+    predict(input, out_local, out_global);
+    
+    printf("LOCAL SCORE:\n");
+    printf("      OUTPUT            --VS--            EXPECTED\n");
+    for (int i = 0; i < OUT_LINES_DEBUG; ++i) {
         for (int j = 0; j < OUT_COLS_DEBUG; ++j) {
-            printf(" %12.8f", output[i][j]);
+            output_t out = out_local[i][j];
+            output_t exp = dataoutexp_0_local[i][j];
+            output_t difference = out - exp;
+            special_print(out, difference, exp);
         }
-        printf("\n");
     }
+
+    printf("GLOBAL SCORE:\n");
+    output_t out = out_global[0];
+    output_t exp = dataoutexp_0_global[0];
+    output_t difference = out - exp;
+    special_print(out, difference, exp);
 
     return 0;
 }
