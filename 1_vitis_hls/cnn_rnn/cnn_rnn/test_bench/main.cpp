@@ -41,7 +41,8 @@ void predict(
     output_t outputGS[OUT_SINGLE_DEBUG]
 );
 
-void test_input_preconv2d(const input_t input[IN_LINES][IN_COLS], conv_t inputPad[OUT_LINES][OUT_COLS]);
+/*
+void test_input_preconv2d(const input_t input[IN_LINES][IN_COLS], input_t inputPad[OUT_LINES][OUT_COLS]);
 void test_conv2d_0_c0(const input_t inputPad[OUT_LINES][OUT_COLS], conv_t output[CHANNELS][OUT_LINES][OUT_COLS]);
 
 
@@ -62,7 +63,7 @@ conv_t test_conv_out[CHANNELS][OUT_LINES][OUT_COLS];
 void test_conv() {
     /*
      * Input is all 0 inside function, but has values outside of it... 0.o
-     */
+     *
 
     test_conv2d_0_c0(input_wPad, test_conv_out);
 
@@ -74,7 +75,7 @@ void test_conv() {
         printf("\n");
     }
 }
-
+*/
 
 #include "z_outputexpected/dataout_0.h"
 int main() {
@@ -103,3 +104,15 @@ int main() {
 
     return 0;
 }
+
+
+
+/*
+
+Para semana de 10 Julho:
+- excel com nº de ciclos de cada layer, cada passo, etc
+- excel com estatisticas do HLS, ainda com float (baseline)
+- organizar melhor a estrutura dos pesos das GRU
+- mudar para ap_fixed 8 bits e ver as melhorias, meter no excel, escrever algum texto
+
+*/

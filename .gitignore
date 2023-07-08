@@ -50,3 +50,4 @@ __pycache__/
 /0_quantization/dump_io/
 /0_quantization/tflite_models/
 /0_quantization/feature_extracted/
+/1_vitis_hls/cnn_rnn/.apc/

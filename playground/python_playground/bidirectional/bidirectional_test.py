@@ -51,7 +51,7 @@ model.set_weights([
         f_kernel, f_recurrent_kernel, f_bias,
         b_kernel, b_recurrent_kernel, b_bias,
     ])
-model.save("model_simple_gru.h5", save_format="h5")
+#model.save("model_simple_gru.h5", save_format="h5")
 
 
 input = np.zeros(shape=INPUT_SHAPE)

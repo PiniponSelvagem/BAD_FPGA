@@ -2,6 +2,7 @@
 <autopilotfilemapping:AutoPilotFileMapping xmlns:autopilotfilemapping="www.autoesl.com/autopilotfilemapping">
   <source>
     <originFiles name="conv2d.h" path="E:\Rodrigo\ISEL\2_Mestrado\2-ANO_1-sem\TFM\BAD_FPGA\1_vitis_hls\cnn_rnn\cnn_rnn\source\conv2d\conv2d.h"/>
+    <originFiles name="gru.h" path="E:\Rodrigo\ISEL\2_Mestrado\2-ANO_1-sem\TFM\BAD_FPGA\1_vitis_hls\cnn_rnn\cnn_rnn\source\gru\gru.h"/>
     <originFiles name="input.h" path="E:\Rodrigo\ISEL\2_Mestrado\2-ANO_1-sem\TFM\BAD_FPGA\1_vitis_hls\cnn_rnn\cnn_rnn\source\input\input.h"/>
     <originFiles name="predict.cpp" path="E:\Rodrigo\ISEL\2_Mestrado\2-ANO_1-sem\TFM\BAD_FPGA\1_vitis_hls\cnn_rnn\cnn_rnn\source\predict.cpp"/>
   </source>

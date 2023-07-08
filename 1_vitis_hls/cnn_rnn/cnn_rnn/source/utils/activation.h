@@ -5,9 +5,10 @@
 
 
 #include "sigmoid.h"
-#include <math.h>
-#define SIGMOID(x)          sigmoid(x);
-#define TANH(x)             tanh(x);        // WARNING: MATH.H is using DOUBLE
+//#include <math.h>
+#include "tanh_rnnoise.h"
+#define SIGMOID(x)          sigmoid(x)
+#define TANH(x)             tansig_approx(x) //tanh(x)
 
 
 #endif // ACTIVATION_H

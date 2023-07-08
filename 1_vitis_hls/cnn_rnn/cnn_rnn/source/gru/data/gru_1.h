@@ -14,7 +14,7 @@
 #define GRU_1__OUT_COLS_BACK    GRU_1__IN_COLS_BACK  // stops after 64
 
 #define GRU_1__KERNEL_LINES     GRU_1__IN_COLS
-#define GRU_1__KERNEL_COLS      ((GRU_1__IN_COLS/2)*3)
+#define GRU_1__KERNEL_COLS      (GRU_1__IN_COLS/2)
 
 #define GRU_1__KERNEL_R_LINES   (GRU_1__KERNEL_LINES/2)
 #define GRU_1__KERNEL_R_COLS    GRU_1__KERNEL_COLS

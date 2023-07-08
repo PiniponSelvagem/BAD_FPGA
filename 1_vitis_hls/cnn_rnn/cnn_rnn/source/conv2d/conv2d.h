@@ -60,10 +60,10 @@ void conv2d_multi(
             conv_t acc = 0;
             conv_t acc_sat;
             conv_row_t korow = orow - PADDING_OFFSET;
-            CONV_loop_k1: for (conv_k_t krow = 0; krow < C2D_KERNEL_LINES; ++krow, ++korow) {
+            CONV_M_loop_k1: for (conv_k_t krow = 0; krow < C2D_KERNEL_LINES; ++krow, ++korow) {
 //#pragma HLS PIPELINE
                 conv_col_t kocol = ocol - PADDING_OFFSET;
-            	CONV_loop_k2: for (conv_k_t kcol = 0; kcol < C2D_KERNEL_COLS; ++kcol, ++kocol) {
+            	CONV_M_loop_k2: for (conv_k_t kcol = 0; kcol < C2D_KERNEL_COLS; ++kcol, ++kocol) {
 //#pragma HLS PIPELINE
                     acc += kernel[krow][kcol] * input[korow][kocol];
                 }

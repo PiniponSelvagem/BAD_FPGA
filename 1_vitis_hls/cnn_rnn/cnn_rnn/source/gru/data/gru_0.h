@@ -12,7 +12,7 @@
 #define GRU_0__OUT_COLS         (GRU_0__IN_COLS*2)
 
 #define GRU_0__KERNEL_LINES     GRU_0__IN_COLS
-#define GRU_0__KERNEL_COLS      (GRU_0__IN_COLS*3)
+#define GRU_0__KERNEL_COLS      GRU_0__IN_COLS
 
 #define GRU_0__KERNEL_R_LINES   GRU_0__KERNEL_LINES
 #define GRU_0__KERNEL_R_COLS    GRU_0__KERNEL_COLS

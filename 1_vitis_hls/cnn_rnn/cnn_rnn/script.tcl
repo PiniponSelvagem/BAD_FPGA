@@ -6,9 +6,10 @@
 open_project cnn_rnn
 set_top predict
 add_files cnn_rnn/cnn_rnn/source/conv2d/conv2d.h
+add_files cnn_rnn/cnn_rnn/source/gru/gru.h
 add_files cnn_rnn/cnn_rnn/source/input/input.h
 add_files cnn_rnn/cnn_rnn/source/predict.cpp
-add_files -tb cnn_rnn/cnn_rnn/test_bench/main.cpp -cflags "-Wno-unknown-pragmas -Wno-unknown-pragmas" -csimflags "-Wno-unknown-pragmas"
+add_files -tb cnn_rnn/cnn_rnn/test_bench/main.cpp -cflags "-Wno-unknown-pragmas -Wno-unknown-pragmas -Wno-unknown-pragmas" -csimflags "-Wno-unknown-pragmas"
 open_solution "cnn_rnn" -flow_target vivado
 set_part {xck26-sfvc784-2LV-c}
 create_clock -period 10 -name default

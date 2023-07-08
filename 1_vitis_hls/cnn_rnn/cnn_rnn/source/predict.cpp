@@ -302,8 +302,8 @@ void predict(
 
 
 
-
-void test_input_preconv2d(const input_t input[INPUT_LINES][INPUT_COLS], conv_t inputpad[INPUT_PAD_LINES][INPUT_PAD_COLS]) {
+/*
+void test_input_preconv2d(const input_t input[INPUT_LINES][INPUT_COLS], input_t inputpad[INPUT_PAD_LINES][INPUT_PAD_COLS]) {
 #pragma HLS INTERFACE s_axilite port=input bundle=BUS1
 #pragma HLS INTERFACE s_axilite port=inputpad bundle=BUS1
 #pragma HLS INTERFACE s_axilite port=return bundle=BUS1
@@ -326,3 +326,4 @@ void test_bnorm_0_c0(const input_t input[CHANNELS][C2D_0__OUT_LINES][C2D_0__OUT_
 
     bnorm<BNORM_0__IN_LINES, BNORM_0__IN_COLS>(input[0], gamma_0[0], beta_0[0], movingmean_0[0], movingvariance_0[0], output[0]);
 }
+*/
