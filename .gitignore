@@ -42,3 +42,11 @@ __pycache__/
 /1_vitis_hls/cnn_rnn/cnn_rnn/syn/
 /1_vitis_hls/cnn_rnn/.vscode/
 /1_vitis_hls/cnn_rnn/.settings
+/1_vitis_hls/log_tests/
+/0_quantization/dump_io__channel_last/
+/0_quantization/model_dump/
+/0_quantization/model_json__channel_last/
+/0_quantization/model_json/
+/0_quantization/dump_io/
+/0_quantization/tflite_models/
+/0_quantization/feature_extracted/
