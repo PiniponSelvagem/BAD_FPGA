@@ -46,7 +46,10 @@ layerName_toChannelFirst = [
     "max_pooling2d",
 ]
 layerName_to3d = "gru"
-
+layerName_split_dim0 = [
+    "gru",
+    "bias",
+]
 
 
 start = time.time()
@@ -126,7 +129,24 @@ for m in model.layers:
             arrayName = v.name.replace('/', '_').replace('.', '_').replace(':', '_')
             if layerName_to3d in v.name:
                 data = rearange_gru_weights(data)
-            cutils.saveArray(folder, str(i)+"_"+arrayName, data, arrayName, data_type)
+            #
+            shouldSplit = True
+            for name in layerName_split_dim0:
+                if name not in v.name:
+                    shouldSplit = False
+                    break
+            if shouldSplit:
+                bias, rbias = np.split(data, 2, axis=0)
+                bias = np.squeeze(bias)
+                rbias = np.squeeze(rbias)
+                biasName = arrayName
+                rbiasBias = arrayName+"_recurrent"
+                print(bias)
+                cutils.saveArray(folder, str(i)+"_"+biasName, bias, biasName, data_type)
+                cutils.saveArray(folder, str(i)+"_"+rbiasBias, rbias, rbiasBias, data_type)
+            #
+            else:
+                cutils.saveArray(folder, str(i)+"_"+arrayName, data, arrayName, data_type)
     i += 1
 
 

@@ -56,6 +56,9 @@
 #include "reducemax/data/reducemax_1.h"
 
 
+// SHOULD ONLY BE USED, in HLS to load the weights in test_bench
+#include "load_weights.h"
+
 
 /* 0,1 */
 input_t inputpad[C2D_0__IN_LINES][C2D_0__IN_COLS] = { 0 };
@@ -88,6 +91,7 @@ output_t outtd_1[INPUT_LINES][TD_1__OUT_COLS] = { 0.0 };
 /* 10 */
 // outputLS
 // outputGS
+
 
 
 // margin included

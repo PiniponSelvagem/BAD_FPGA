@@ -34,7 +34,7 @@ void special_print(float out, float difference, float exp) {
     printf(" %15.12f | %15s | %15.12f\n", out, difference_str, exp);
 }
 
-
+void loadWeights();
 void predict(
     const input_t input[IN_LINES][IN_COLS],
     output_t outputLS[OUT_LINES_DEBUG][OUT_COLS_DEBUG],
@@ -77,8 +77,19 @@ void test_conv() {
 }
 */
 
+#include "weights.h"
+
+
 #include "z_outputexpected/dataout_0.h"
 int main() {
+
+    /*
+    loadWeights();
+    for (int j = 0; j < 64; ++j) {
+        printf(" %10.6f", bias_0[j]);
+    }
+    */
+
 
     /*
     input_t inputpad[433][42] = { 0 };
@@ -92,9 +103,12 @@ int main() {
         printf("\n");
     }
     */
+    loadWeights();
+
 
     output_t out_local[OUT_LINES_DEBUG][OUT_COLS_DEBUG] = { 0 };
     output_t out_global[OUT_SINGLE_DEBUG] = { 0 };
+
 
     predict(input, out_local, out_global);
     
@@ -114,6 +128,7 @@ int main() {
     float exp = dataoutexp_0_global[0];
     float difference = out - exp;
     special_print(out, difference, exp);
+
     return 0;
 }
 
