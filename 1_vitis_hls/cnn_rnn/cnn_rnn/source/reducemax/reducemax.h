@@ -31,8 +31,8 @@ void reducemax_0_saveTranspose(
 }
 
 template <int RM_IN_LINES>
-void reducemax_1(const reducemax_t input[RM_IN_LINES], reducemax_t output[1]) {
-    reducemax_t maxval = RMAX_MIN_VALUE;
+void reducemax_1(const output_t input[RM_IN_LINES], output_t output[1]) {
+    output_t maxval = RMAX_MIN_VALUE;
     RMAX_1_loop_row: for (rmax_row_t row = 0; row < RM_IN_LINES; ++row) {
         if (input[row] > maxval) {
             maxval = input[row];

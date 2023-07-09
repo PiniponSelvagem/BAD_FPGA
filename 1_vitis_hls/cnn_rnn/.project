@@ -27,11 +27,6 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>ap_int_base.h</name>
-			<type>1</type>
-			<location>E:/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h</location>
-		</link>
-		<link>
 			<name>source</name>
 			<type>2</type>
 			<location>E:/Rodrigo/ISEL/2_Mestrado/2-ANO_1-sem/TFM/BAD_FPGA/1_vitis_hls/cnn_rnn/.apc/.src</location>
@@ -45,21 +40,6 @@
 			<name>cnn_rnn/constraints</name>
 			<type>2</type>
 			<location>E:/Rodrigo/ISEL/2_Mestrado/2-ANO_1-sem/TFM/BAD_FPGA/1_vitis_hls/cnn_rnn/cnn_rnn/.tcls</location>
-		</link>
-		<link>
-			<name>source/conv2d.h</name>
-			<type>1</type>
-			<location>E:/Rodrigo/ISEL/2_Mestrado/2-ANO_1-sem/TFM/BAD_FPGA/1_vitis_hls/cnn_rnn/cnn_rnn/source/conv2d/conv2d.h</location>
-		</link>
-		<link>
-			<name>source/gru.h</name>
-			<type>1</type>
-			<location>E:/Rodrigo/ISEL/2_Mestrado/2-ANO_1-sem/TFM/BAD_FPGA/1_vitis_hls/cnn_rnn/cnn_rnn/source/gru/gru.h</location>
-		</link>
-		<link>
-			<name>source/input.h</name>
-			<type>1</type>
-			<location>E:/Rodrigo/ISEL/2_Mestrado/2-ANO_1-sem/TFM/BAD_FPGA/1_vitis_hls/cnn_rnn/cnn_rnn/source/input/input.h</location>
 		</link>
 		<link>
 			<name>source/predict.cpp</name>

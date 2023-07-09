@@ -12,19 +12,22 @@ typedef ap_uint<9> gru_wg_col_t;
 
 #define GRU_SPLIT   3
 
-#define GRU_MAX_STATE 2                         // requires to be equal to STATE_SIZE, for gru_syncState to work
+#define GRU_STATE_SIZE  64
+#define GRU_MAX_STATE   2                       // requires to be equal to STATE_SIZE, for gru_syncState to work
 gru_t state[GRU_MAX_STATE][GRU_STATE_SIZE];     // 0 -> current, 1 -> next
 
+typedef ap_uint<2> grustaterow_t;
+typedef ap_uint<7> grustatecol_t;
 void gru_clearState() {
-    GRU_clearstate_loop_row: for (int i = 0; i < GRU_MAX_STATE; ++i) {
-        GRU_clearstate_loop_col: for (int j = 0; j < GRU_STATE_SIZE; ++j) {
+    GRU_clearstate_loop_row: for (grustaterow_t i = 0; i < GRU_MAX_STATE; ++i) {
+        GRU_clearstate_loop_col: for (grustatecol_t j = 0; j < GRU_STATE_SIZE; ++j) {
             state[i][j] = 0;
         }
     }
 }
 
 void gru_syncState() {
-    GRU_syncstate_loop: for (int i = 0; i < GRU_STATE_SIZE; ++i) {
+    GRU_syncstate_loop: for (grustatecol_t i = 0; i < GRU_STATE_SIZE; ++i) {
         state[0][i] = state[1][i];
     }
 }
@@ -32,7 +35,7 @@ void gru_syncState() {
 template
 <
     int GRU_IN_COLS,
-    int GRU_KERNEL_LINES,  int GRU_KERNEL_COLS,
+    int GRU_KERNEL_LINES,   int GRU_KERNEL_COLS,
     int GRU_KERNEL_R_LINES, int GRU_KERNEL_R_COLS,
     int GRU_BIAS_SIZE
 >
@@ -77,9 +80,9 @@ void gru(
     }
 
 
-    gru_t z = (gru_t)SIGMOID((float)(matrix_x[0] + matrix_inner[0]));
-    gru_t r = (gru_t)SIGMOID((float)(matrix_x[1] + matrix_inner[1]));
-    gru_t hh = (gru_t)TANH((float)(matrix_x[2] + (r * matrix_inner[2])));
+    gru_t z = (gru_t)SIGMOID(matrix_x[0] + matrix_inner[0]);
+    gru_t r = (gru_t)SIGMOID(matrix_x[1] + matrix_inner[1]);
+    gru_t hh = (gru_t)TANH(matrix_x[2] + (r * matrix_inner[2]));
 
     gru_t out = z * state[0][idx] + (1 - z) * hh;
     state[1][idx] = out;

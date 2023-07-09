@@ -7,6 +7,4 @@
 #include "../types.h"
 #include "../utils/activation.h"
 
-#define GRU_STATE_SIZE      64
-
 #endif // GRU_SETTINGS_H

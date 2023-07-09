@@ -80,6 +80,19 @@ void test_conv() {
 #include "z_outputexpected/dataout_0.h"
 int main() {
 
+    /*
+    input_t inputpad[433][42] = { 0 };
+    predict(input, inputpad);
+
+    for (int i = 0; i < OUT_LINES; ++i) {
+        printf("%3d > ", i);
+        for (int j = 0; j < OUT_COLS; ++j) {
+            printf(" %10.6f", inputpad[i][j].to_float());
+        }
+        printf("\n");
+    }
+    */
+
     output_t out_local[OUT_LINES_DEBUG][OUT_COLS_DEBUG] = { 0 };
     output_t out_global[OUT_SINGLE_DEBUG] = { 0 };
 
@@ -89,19 +102,18 @@ int main() {
     printf("      OUTPUT            --VS--            EXPECTED\n");
     for (int i = 0; i < OUT_LINES_DEBUG; ++i) {
         for (int j = 0; j < OUT_COLS_DEBUG; ++j) {
-            output_t out = out_local[i][j];
-            output_t exp = dataoutexp_0_local[i][j];
-            output_t difference = out - exp;
+            float out = out_local[i][j];
+            float exp = dataoutexp_0_local[i][j];
+            float difference = out - exp;
             special_print(out, difference, exp);
         }
     }
 
     printf("GLOBAL SCORE:\n");
-    output_t out = out_global[0];
-    output_t exp = dataoutexp_0_global[0];
-    output_t difference = out - exp;
+    float out = out_global[0];
+    float exp = dataoutexp_0_global[0];
+    float difference = out - exp;
     special_print(out, difference, exp);
-
     return 0;
 }
 

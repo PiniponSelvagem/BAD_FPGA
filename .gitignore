@@ -51,3 +51,4 @@ __pycache__/
 /0_quantization/tflite_models/
 /0_quantization/feature_extracted/
 /1_vitis_hls/cnn_rnn/.apc/
+/1_vitis_hls/cnn_rnn/cnn_rnn/source/bin_weights/

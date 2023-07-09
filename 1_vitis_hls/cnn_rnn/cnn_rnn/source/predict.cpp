@@ -1,3 +1,5 @@
+#include "types.h"
+
 #include "input/input.h"
 #include "output/output.h"
 
@@ -80,14 +82,18 @@ gru_t outgru_0[GRU_0__OUT_LINES][GRU_0__OUT_COLS] = { 0.0 };
 gru_t outgru_1[GRU_1__OUT_LINES][GRU_1__OUT_COLS] = { 0.0 };
 
 /* 9 */
-float outtd_0[INPUT_LINES][TD_0__OUT_COLS] = { 0.0 };
-float outtd_1[INPUT_LINES][TD_1__OUT_COLS] = { 0.0 };
+output_t outtd_0[INPUT_LINES][TD_0__OUT_COLS] = { 0.0 };
+output_t outtd_1[INPUT_LINES][TD_1__OUT_COLS] = { 0.0 };
 
 /* 10 */
 // outputLS
 // outputGS
 
 
+// margin included
+typedef ap_uint<7> i64_t;
+typedef ap_uint<8> i128_t;
+typedef ap_int<10> i431_t;  // requires signal because backward layer has check: i >= 0, and i will be -1
 
 void predict(
     const input_t input[INPUT_LINES][INPUT_COLS],
@@ -108,33 +114,27 @@ void predict(
 
     input_preconv2d(input, inputpad);
 
-    /*
-    TODO: change loop inter from "int" to "ap_uint"
-    TODO: change loop inter from "int" to "ap_uint"
-    TODO: change loop inter from "int" to "ap_uint"
-    TODO: change loop inter from "int" to "ap_uint"
-    */
 
     /*************************************/
     /**************** CNN ****************/
     /*************************************/
     /* 0 */
     // Conv2D
-    P_CONV_0: for (int c = 0; c < CHANNELS; ++c) {
+    P_CONV_0: for (i64_t c = 0; c < CHANNELS; ++c) {
 #pragma HLS PIPELINE off
         conv2d<C2D_0__IN_LINES, C2D_0__IN_COLS, C2D_0__OUT_LINES, C2D_0__OUT_COLS>(inputpad, kernel_0[c], bias_0[c], outpad_01_a[c]);
     }
     // BatchNormalization
-    P_BNORM_0: for (int c = 0; c < CHANNELS; ++c) {    // BATCH NORMALIZATION + RELU
+    P_BNORM_0: for (i64_t c = 0; c < CHANNELS; ++c) {    // BATCH NORMALIZATION + RELU
         bnorm<BNORM_0__IN_LINES, BNORM_0__IN_COLS>(outpad_01_a[c], gamma_0[c], beta_0[c], movingmean_0[c], movingvariance_0[c], outpad_01_b[c]);
     }
     
     /* 1 */
     // Conv2D
-    P_CONV_1: for (int f = 0; f < FILTERS; ++f) {
+    P_CONV_1: for (i64_t f = 0; f < FILTERS; ++f) {
 #pragma HLS PIPELINE off
         conv_t biasVal = bias_1[f];
-        int c = 0;
+        i64_t c = 0;
         conv2d<C2D_1__IN_LINES, C2D_1__IN_COLS, C2D_1__OUT_LINES, C2D_1__OUT_COLS>(outpad_01_b[c], kernel_1[c][f], biasVal, outpad_01_a[f]);
         ++c;
         P_CONV_1_M: for (; c < CHANNELS; ++c) {
@@ -143,20 +143,20 @@ void predict(
         }
     }
     // BatchNormalization
-    P_BNORM_1: for (int c = 0; c < CHANNELS; ++c) {    // BATCH NORMALIZATION + RELU
+    P_BNORM_1: for (i64_t c = 0; c < CHANNELS; ++c) {    // BATCH NORMALIZATION + RELU
         bnorm<BNORM_1__IN_LINES, BNORM_1__IN_COLS>(outpad_01_a[c], gamma_1[c], beta_1[c], movingmean_1[c], movingvariance_1[c], outpad_01_b[c]);
     }
     // MaxPool2D
-    P_MAXPOOL_0: for (int c = 0; c < CHANNELS; ++c) {    /* 0 */
+    P_MAXPOOL_0: for (i64_t c = 0; c < CHANNELS; ++c) {    /* 0 */
         maxpool2d<MP2D_0__IN_LINES, MP2D_0__IN_COLS, MP2D_0__OUT_LINES, MP2D_0__OUT_COLS, PADDING_OFFSET>(outpad_01_b[c], outpad_23_a[c]);
     }
 
      /* 2 */
     // Conv2D
-    P_CONV_2: for (int f = 0; f < FILTERS; ++f) {
+    P_CONV_2: for (i64_t f = 0; f < FILTERS; ++f) {
 #pragma HLS PIPELINE off
         conv_t biasVal = bias_2[f];
-        int c = 0;
+        i64_t c = 0;
         conv2d<C2D_2__IN_LINES, C2D_2__IN_COLS, C2D_2__OUT_LINES, C2D_2__OUT_COLS>(outpad_23_a[c], kernel_2[c][f], biasVal, outpad_23_b[f]);
         ++c;
         P_CONV_2_M: for (; c < CHANNELS; ++c) {
@@ -165,16 +165,16 @@ void predict(
         }
     }
     // BatchNormalization
-    P_BNORM_2: for (int c = 0; c < CHANNELS; ++c) {    // BATCH NORMALIZATION + RELU
+    P_BNORM_2: for (i64_t c = 0; c < CHANNELS; ++c) {    // BATCH NORMALIZATION + RELU
         bnorm<BNORM_2__IN_LINES, BNORM_2__IN_COLS>(outpad_23_b[c], gamma_2[c], beta_2[c], movingmean_2[c], movingvariance_2[c], outpad_23_a[c]);
     }
 
     /* 3 */
     // Conv2D
-    P_CONV_3: for (int f = 0; f < FILTERS; ++f) {
+    P_CONV_3: for (i64_t f = 0; f < FILTERS; ++f) {
 #pragma HLS PIPELINE off
         conv_t biasVal = bias_3[f];
-        int c = 0;
+        i64_t c = 0;
         conv2d<C2D_3__IN_LINES, C2D_3__IN_COLS, C2D_3__OUT_LINES, C2D_3__OUT_COLS>(outpad_23_a[c], kernel_3[c][f], biasVal, outpad_23_b[f]);
         ++c;
         P_CONV_3_M: for (; c < CHANNELS; ++c) {
@@ -183,20 +183,20 @@ void predict(
         }
     }
     // BatchNormalization
-    P_BNORM_3: for (int c = 0; c < CHANNELS; ++c) {    // BATCH NORMALIZATION + RELU
+    P_BNORM_3: for (i64_t c = 0; c < CHANNELS; ++c) {    // BATCH NORMALIZATION + RELU
         bnorm<BNORM_3__IN_LINES, BNORM_3__IN_COLS>(outpad_23_b[c], gamma_3[c], beta_3[c], movingmean_3[c], movingvariance_3[c], outpad_23_a[c]);
     }
     // MaxPool2D
-    P_MAXPOOL_1: for (int c = 0; c < CHANNELS; ++c) {    /* 1 */
+    P_MAXPOOL_1: for (i64_t c = 0; c < CHANNELS; ++c) {    /* 1 */
         maxpool2d<MP2D_1__IN_LINES, MP2D_1__IN_COLS, MP2D_1__OUT_LINES, MP2D_1__OUT_COLS, PADDING_OFFSET>(outpad_23_a[c], outpad_45_a[c]);
     }
 
     /* 4 */
     // Conv2D
-    P_CONV_4: for (int f = 0; f < FILTERS; ++f) {
+    P_CONV_4: for (i64_t f = 0; f < FILTERS; ++f) {
 #pragma HLS PIPELINE off
         conv_t biasVal = bias_4[f];
-        int c = 0;
+        i64_t c = 0;
         conv2d<C2D_4__IN_LINES, C2D_4__IN_COLS, C2D_4__OUT_LINES, C2D_4__OUT_COLS>(outpad_45_a[c], kernel_4[c][f], biasVal, outpad_45_b[f]);
         ++c;
         P_CONV_4_M: for (; c < CHANNELS; ++c) {
@@ -205,16 +205,16 @@ void predict(
         }
     }
     // BatchNormalization
-    P_BNORM_4: for (int c = 0; c < CHANNELS; ++c) {    // BATCH NORMALIZATION + RELU
+    P_BNORM_4: for (i64_t c = 0; c < CHANNELS; ++c) {    // BATCH NORMALIZATION + RELU
         bnorm<BNORM_4__IN_LINES, BNORM_4__IN_COLS>(outpad_45_b[c], gamma_4[c], beta_4[c], movingmean_4[c], movingvariance_4[c], outpad_45_a[c]);
     }
 
     /* 5 */
     // Conv2D
-    P_CONV_5: for (int f = 0; f < FILTERS; ++f) {
+    P_CONV_5: for (i64_t f = 0; f < FILTERS; ++f) {
 #pragma HLS PIPELINE off
         conv_t biasVal = bias_5[f];
-        int c = 0;
+        i64_t c = 0;
         conv2d<C2D_5__IN_LINES, C2D_5__IN_COLS, C2D_5__OUT_LINES, C2D_5__OUT_COLS>(outpad_45_a[c], kernel_5[c][f], biasVal, outpad_45_b[f]);
         ++c;
         P_CONV_5_M: for (; c < CHANNELS; ++c) {
@@ -223,11 +223,11 @@ void predict(
         }
     }
     // BatchNormalization
-    P_BNORM_5: for (int c = 0; c < CHANNELS; ++c) {    // BATCH NORMALIZATION + RELU
+    P_BNORM_5: for (i64_t c = 0; c < CHANNELS; ++c) {    // BATCH NORMALIZATION + RELU
         bnorm<BNORM_5__IN_LINES, BNORM_5__IN_COLS>(outpad_45_b[c], gamma_5[c], beta_5[c], movingmean_5[c], movingvariance_5[c], outpad_45_a[c]);
     }
     // MaxPool2D
-    P_MAXPOOL_2: for (int c = 0; c < CHANNELS; ++c) {    /* 2 */
+    P_MAXPOOL_2: for (i64_t c = 0; c < CHANNELS; ++c) {    /* 2 */
         maxpool2d<MP2D_2__IN_LINES, MP2D_2__IN_COLS, MP2D_2__OUT_LINES, MP2D_2__OUT_COLS, 0>(outpad_45_a[c], outpad_45_nopad[c]);
     }
 
@@ -242,8 +242,8 @@ void predict(
     /* 7 */
     // GRU 0 (forward)
     gru_clearState();
-    P_GRU_0_F_LINES: for (int i = 0; i < GRU_0__IN_LINES; ++i) {
-        P_GRU_0_F_COLS: for (int idx = 0; idx < GRU_0__IN_COLS; ++idx) {
+    P_GRU_0_F_LINES: for (i431_t i = 0; i < GRU_0__IN_LINES; ++i) {
+        P_GRU_0_F_COLS: for (i64_t idx = 0; idx < GRU_0__IN_COLS; ++idx) {
             gru<GRU_0__IN_COLS, GRU_0__KERNEL_LINES, GRU_0__KERNEL_COLS, GRU_0__KERNEL_R_LINES, GRU_0__KERNEL_R_COLS, GRU_0__BIAS_SIZE>
                 (idx, out_rmax0[i], kernel_gru0_f, bias_gru0_f, recurrent_kernel_gru0_f, recurrent_bias_gru0_f, &outgru_0[i][idx]);
         }
@@ -251,8 +251,8 @@ void predict(
     }
     // GRU 0 (backward)
     gru_clearState();
-    P_GRU_0_B_LINES: for (int i = GRU_0__IN_LINES-1; i >= 0; --i) {
-        P_GRU_0_B_COLS: for (gru_idx_t idx = 0; idx < GRU_0__IN_COLS; ++idx) {
+    P_GRU_0_B_LINES: for (i431_t i = GRU_0__IN_LINES-1; i >= 0; --i) {
+        P_GRU_0_B_COLS: for (i64_t idx = 0; idx < GRU_0__IN_COLS; ++idx) {
             gru<GRU_0__IN_COLS, GRU_0__KERNEL_LINES, GRU_0__KERNEL_COLS, GRU_0__KERNEL_R_LINES, GRU_0__KERNEL_R_COLS, GRU_0__BIAS_SIZE>
                 (idx, out_rmax0[i], kernel_gru0_b, bias_gru0_b, recurrent_kernel_gru0_b, recurrent_bias_gru0_b, &outgru_0[i][idx+64]);
         }
@@ -262,8 +262,8 @@ void predict(
     /* 8 */
     // GRU 1 (forward)
     gru_clearState();
-    P_GRU_1_F_LINES: for (int i = 0; i < GRU_1__IN_LINES; ++i) {
-        P_GRU_1_F_COLS: for (int idx = 0; idx < GRU_1__IN_COLS; ++idx) {
+    P_GRU_1_F_LINES: for (i431_t i = 0; i < GRU_1__IN_LINES; ++i) {
+        P_GRU_1_F_COLS: for (i128_t idx = 0; idx < GRU_1__IN_COLS; ++idx) {
             gru<GRU_1__IN_COLS, GRU_1__KERNEL_LINES, GRU_1__KERNEL_COLS, GRU_1__KERNEL_R_LINES, GRU_1__KERNEL_R_COLS, GRU_1__BIAS_SIZE>
                 (idx, outgru_0[i], kernel_gru1_f, bias_gru1_f, recurrent_kernel_gru1_f, recurrent_bias_gru1_f, &outgru_1[i][idx]);
         }
@@ -271,8 +271,8 @@ void predict(
     }
     // GRU 1 (backward)
     gru_clearState();
-    P_GRU_1_B_LINES: for (int i = GRU_1__IN_LINES-1; i >= 0; --i) {
-        P_GRU_1_B_COLS: for (int idx = 0; idx < GRU_1__IN_COLS_BACK; ++idx) {
+    P_GRU_1_B_LINES: for (i431_t i = GRU_1__IN_LINES-1; i >= 0; --i) {
+        P_GRU_1_B_COLS: for (i64_t idx = 0; idx < GRU_1__IN_COLS_BACK; ++idx) {
             gru<GRU_1__IN_COLS, GRU_1__KERNEL_LINES, GRU_1__KERNEL_COLS, GRU_1__KERNEL_R_LINES, GRU_1__KERNEL_R_COLS, GRU_1__BIAS_SIZE>
                 (idx, outgru_0[i], kernel_gru1_b, bias_gru1_b, recurrent_kernel_gru1_b, recurrent_bias_gru1_b, &outgru_1[i][idx+64]);
         }
@@ -281,12 +281,12 @@ void predict(
 
     /* 9 */
     // TimeDistribution 0 (Dense)
-    P_TDIST_0: for (int i = 0; i < INPUT_LINES; ++i) {
+    P_TDIST_0: for (i431_t i = 0; i < INPUT_LINES; ++i) {
         timedistributed_dense<TD_0__IN_LINES, TD_0__IN_COLS, TD_0__KERNEL_LINES, TD_0__KERNEL_COLS, TD_0__BIAS_SIZE, TD_0__OUT_LINES, TD_0__OUT_COLS>
             (outgru_1[i], kernel_td0, bias_td0, outtd_0[i]);
     }
     // TimeDistribution 1 (Dense)
-    P_TDIST_1: for (int i = 0; i < INPUT_LINES; ++i) {
+    P_TDIST_1: for (i431_t i = 0; i < INPUT_LINES; ++i) {
 #pragma HLS PIPELINE off
         timedistributed_dense<TD_1__IN_LINES, TD_1__IN_COLS, TD_1__KERNEL_LINES, TD_1__KERNEL_COLS, TD_1__BIAS_SIZE, TD_1__OUT_LINES, TD_1__OUT_COLS>
             (outtd_0[i], kernel_td1, bias_td1, outputLS[i]);

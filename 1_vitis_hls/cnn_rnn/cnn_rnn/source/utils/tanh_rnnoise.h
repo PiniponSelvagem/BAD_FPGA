@@ -3,7 +3,7 @@
 #ifndef TANH_H
 #define TANH_H
 
-#include <math.h>
+#include "../types.h"
 
 // Taken from: https://github.com/xiph/rnnoise/blob/master/src/rnn.c
 
@@ -34,7 +34,7 @@
     SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-static const float tansig_table[201] = {
+static const tanh_t tansig_table[201] = {
     0.000000f, 0.039979f, 0.079830f, 0.119427f, 0.158649f,
     0.197375f, 0.235496f, 0.272905f, 0.309507f, 0.345214f,
     0.379949f, 0.413644f, 0.446244f, 0.477700f, 0.507977f,
@@ -80,11 +80,21 @@ static const float tansig_table[201] = {
 
 #define celt_isnan(x) ((x)!=(x))
 
+//typedef ap_int<16> i_t;
+/*
+typedef int i_t;
+static inline i_t floor_tanh(tanh_t value) {
+    i_t intValue = static_cast<i_t>(value);
+    if (value < 0 && intValue != value)
+        intValue -= 1;    
+    return intValue;
+}
+*/
 
-static inline float tansig_approx(float x) {
-    int i;
-    float y, dy;
-    float sign = 1;
+static inline tanh_t tansig_approx(tanh_t x) {
+    i_t i;
+    tanh_t y, dy;
+    tanh_t sign = 1;
     /* Tests are reversed to catch NaNs */
     if (!(x < 8))
         return 1;
@@ -99,8 +109,8 @@ static inline float tansig_approx(float x) {
         x = -x;
         sign = -1;
     }
-    i = (int)floor(.5f + 25 * x);
-    x -= .04f * i;
+    i = floor((tanh_t)(.5) + 25 * x);
+    x -= (tanh_t)(.04) * i;
     y = tansig_table[i];
     dy = 1 - y * y;
     y = y + x * dy * (1 - y * x);
