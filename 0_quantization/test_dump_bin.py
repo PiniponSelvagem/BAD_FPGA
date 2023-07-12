@@ -4,7 +4,7 @@ import struct
 #filename = "23_bidirectional_backward_gru_gru_cell_2_bias_0"
 filename = "4_conv2d_1_kernel_0"
 
-def print1D():
+def print1D_f():
     with open('model_dump/'+filename+'.bin', 'rb') as file:
         binary_data = file.read()
 
@@ -15,7 +15,7 @@ def print1D():
         for value in values:
             print(value)
 
-def print2D(size0):
+def print2D_f(size0):
     with open('model_dump/'+filename+'.bin', 'rb') as file:
         binary_data = file.read()
 
@@ -28,7 +28,7 @@ def print2D(size0):
         for row in extracted_array:
             print(row)
 
-def print3D(size1, size2):
+def print3D_f(size1, size2):
     with open('model_dump/'+filename+'.bin', 'rb') as file:
         binary_data = file.read()
 
@@ -47,7 +47,7 @@ def print3D(size1, size2):
         for matrix in extracted_array:
             print(matrix)
 
-def print4D(size0, size1, size2):
+def print4D_f(size0, size1, size2):
     with open('model_dump/'+filename+'.bin', 'rb') as file:
         binary_data = file.read()
 
@@ -73,7 +73,7 @@ def print4D(size0, size1, size2):
 
 
 
-#print1D()
-#print2D(64)
-#print3D(3, 64)
-print4D(64, 64, 3)
+#print1D_f()
+#print2D_f(64)
+#print3D_f(3, 64)
+print4D_f(64, 64, 3)

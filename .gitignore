@@ -52,3 +52,7 @@ __pycache__/
 /0_quantization/feature_extracted/
 /1_vitis_hls/cnn_rnn/.apc/
 /1_vitis_hls/cnn_rnn/cnn_rnn/test_bench/bin_weights/
+/1_vitis_hls/cnn_rnn/cnn_rnn/cnn_rnn_data.json
+/1_vitis_hls/microfaune_ai/.apc
+/1_vitis_hls/microfaune_ai/.settings
+/1_vitis_hls/microfaune_ai/.vitis_hls_log_all.xml

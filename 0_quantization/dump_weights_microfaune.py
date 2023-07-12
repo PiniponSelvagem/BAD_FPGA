@@ -51,6 +51,12 @@ layerName_split_dim0 = [
     "bias",
 ]
 
+data_type = {}
+#data_type["name"] = "float"
+data_type["name"] = "ap_fixed"
+data_type["bits_total"] = 32
+data_type["bits_int"] = 8
+
 
 start = time.time()
 #########################################################
@@ -106,7 +112,6 @@ class Layer:
         return self.__dict__
 
 
-data_type = "float"
 i = 0
 for m in model.layers:
     if any(layerName_save in m.name for layerName_save in layerName_toSave):
@@ -141,13 +146,16 @@ for m in model.layers:
                 rbias = np.squeeze(rbias)
                 biasName = arrayName
                 rbiasBias = arrayName+"_recurrent"
-                print(bias)
                 cutils.saveArray(folder, str(i)+"_"+biasName, bias, biasName, data_type)
                 cutils.saveArray(folder, str(i)+"_"+rbiasBias, rbias, rbiasBias, data_type)
             #
             else:
-                cutils.saveArray(folder, str(i)+"_"+arrayName, data, arrayName, data_type)
+                #data = [-35.51, 2.5, -0.5, 0.125, -0.125, 0.05, 0.625, -0.625, 0.02698972076177597]
+                #data = np.array(data)
+                if "conv2d_bias_0" in arrayName:
+                    cutils.saveArray(folder, str(i)+"_"+arrayName, data, arrayName, data_type)
     i += 1
+
 
 
 
