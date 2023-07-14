@@ -11,8 +11,6 @@ typedef ap_uint<9> conv_row_t;
 typedef ap_uint<6> conv_col_t;
 typedef ap_uint<2> conv_k_t;
 
-typedef ap_uint<17> conv_f_c_Kl_Kc;
-typedef ap_uint<11> conv_c_Kl_Kc;
 typedef ap_uint<22> conv_c_l_c;
 
 
@@ -24,57 +22,69 @@ void conv2d(
     const i64_t filters,
     const i64_t channels,
     const conv_row_t inLines,
-    const conv_col_t inCols,
+    //const conv_col_t inCols,
     const conv_row_t outLines,
-    const conv_col_t outCols,
+    //const conv_col_t outCols,
     const conv_t* input,        // 3D array
     const conv_t* kernel,       // 3D array if filters==1, 4D array if filters>1
     const conv_t* bias,         // 1D array
     conv_t* output
 ) {
+
+    // aux array: set usable bottom line to 0 because maxpool will reduce lines and old aux data is still there
+    /*
+    for (i64_t c = 0; c < CHANNELS; ++c) {
+        for (conv_col_t col = 0; col < C2D_0__IN_COLS; ++col) {
+            aux[c][C2D_0__IN_LINES-1][col] = 0;
+        }
+    }
+    */
+
     conv_t bias_none = 0;
     conv_t* pbias_backup = (conv_t*)bias;
     conv_t* pbias = pbias_backup;
-    //conv_t (*input)[CHANNELS][C2D_0__IN_LINES][C2D_0__IN_COLS] = (conv_t (*)[CHANNELS][C2D_0__IN_LINES][C2D_0__IN_COLS]) pinput;
-    conv_t(*kernelArr)[CHANNELS][C2D_KERNEL_LINES][C2D_KERNEL_COLS] = (conv_t(*)[CHANNELS][C2D_KERNEL_LINES][C2D_KERNEL_COLS]) kernel;
-    //conv_t (*bias)[CHANNELS] = (conv_t (*)[CHANNELS]) pbias;
-    //conv_t (*output)[CHANNELS][C2D_0__IN_LINES][C2D_0__IN_COLS] = (conv_t (*)[CHANNELS][C2D_0__IN_LINES][C2D_0__IN_COLS]) poutput;
 
     CONV_loop_filter: for (i64_t f = 0; f < filters; ++f) {
-        conv_f_c_Kl_Kc kernel_offset_f = f * CHANNELS * C2D_KERNEL_LINES * C2D_KERNEL_COLS;
+        conv_t* pkernel = (conv_t*)kernel + (f * CHANNELS * C2D_KERNEL_LINES * C2D_KERNEL_COLS);
 
         conv_c_l_c output_offset;
+        conv_t* poutput_offset;
+        conv_t* pprev_offset;
         if (filters > 1) {
-            output_offset = f * outLines * outCols;
+            output_offset = f * outLines * C2D_0__IN_COLS;
+            poutput_offset = output + output_offset;
+            pprev_offset = prev + output_offset;
         }
 
-        //printf("\nf: %d ", f);
         CONV_loop_channel: for (i64_t c = 0; c < channels; ++c) {
-            conv_c_Kl_Kc kernel_offset_c = c * C2D_KERNEL_LINES * C2D_KERNEL_COLS;
-            conv_c_l_c input_offset_c  = c * inLines * inCols;
+            conv_t* pkernel_c = pkernel + (c * C2D_KERNEL_LINES * C2D_KERNEL_COLS);
+            conv_t* pinput_c = (conv_t*)input + (c * inLines * C2D_0__IN_COLS);
 
             if (filters == 1) {
-                output_offset = c * outLines * outCols;
+                output_offset = c * outLines * C2D_0__IN_COLS;
+                poutput_offset = output + output_offset;
+                pprev_offset = prev + output_offset;
             }
 
             CONV_loop_row: for (conv_row_t orow = PADDING_OFFSET; orow < (outLines - PADDING_OFFSET); ++orow) {
-                CONV_loop_col: for (conv_col_t ocol = PADDING_OFFSET; ocol < (outCols - PADDING_OFFSET); ++ocol) {
+                conv_t* poutput_offset_orow = poutput_offset + (orow * C2D_0__IN_COLS);
+                conv_t* pprev_offset_orow = pprev_offset + (orow * C2D_0__IN_COLS);
+                CONV_loop_col: for (conv_col_t ocol = PADDING_OFFSET; ocol < (C2D_0__IN_COLS - PADDING_OFFSET); ++ocol) {
         #pragma HLS PIPELINE
                     conv_t acc = *pbias;
                     conv_t acc_sat;
                     conv_row_t korow = orow - PADDING_OFFSET;
                     CONV_loop_k1: for (conv_k_t krow = 0; krow < C2D_KERNEL_LINES; ++krow, ++korow) {
         //#pragma HLS PIPELINE
+                        conv_t* pkernel_c_krow = pkernel_c + (krow * C2D_KERNEL_COLS);
+                        conv_t* pinput_c_krow = pinput_c + (korow * C2D_0__IN_COLS);
                         conv_col_t kocol = ocol - PADDING_OFFSET;
                         CONV_loop_k2: for (conv_k_t kcol = 0; kcol < C2D_KERNEL_COLS; ++kcol, ++kocol) {
         //#pragma HLS PIPELINE
-// TODO: Improve pointer calculation
-                            //k = kernelArr[f][c][krow][kcol];
-                            conv_t k = *(kernel + (kernel_offset_f) + (kernel_offset_c) + (krow * C2D_KERNEL_COLS) + kcol);
+                            //conv_t k = kernelArr[f][c][krow][kcol];
+                            conv_t k = *(pkernel_c_krow + kcol);
                             //conv_t i = input[c][korow][kocol];
-                            conv_t i = *(input + (input_offset_c + korow * inCols + kocol));
-                            //if (c == 0 && korow == 1 && kocol == 1)
-                            //   printf("%9.6f ", i);
+                            conv_t i = *(pinput_c_krow + kocol);
                             acc += k * i;
                         }
                     }
@@ -90,14 +100,14 @@ void conv2d(
                     */
                     
                     //output[orow][ocol] = acc_sat;
-                    conv_t* poutput = (output + (output_offset + orow * outCols + ocol));
-                    conv_t* pprev = (prev + (output_offset + orow * inCols + ocol));
+                    conv_t* poutput = (poutput_offset_orow + ocol);
+                    conv_t* pprev = (pprev_offset_orow + ocol);
                     if (c == 0 || filters == 1) {
                         *pprev = 0;
                     }
                     acc_sat = acc + *pprev;
                     *poutput = acc_sat;
-                    if (c == 0)
+                    if ((c == 0 && filters == 1) || (filters > 1))
                         *pprev = acc_sat;
                     //printf("%9.6f ", acc_sat);
                 }

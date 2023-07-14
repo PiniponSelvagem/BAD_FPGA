@@ -53,10 +53,11 @@ layerName_split_dim0 = [
 
 data_type = {}
 data_type["name"] = "float"
-#data_type["name"] = "ap_fixed"
-#data_type["bits_total"] = 32
-#data_type["bits_int"] = 8
-
+"""
+data_type["name"] = "ap_fixed"
+data_type["bits_total"] = 16
+data_type["bits_int"] = 7
+"""
 
 start = time.time()
 #########################################################
@@ -123,11 +124,8 @@ for m in model.layers:
             if any(layerName_c1 in m.name for layerName_c1 in layerName_toChannelFirst):
                 # change to channel first
                 if sdim == 4:
-                    [shape[i] for i in (2, 3, 0, 1)]
-                    if (m.name == "conv2d"):
-                        data = data.transpose((2, 3, 0, 1)) #cf
-                    else:
-                        data = data.transpose((3, 2, 0, 1)) #fc
+                    [shape[i] for i in (3, 2, 0, 1)]
+                    data = data.transpose((3, 2, 0, 1)) #fc
                 elif sdim == 3:
                     [shape[i] for i in (0, 2, 1)]
                     data = data.transpose((0, 2, 1))

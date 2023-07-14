@@ -26,9 +26,11 @@ void bnorm(
     BNORM_loop_channel: for (i64_t c = 0; c < channels; ++c) {
         bnorm_c_l_c output_offset_c = c * inLines * inCols;
         BNORM_loop_row: for (bnorm_row_t row = PADDING_OFFSET; row < (inLines - PADDING_OFFSET); ++row) {
+            // for some reason pointer arithmetic worked in conv2d, but here the compiler said "NO", so had to separate it
+            bnorm_offset_col offsetcol_row = output_offset_c + row * inCols;
+            bnorm_t* pinout_row = input_output + offsetcol_row;
             BNORM_loop_col: for (bnrom_col_t col = PADDING_OFFSET; col < (inCols - PADDING_OFFSET); ++col) {
-                bnorm_offset_col offsetcol = (output_offset_c + row * inCols + col); // no idea why i have to do this wierd dance and cant combine in pinout, but compiler didnt liked it
-                bnorm_t* pinout = (input_output + offsetcol);
+                bnorm_t* pinout = pinout_row + col;
                 bnorm_t value = movingvariance[c] + epsilon;
                 #ifdef USE_FLOAT
                 bnorm_t normalized = (*pinout - movingmean[c]) / (bnorm_t)(sqrt(value));
