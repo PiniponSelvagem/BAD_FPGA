@@ -74,7 +74,7 @@ def packRow(array, dataType):
         bits_dec = dataType["bits_total"] - bits_int
         #
         packed_bits = bitarray()
-        print(array)
+        #print(array)
         for value in array:
             is_neg = value < 0
             integer_part = abs(int(value))
@@ -91,10 +91,10 @@ def packRow(array, dataType):
             decimal_part &= (1 << bits_dec) - 1
             #
             packed_bits.extend(format(integer_part, '0{}b'.format(bits_int)))
-            print(packed_bits)
+            #print(packed_bits)
             packed_bits.extend(format(decimal_part, '0{}b'.format(bits_dec)))
-            print(packed_bits)
-            print("value: " + str(value))
+            #print(packed_bits)
+            #print("value: " + str(value))
         #
         while len(packed_bits) % 8 != 0:
             # Pad the packed bits to a multiple of 8 if necessary

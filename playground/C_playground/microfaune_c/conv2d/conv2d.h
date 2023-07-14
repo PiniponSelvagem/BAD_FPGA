@@ -20,7 +20,9 @@ void conv2d(
             conv_t acc_sat;
             for (int krow = 0, korow = orow - PADDING_OFFSET; krow < C2D_KERNEL_LINES; ++krow, korow++) {
                 for (int kcol = 0, kocol = ocol - PADDING_OFFSET; kcol < C2D_KERNEL_COLS; ++kcol, kocol++) {
-                    acc += kernel[krow][kcol] * input[korow][kocol];
+                    conv_t k = kernel[krow][kcol];
+                    conv_t i = input[korow][kocol];
+                    acc += k * i;
                 }
             }
             /*
@@ -44,6 +46,7 @@ void conv2d(
     }
 }
 
+#include <stdio.h>
 template <int C_IN_LINES, int C_IN_COLS, int C_OUT_LINES, int C_OUT_COLS>
 void conv2d_multi(
     const conv_t input[C_IN_LINES][C_IN_COLS],
@@ -55,11 +58,21 @@ void conv2d_multi(
         for (int ocol = PADDING_OFFSET; ocol < (C_OUT_COLS - PADDING_OFFSET); ++ocol) {
             conv_t acc = 0;
             conv_t acc_sat;
+            /*
+            conv_t acc_sat;
             for (int krow = 0; krow < C2D_KERNEL_LINES; ++krow) {
                 for (int kcol = 0; kcol < C2D_KERNEL_COLS; ++kcol) {
                     conv_t wg = kernel[krow][kcol];
                     conv_t in = input[orow + krow - PADDING_OFFSET][ocol + kcol - PADDING_OFFSET];
                     acc += wg * in;
+                }
+            }
+            */
+            for (int krow = 0, korow = orow - PADDING_OFFSET; krow < C2D_KERNEL_LINES; ++krow, korow++) {
+                for (int kcol = 0, kocol = ocol - PADDING_OFFSET; kcol < C2D_KERNEL_COLS; ++kcol, kocol++) {
+                    conv_t k = kernel[krow][kcol];
+                    conv_t i = input[korow][kocol];
+                    acc += k * i;
                 }
             }
 
@@ -70,7 +83,8 @@ void conv2d_multi(
                 acc_sat = 0;    // ReLu
             else
             */
-            acc_sat = acc + prev[orow][ocol];
+            conv_t pv = prev[orow][ocol];
+            acc_sat = acc + pv;
             output[orow][ocol] = acc_sat;
         }
     }

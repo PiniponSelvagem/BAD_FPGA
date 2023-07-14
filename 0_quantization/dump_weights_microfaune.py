@@ -52,10 +52,10 @@ layerName_split_dim0 = [
 ]
 
 data_type = {}
-#data_type["name"] = "float"
-data_type["name"] = "ap_fixed"
-data_type["bits_total"] = 32
-data_type["bits_int"] = 8
+data_type["name"] = "float"
+#data_type["name"] = "ap_fixed"
+#data_type["bits_total"] = 32
+#data_type["bits_int"] = 8
 
 
 start = time.time()
@@ -124,7 +124,10 @@ for m in model.layers:
                 # change to channel first
                 if sdim == 4:
                     [shape[i] for i in (2, 3, 0, 1)]
-                    data = data.transpose((2, 3, 0, 1))
+                    if (m.name == "conv2d"):
+                        data = data.transpose((2, 3, 0, 1)) #cf
+                    else:
+                        data = data.transpose((3, 2, 0, 1)) #fc
                 elif sdim == 3:
                     [shape[i] for i in (0, 2, 1)]
                     data = data.transpose((0, 2, 1))
@@ -152,8 +155,8 @@ for m in model.layers:
             else:
                 #data = [-35.51, 2.5, -0.5, 0.125, -0.125, 0.05, 0.625, -0.625, 0.02698972076177597]
                 #data = np.array(data)
-                if "conv2d_bias_0" in arrayName:
-                    cutils.saveArray(folder, str(i)+"_"+arrayName, data, arrayName, data_type)
+                #if "conv2d_bias_0" in arrayName:
+                cutils.saveArray(folder, str(i)+"_"+arrayName, data, arrayName, data_type)
     i += 1
 
 
