@@ -121,8 +121,8 @@ void predict(
     // Conv2D
     conv2d(
         1/*FILTERS*/, CHANNELS,
-        C2D_0__IN_LINES,  //C2D_0__IN_COLS,
-        C2D_0__OUT_LINES, //C2D_0__OUT_COLS,
+        C2D_0__IN_COLS,
+        C2D_0__OUT_COLS,
         (conv_t*)inputpad,
         (conv_t*)kernel_0,
         (conv_t*)bias_0,
@@ -136,11 +136,10 @@ void predict(
         }
         printf("\n");
     }
-
     // BatchNormalization
     bnorm(
         CHANNELS,
-        BNORM_0__IN_LINES, BNORM_0__IN_COLS,
+        BNORM_0__IN_COLS,
         (bnorm_t*)outpad_01_a,
         (bnorm_t*)gamma_0,
         (bnorm_t*)beta_0,
@@ -160,8 +159,8 @@ void predict(
     // Conv2D
     conv2d(
         FILTERS, CHANNELS,
-        C2D_1__IN_LINES,  //C2D_1__IN_COLS,
-        C2D_1__OUT_LINES, //C2D_1__OUT_COLS,
+        C2D_1__IN_COLS,
+        C2D_1__OUT_COLS,
         (conv_t*)outpad_01_a,
         (conv_t*)kernel_1,
         (conv_t*)bias_1,
@@ -179,7 +178,7 @@ void predict(
     // BatchNormalization
     bnorm(
         CHANNELS,
-        BNORM_1__IN_LINES, BNORM_1__IN_COLS,
+        BNORM_1__IN_COLS,
         (bnorm_t*)outpad_01_b,
         (bnorm_t*)gamma_1,
         (bnorm_t*)beta_1,
@@ -187,14 +186,13 @@ void predict(
         (bnorm_t*)movingvariance_1
     ); // BATCH NORMALIZATION + RELU
     printf("BNORM_1\n");
-    for (int l = 0; l < 16/*433*/; ++l) {
-        for (int c = 0; c < 6/*42*/; ++c) {
-            float a = outpad_01_b[63][l][c];
+    for (int l = 0; l < 433; ++l) {
+        for (int c = 0; c < 42; ++c) {
+            float a = outpad_01_b[0][l][c];
             printf("%9.6f ", a);
         }
         printf("\n");
     }
-    
 }
 
 void test(

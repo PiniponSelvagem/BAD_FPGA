@@ -82,7 +82,6 @@ void test_conv() {
 
 #include "z_outputexpected/dataout_0.h"
 int main() {
-
     /*
     loadWeights();
     for (int j = 0; j < 64; ++j) {
@@ -103,8 +102,8 @@ int main() {
         printf("\n");
     }
     */
+    
     loadWeights();
-
 
     output_t out_local[OUT_LINES_DEBUG][OUT_COLS_DEBUG] = { 0 };
     output_t out_global[OUT_SINGLE_DEBUG] = { 0 };
@@ -112,6 +111,7 @@ int main() {
 
     predict(input, out_local, out_global);
     
+    /*
     printf("LOCAL SCORE:\n");
     printf("      OUTPUT            --VS--            EXPECTED\n");
     for (int i = 0; i < OUT_LINES_DEBUG; ++i) {
@@ -128,7 +128,33 @@ int main() {
     float exp = dataoutexp_0_global[0];
     float difference = out - exp;
     special_print(out, difference, exp);
+    */
 
+    /*
+    #define WIDTH 16 // Specify the total number of bits
+    #define INT_BITS 7 // Specify the number of integer bits
+
+	// Test values
+	ap_fixed<WIDTH, INT_BITS> numbers[] = {0.5, -0.25, 0.75, 0.001, 0.01, 1.0/2/2/2/2/2/2/2/2/2};
+    //numbers[5][0] = 1; // Set the lowest bit of the decimal part to 1
+
+	int numElements = sizeof(numbers) / sizeof(numbers[0]);
+
+	// Convert numbers to bit representation and output
+	for (int i = 0; i < numElements; ++i) {
+		unsigned int bits = *((unsigned int*)(&numbers[i]));
+
+		// Display binary representation
+		std::cout << "Bit representation: ";
+		for (int j = WIDTH - 1; j >= 0; --j) {
+			std::cout << ((bits >> j) & 1);
+		}
+
+		// Display original float value
+		std::cout << " (" << numbers[i] << ")" << std::endl;
+	}
+    */
+    
     return 0;
 }
 

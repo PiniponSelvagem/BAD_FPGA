@@ -14,7 +14,6 @@ typedef ap_uint<22> bnorm_offset_col;
 
 void bnorm(
     const i64_t channels,
-    const bnorm_t inLines,
     const bnorm_t inCols,
     bnorm_t* input_output,
     const bnorm_t gamma[CHANNELS],
@@ -24,8 +23,8 @@ void bnorm(
 ) {
     const bnorm_t epsilon = BNORM_EPSILON;
     BNORM_loop_channel: for (i64_t c = 0; c < channels; ++c) {
-        bnorm_c_l_c output_offset_c = c * inLines * inCols;
-        BNORM_loop_row: for (bnorm_row_t row = PADDING_OFFSET; row < (inLines - PADDING_OFFSET); ++row) {
+        bnorm_c_l_c output_offset_c = c * BNORM_0__IN_LINES * inCols;
+        BNORM_loop_row: for (bnorm_row_t row = PADDING_OFFSET; row < (BNORM_0__IN_LINES - PADDING_OFFSET); ++row) {
             // for some reason pointer arithmetic worked in conv2d, but here the compiler said "NO", so had to separate it
             bnorm_offset_col offsetcol_row = output_offset_c + row * inCols;
             bnorm_t* pinout_row = input_output + offsetcol_row;

@@ -21,10 +21,8 @@ conv_t* prev = (conv_t*)aux;
 void conv2d(
     const i64_t filters,
     const i64_t channels,
-    const conv_row_t inLines,
-    //const conv_col_t inCols,
-    const conv_row_t outLines,
-    //const conv_col_t outCols,
+    const conv_col_t inCols,
+    const conv_col_t outCols,
     const conv_t* input,        // 3D array
     const conv_t* kernel,       // 3D array if filters==1, 4D array if filters>1
     const conv_t* bias,         // 1D array
@@ -32,13 +30,16 @@ void conv2d(
 ) {
 
     // aux array: set usable bottom line to 0 because maxpool will reduce lines and old aux data is still there
-    /*
     for (i64_t c = 0; c < CHANNELS; ++c) {
-        for (conv_col_t col = 0; col < C2D_0__IN_COLS; ++col) {
-            aux[c][C2D_0__IN_LINES-1][col] = 0;
+        conv_t* pprev = prev + (c * C2D_0__OUT_LINES * outCols) + ((C2D_0__OUT_LINES-1) * outCols);
+        conv_t* poutput = output + (c * C2D_0__OUT_LINES * outCols) + ((C2D_0__OUT_LINES-1) * outCols);
+        for (conv_col_t col = 0; col < outCols; ++col) {
+            *pprev = 0;
+            *poutput = 0;
+            *pprev++;
+            *poutput++;
         }
     }
-    */
 
     conv_t bias_none = 0;
     conv_t* pbias_backup = (conv_t*)bias;
@@ -51,25 +52,25 @@ void conv2d(
         conv_t* poutput_offset;
         conv_t* pprev_offset;
         if (filters > 1) {
-            output_offset = f * outLines * C2D_0__IN_COLS;
+            output_offset = f * C2D_0__OUT_LINES * outCols;
             poutput_offset = output + output_offset;
             pprev_offset = prev + output_offset;
         }
 
         CONV_loop_channel: for (i64_t c = 0; c < channels; ++c) {
             conv_t* pkernel_c = pkernel + (c * C2D_KERNEL_LINES * C2D_KERNEL_COLS);
-            conv_t* pinput_c = (conv_t*)input + (c * inLines * C2D_0__IN_COLS);
+            conv_t* pinput_c = (conv_t*)input + (c * C2D_0__IN_LINES * inCols);
 
             if (filters == 1) {
-                output_offset = c * outLines * C2D_0__IN_COLS;
+                output_offset = c * C2D_0__OUT_LINES * outCols;
                 poutput_offset = output + output_offset;
                 pprev_offset = prev + output_offset;
             }
 
-            CONV_loop_row: for (conv_row_t orow = PADDING_OFFSET; orow < (outLines - PADDING_OFFSET); ++orow) {
-                conv_t* poutput_offset_orow = poutput_offset + (orow * C2D_0__IN_COLS);
-                conv_t* pprev_offset_orow = pprev_offset + (orow * C2D_0__IN_COLS);
-                CONV_loop_col: for (conv_col_t ocol = PADDING_OFFSET; ocol < (C2D_0__IN_COLS - PADDING_OFFSET); ++ocol) {
+            CONV_loop_row: for (conv_row_t orow = PADDING_OFFSET; orow < (C2D_0__OUT_LINES - PADDING_OFFSET); ++orow) {
+                conv_t* poutput_offset_orow = poutput_offset + (orow * inCols);
+                conv_t* pprev_offset_orow = pprev_offset + (orow * inCols);
+                CONV_loop_col: for (conv_col_t ocol = PADDING_OFFSET; ocol < (inCols - PADDING_OFFSET); ++ocol) {
         #pragma HLS PIPELINE
                     conv_t acc = *pbias;
                     conv_t acc_sat;
@@ -77,7 +78,7 @@ void conv2d(
                     CONV_loop_k1: for (conv_k_t krow = 0; krow < C2D_KERNEL_LINES; ++krow, ++korow) {
         //#pragma HLS PIPELINE
                         conv_t* pkernel_c_krow = pkernel_c + (krow * C2D_KERNEL_COLS);
-                        conv_t* pinput_c_krow = pinput_c + (korow * C2D_0__IN_COLS);
+                        conv_t* pinput_c_krow = pinput_c + (korow * inCols);
                         conv_col_t kocol = ocol - PADDING_OFFSET;
                         CONV_loop_k2: for (conv_k_t kcol = 0; kcol < C2D_KERNEL_COLS; ++kcol, ++kocol) {
         //#pragma HLS PIPELINE
