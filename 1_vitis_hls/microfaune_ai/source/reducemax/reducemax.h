@@ -13,7 +13,7 @@ typedef ap_uint<9> rmax_row_t;
 typedef ap_uint<6> rmax_col_t;
 
 void reducemax_0_saveTranspose(
-    reducemax_t* input_output,
+    reducemax_t* input_output
 ) {
     RMAX_0_loop_channel: for (rmax_cha_t c = 0; c < CHANNELS; ++c) {
         RMAX_0_loop_row: for (rmax_row_t row = 0; row < CNN_LINES; ++row) {

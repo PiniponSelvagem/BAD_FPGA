@@ -295,7 +295,6 @@ void predict(
 
     /* 4 */
     // Conv2D
-    // Conv2D
     conv2d(
         FILTERS,
         C2D_4__IN_COLS,
