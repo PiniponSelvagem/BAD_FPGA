@@ -120,7 +120,7 @@ void predict(
     /* 0 */
     // Conv2D
     conv2d(
-        1/*FILTERS*/, CHANNELS,
+        1/*FILTERS*/,
         C2D_0__IN_COLS,
         C2D_0__OUT_COLS,
         (conv_t*)inputpad,
@@ -129,8 +129,8 @@ void predict(
         (conv_t*)outpad_01_a
     );
     printf("CONV2D_0\n");
-    for (int l = 0; l < 16/*433*/; ++l) {
-        for (int c = 0; c < 8/*42*/; ++c) {
+    for (int l = 0; l < 16; ++l) {
+        for (int c = 0; c < 8; ++c) {
             float a = outpad_01_a[0][l][c];
             printf("%9.6f ", a);
         }
@@ -138,7 +138,6 @@ void predict(
     }
     // BatchNormalization
     bnorm(
-        CHANNELS,
         BNORM_0__IN_COLS,
         (bnorm_t*)outpad_01_a,
         (bnorm_t*)gamma_0,
@@ -147,8 +146,8 @@ void predict(
         (bnorm_t*)movingvariance_0
     ); // BATCH NORMALIZATION + RELU
     printf("BNORM_0\n");
-    for (int l = 0; l < 16/*433*/; ++l) {
-        for (int c = 0; c < 8/*42*/; ++c) {
+    for (int l = 0; l < 16; ++l) {
+        for (int c = 0; c < 8; ++c) {
             float a = outpad_01_a[0][l][c];
             printf("%9.6f ", a);
         }
@@ -158,7 +157,7 @@ void predict(
     /* 1 */
     // Conv2D
     conv2d(
-        FILTERS, CHANNELS,
+        FILTERS,
         C2D_1__IN_COLS,
         C2D_1__OUT_COLS,
         (conv_t*)outpad_01_a,
@@ -167,17 +166,15 @@ void predict(
         (conv_t*)outpad_01_b
     );
     printf("CONV2D_1\n");
-    for (int l = 0; l < 16/*433*/; ++l) {
-        for (int c = 0; c < 8/*42*/; ++c) {
+    for (int l = 0; l < 16; ++l) {
+        for (int c = 0; c < 8; ++c) {
             float a = outpad_01_b[0][l][c];
             printf("%9.6f ", a);
         }
         printf("\n");
     }
-
     // BatchNormalization
     bnorm(
-        CHANNELS,
         BNORM_1__IN_COLS,
         (bnorm_t*)outpad_01_b,
         (bnorm_t*)gamma_1,
@@ -186,9 +183,218 @@ void predict(
         (bnorm_t*)movingvariance_1
     ); // BATCH NORMALIZATION + RELU
     printf("BNORM_1\n");
-    for (int l = 0; l < 433; ++l) {
-        for (int c = 0; c < 42; ++c) {
+    for (int l = 0; l < 16; ++l) {
+        for (int c = 0; c < 8; ++c) {
             float a = outpad_01_b[0][l][c];
+            printf("%9.6f ", a);
+        }
+        printf("\n");
+    }
+    // MaxPool2D
+    maxpool2d(
+        MP2D_0__IN_COLS,
+        PADDING_OFFSET,
+        (mpool_t*)outpad_01_b
+    );
+    printf("MAXPOOL_0\n");
+    for (int l = 0; l < 16; ++l) {
+        for (int c = 0; c < 23; ++c) {
+            float a = outpad_01_b[0][l][c];
+            printf("%9.6f ", a);
+        }
+        printf("\n");
+    }
+
+    /* 2 */
+    // Conv2D
+    conv2d(
+        FILTERS,
+        C2D_2__IN_COLS,
+        C2D_2__OUT_COLS,
+        (conv_t*)outpad_01_b,
+        (conv_t*)kernel_2,
+        (conv_t*)bias_2,
+        (conv_t*)outpad_01_a
+    );
+    printf("CONV2D_2\n");
+    for (int l = 0; l < 16; ++l) {
+        for (int c = 0; c < 23; ++c) {
+            float a = outpad_01_a[0][l][c];
+            printf("%9.6f ", a);
+        }
+        printf("\n");
+    }
+    // BatchNormalization
+    bnorm(
+        BNORM_2__IN_COLS,
+        (bnorm_t*)outpad_01_a,
+        (bnorm_t*)gamma_2,
+        (bnorm_t*)beta_2,
+        (bnorm_t*)movingmean_2,
+        (bnorm_t*)movingvariance_2
+    ); // BATCH NORMALIZATION + RELU
+    printf("BNORM_2\n");
+    for (int l = 0; l < 16; ++l) {
+        for (int c = 0; c < 23; ++c) {
+            float a = outpad_01_a[0][l][c];
+            printf("%9.6f ", a);
+        }
+        printf("\n");
+    }
+
+    /* 3 */
+    // Conv2D
+    conv2d(
+        FILTERS,
+        C2D_3__IN_COLS,
+        C2D_3__OUT_COLS,
+        (conv_t*)outpad_01_a,
+        (conv_t*)kernel_3,
+        (conv_t*)bias_3,
+        (conv_t*)outpad_01_b
+    );
+    printf("CONV2D_3\n");
+    for (int l = 0; l < 16; ++l) {
+        for (int c = 0; c < 23; ++c) {
+            float a = outpad_01_b[0][l][c];
+            printf("%9.6f ", a);
+        }
+        printf("\n");
+    }
+    // BatchNormalization
+    bnorm(
+        BNORM_3__IN_COLS,
+        (bnorm_t*)outpad_01_b,
+        (bnorm_t*)gamma_3,
+        (bnorm_t*)beta_3,
+        (bnorm_t*)movingmean_3,
+        (bnorm_t*)movingvariance_3
+    ); // BATCH NORMALIZATION + RELU
+    printf("BNORM_3\n");
+    for (int l = 0; l < 16; ++l) {
+        for (int c = 0; c < 23; ++c) {
+            float a = outpad_01_b[0][l][c];
+            printf("%9.6f ", a);
+        }
+        printf("\n");
+    }
+    // MaxPool2D
+    maxpool2d(
+        MP2D_1__IN_COLS,
+        PADDING_OFFSET,
+        (mpool_t*)outpad_01_b
+    );
+    printf("MAXPOOL_1\n");
+    for (int l = 0; l < 16; ++l) {
+        for (int c = 0; c < 23; ++c) {
+            float a = outpad_01_b[0][l][c];
+            printf("%9.6f ", a);
+        }
+        printf("\n");
+    }
+
+    /* 4 */
+    // Conv2D
+    // Conv2D
+    conv2d(
+        FILTERS,
+        C2D_4__IN_COLS,
+        C2D_4__OUT_COLS,
+        (conv_t*)outpad_01_b,
+        (conv_t*)kernel_4,
+        (conv_t*)bias_4,
+        (conv_t*)outpad_01_a
+    );
+    printf("CONV2D_4\n");
+    for (int l = 0; l < 16; ++l) {
+        for (int c = 0; c < 12; ++c) {
+            float a = outpad_01_a[0][l][c];
+            printf("%9.6f ", a);
+        }
+        printf("\n");
+    }
+    // BatchNormalization
+    bnorm(
+        BNORM_4__IN_COLS,
+        (bnorm_t*)outpad_01_a,
+        (bnorm_t*)gamma_4,
+        (bnorm_t*)beta_4,
+        (bnorm_t*)movingmean_4,
+        (bnorm_t*)movingvariance_4
+    ); // BATCH NORMALIZATION + RELU
+    printf("BNORM_4\n");
+    for (int l = 0; l < 16; ++l) {
+        for (int c = 0; c < 12; ++c) {
+            float a = outpad_01_a[0][l][c];
+            printf("%9.6f ", a);
+        }
+        printf("\n");
+    }
+
+    /* 5 */
+    // Conv2D
+    conv2d(
+        FILTERS,
+        C2D_5__IN_COLS,
+        C2D_5__OUT_COLS,
+        (conv_t*)outpad_01_a,
+        (conv_t*)kernel_5,
+        (conv_t*)bias_5,
+        (conv_t*)outpad_01_b
+    );
+    printf("CONV2D_5\n");
+    for (int l = 0; l < 16; ++l) {
+        for (int c = 0; c < 12; ++c) {
+            float a = outpad_01_b[0][l][c];
+            printf("%9.6f ", a);
+        }
+        printf("\n");
+    }
+    // BatchNormalization
+    bnorm(
+        BNORM_5__IN_COLS,
+        (bnorm_t*)outpad_01_b,
+        (bnorm_t*)gamma_5,
+        (bnorm_t*)beta_5,
+        (bnorm_t*)movingmean_5,
+        (bnorm_t*)movingvariance_5
+    ); // BATCH NORMALIZATION + RELU
+    printf("BNORM_5\n");
+    for (int l = 0; l < 16; ++l) {
+        for (int c = 0; c < 12; ++c) {
+            float a = outpad_01_b[0][l][c];
+            printf("%9.6f ", a);
+        }
+        printf("\n");
+    }
+    // MaxPool2D
+    maxpool2d(
+        MP2D_2__IN_COLS,
+        0,
+        (mpool_t*)outpad_01_b
+    );
+    printf("MAXPOOL_1\n");
+    for (int l = 0; l < 431; ++l) {
+        printf("%3d ", l);
+        for (int c = 0; c < 5; ++c) {
+            float a = outpad_01_b[63][l][c];
+            printf("%9.6f ", a);
+        }
+        printf("\n");
+    }
+
+    /* 6 */
+    // ReduceMax
+    reducemax_0_saveTranspose(
+        (reducemax_t*)outpad_01_b
+    );
+    printf("RMAX_0\n");
+    for (int l = 0; l < RMAX_0__OUT_LINES; ++l) {
+        printf("%3d ", l);
+        for (int c = 0; c < RMAX_0__OUT_COLS; ++c) {
+            reducemax_t (*poutput)[RMAX_0__OUT_COLS] = (reducemax_t(*)[64])outpad_01_b;
+            float a = poutput[l][c];
+            //float a = outpad_01_a[0][l][c];
             printf("%9.6f ", a);
         }
         printf("\n");
@@ -200,97 +406,6 @@ void test(
     output_t outputLS[OUTPUT_LOCAL_SCORE_LINES][OUTPUT_LOCAL_SCORE_COLS],
     output_t outputGS[OUTPUT_GLOBAL_SCORE]
 ) {
-    
-    
-    // MaxPool2D
-    P_MAXPOOL_0: for (i64_t c = 0; c < CHANNELS; ++c) {    /* 0 */
-        maxpool2d<MP2D_0__IN_LINES, MP2D_0__IN_COLS, MP2D_0__OUT_LINES, MP2D_0__OUT_COLS, PADDING_OFFSET>(outpad_01_b[c], outpad_23_a[c]);
-    }
-
-     /* 2 */
-    // Conv2D
-    P_CONV_2: for (i64_t f = 0; f < FILTERS; ++f) {
-#pragma HLS PIPELINE off
-        conv_t biasVal = bias_2[f];
-        i64_t c = 0;
-        conv2d_start<C2D_2__IN_LINES, C2D_2__IN_COLS, C2D_2__OUT_LINES, C2D_2__OUT_COLS>(outpad_23_a[c], kernel_2[c][f], biasVal, outpad_23_b[f]);
-        ++c;
-        P_CONV_2_M: for (; c < CHANNELS; ++c) {
-#pragma HLS PIPELINE off
-            conv2d_multi<C2D_2__IN_LINES, C2D_2__IN_COLS, C2D_2__OUT_LINES, C2D_2__OUT_COLS>(outpad_23_a[c], outpad_23_b[f], kernel_2[c][f], outpad_23_b[f]);
-        }
-    }
-    // BatchNormalization
-    P_BNORM_2: for (i64_t c = 0; c < CHANNELS; ++c) {    // BATCH NORMALIZATION + RELU
-        bnorm_old<BNORM_2__IN_LINES, BNORM_2__IN_COLS>(outpad_23_b[c], gamma_2[c], beta_2[c], movingmean_2[c], movingvariance_2[c], outpad_23_a[c]);
-    }
-
-    /* 3 */
-    // Conv2D
-    P_CONV_3: for (i64_t f = 0; f < FILTERS; ++f) {
-#pragma HLS PIPELINE off
-        conv_t biasVal = bias_3[f];
-        i64_t c = 0;
-        conv2d_start<C2D_3__IN_LINES, C2D_3__IN_COLS, C2D_3__OUT_LINES, C2D_3__OUT_COLS>(outpad_23_a[c], kernel_3[c][f], biasVal, outpad_23_b[f]);
-        ++c;
-        P_CONV_3_M: for (; c < CHANNELS; ++c) {
-#pragma HLS PIPELINE off
-            conv2d_multi<C2D_3__IN_LINES, C2D_3__IN_COLS, C2D_3__OUT_LINES, C2D_3__OUT_COLS>(outpad_23_a[c], outpad_23_b[f], kernel_3[c][f], outpad_23_b[f]);
-        }
-    }
-    // BatchNormalization
-    P_BNORM_3: for (i64_t c = 0; c < CHANNELS; ++c) {    // BATCH NORMALIZATION + RELU
-        bnorm_old<BNORM_3__IN_LINES, BNORM_3__IN_COLS>(outpad_23_b[c], gamma_3[c], beta_3[c], movingmean_3[c], movingvariance_3[c], outpad_23_a[c]);
-    }
-    // MaxPool2D
-    P_MAXPOOL_1: for (i64_t c = 0; c < CHANNELS; ++c) {    /* 1 */
-        maxpool2d<MP2D_1__IN_LINES, MP2D_1__IN_COLS, MP2D_1__OUT_LINES, MP2D_1__OUT_COLS, PADDING_OFFSET>(outpad_23_a[c], outpad_45_a[c]);
-    }
-
-    /* 4 */
-    // Conv2D
-    P_CONV_4: for (i64_t f = 0; f < FILTERS; ++f) {
-#pragma HLS PIPELINE off
-        conv_t biasVal = bias_4[f];
-        i64_t c = 0;
-        conv2d_start<C2D_4__IN_LINES, C2D_4__IN_COLS, C2D_4__OUT_LINES, C2D_4__OUT_COLS>(outpad_45_a[c], kernel_4[c][f], biasVal, outpad_45_b[f]);
-        ++c;
-        P_CONV_4_M: for (; c < CHANNELS; ++c) {
-#pragma HLS PIPELINE off
-            conv2d_multi<C2D_4__IN_LINES, C2D_4__IN_COLS, C2D_4__OUT_LINES, C2D_4__OUT_COLS>(outpad_45_a[c], outpad_45_b[f], kernel_4[c][f], outpad_45_b[f]);
-        }
-    }
-    // BatchNormalization
-    P_BNORM_4: for (i64_t c = 0; c < CHANNELS; ++c) {    // BATCH NORMALIZATION + RELU
-        bnorm_old<BNORM_4__IN_LINES, BNORM_4__IN_COLS>(outpad_45_b[c], gamma_4[c], beta_4[c], movingmean_4[c], movingvariance_4[c], outpad_45_a[c]);
-    }
-
-    /* 5 */
-    // Conv2D
-    P_CONV_5: for (i64_t f = 0; f < FILTERS; ++f) {
-#pragma HLS PIPELINE off
-        conv_t biasVal = bias_5[f];
-        i64_t c = 0;
-        conv2d_start<C2D_5__IN_LINES, C2D_5__IN_COLS, C2D_5__OUT_LINES, C2D_5__OUT_COLS>(outpad_45_a[c], kernel_5[c][f], biasVal, outpad_45_b[f]);
-        ++c;
-        P_CONV_5_M: for (; c < CHANNELS; ++c) {
-#pragma HLS PIPELINE off
-            conv2d_multi<C2D_5__IN_LINES, C2D_5__IN_COLS, C2D_5__OUT_LINES, C2D_5__OUT_COLS>(outpad_45_a[c], outpad_45_b[f], kernel_5[c][f], outpad_45_b[f]);
-        }
-    }
-    // BatchNormalization
-    P_BNORM_5: for (i64_t c = 0; c < CHANNELS; ++c) {    // BATCH NORMALIZATION + RELU
-        bnorm_old<BNORM_5__IN_LINES, BNORM_5__IN_COLS>(outpad_45_b[c], gamma_5[c], beta_5[c], movingmean_5[c], movingvariance_5[c], outpad_45_a[c]);
-    }
-    // MaxPool2D
-    P_MAXPOOL_2: for (i64_t c = 0; c < CHANNELS; ++c) {    /* 2 */
-        maxpool2d<MP2D_2__IN_LINES, MP2D_2__IN_COLS, MP2D_2__OUT_LINES, MP2D_2__OUT_COLS, 0>(outpad_45_a[c], outpad_45_nopad[c]);
-    }
-
-    /* 6 */
-    // ReduceMax
-    reducemax_0_saveTranspose<RMAX_0__IN_LINES, RMAX_0__IN_COLS, RMAX_0__OUT_LINES, RMAX_0__OUT_COLS>(outpad_45_nopad, out_rmax0);
-
 
     /*************************************/
     /**************** RNN ****************/

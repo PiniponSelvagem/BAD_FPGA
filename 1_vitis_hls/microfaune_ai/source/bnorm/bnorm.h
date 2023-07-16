@@ -13,8 +13,7 @@ typedef ap_uint<22> bnorm_c_l_c;
 typedef ap_uint<22> bnorm_offset_col;
 
 void bnorm(
-    const i64_t channels,
-    const bnorm_t inCols,
+    const bnrom_col_t inCols,
     bnorm_t* input_output,
     const bnorm_t gamma[CHANNELS],
     const bnorm_t beta[CHANNELS],
@@ -22,11 +21,11 @@ void bnorm(
     const bnorm_t movingvariance[CHANNELS]
 ) {
     const bnorm_t epsilon = BNORM_EPSILON;
-    BNORM_loop_channel: for (i64_t c = 0; c < channels; ++c) {
-        bnorm_c_l_c output_offset_c = c * BNORM_0__IN_LINES * inCols;
-        BNORM_loop_row: for (bnorm_row_t row = PADDING_OFFSET; row < (BNORM_0__IN_LINES - PADDING_OFFSET); ++row) {
+    BNORM_loop_channel: for (i64_t c = 0; c < CHANNELS; ++c) {
+        bnorm_c_l_c output_offset_c = c * CNN_LINES_PAD * CNN_COLS_PAD;
+        BNORM_loop_row: for (bnorm_row_t row = PADDING_OFFSET; row < (CNN_LINES_PAD - PADDING_OFFSET); ++row) {
             // for some reason pointer arithmetic worked in conv2d, but here the compiler said "NO", so had to separate it
-            bnorm_offset_col offsetcol_row = output_offset_c + row * inCols;
+            bnorm_offset_col offsetcol_row = output_offset_c + row * CNN_COLS_PAD;
             bnorm_t* pinout_row = input_output + offsetcol_row;
             BNORM_loop_col: for (bnrom_col_t col = PADDING_OFFSET; col < (inCols - PADDING_OFFSET); ++col) {
                 bnorm_t* pinout = pinout_row + col;
@@ -41,33 +40,6 @@ void bnorm(
                 if (out < 0) { out = 0; } // ReLu
                 *pinout = out;
             }
-        }
-    }
-}
-
-
-template <int BN_LINES, int BN_COLS>
-void bnorm_old(
-    const bnorm_t input[BN_LINES][BN_COLS],
-    const bnorm_t gamma,
-    const bnorm_t beta,
-    const bnorm_t movingmean,
-    const bnorm_t movingvariance,
-    bnorm_t output[BN_LINES][BN_COLS]
-) {
-    const bnorm_t epsilon = BNORM_EPSILON;
-    BNORM_loop_row: for (bnorm_row_t row = PADDING_OFFSET; row < (BN_LINES - PADDING_OFFSET); ++row) {
-        BNORM_loop_col: for (bnrom_col_t col = PADDING_OFFSET; col < (BN_COLS - PADDING_OFFSET); ++col) {
-            bnorm_t sqrt_value = movingvariance + epsilon;
-            #ifdef USE_FLOAT
-            bnorm_t normalized = (input[row][col] - movingmean) / (bnorm_t)(sqrt(sqrt_value));
-            #else
-            bnorm_t normalized = (input[row][col] - movingmean) / (bnorm_t)(sqrt(sqrt_value.to_float()));
-            #endif
-            bnorm_t out = gamma * normalized + beta;
-
-            if (out < 0) { out = 0; } // ReLu
-            output[row][col] = out;
         }
     }
 }
