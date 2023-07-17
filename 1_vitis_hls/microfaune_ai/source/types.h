@@ -10,6 +10,7 @@
 // margin included
 typedef ap_uint<7> i64_t;
 typedef ap_uint<8> i128_t;
+typedef ap_int<10> i512_t;  // requires signal because backward layer has check: i >= 0, and i will be -1
 
 /* LAYER TYPES */
 #define USE_FLOAT

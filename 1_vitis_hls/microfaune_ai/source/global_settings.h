@@ -15,5 +15,7 @@
 #define CNN_LINES_PAD   (CNN_LINES+PADDING)
 #define CNN_COLS_PAD    (CNN_COLS+PADDING)
 
+#define RNN_LINES_GRU   431
+#define RNN_COLS_GRU    128
 
 #endif // GLOBAL_SETTINGS_H

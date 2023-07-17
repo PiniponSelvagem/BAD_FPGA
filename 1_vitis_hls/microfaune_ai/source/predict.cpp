@@ -92,9 +92,6 @@ output_t outtd_1[INPUT_LINES][TD_1__OUT_COLS] = { 0.0 };
 // outputLS
 // outputGS
 
-// margin included
-typedef ap_int<10> i512_t;  // requires signal because backward layer has check: i >= 0, and i will be -1
-
 
 void predict(
     const input_t input[INPUT_LINES][INPUT_COLS],
@@ -388,13 +385,139 @@ void predict(
         (reducemax_t*)outpad_01_b
     );
     printf("RMAX_0\n");
-    for (int l = 0; l < RMAX_0__OUT_LINES; ++l) {
+    for (int l = 0; l < 16; ++l) {
         printf("%3d ", l);
-        for (int c = 0; c < RMAX_0__OUT_COLS; ++c) {
-            reducemax_t (*poutput)[RMAX_0__OUT_COLS] = (reducemax_t(*)[64])outpad_01_b;
+        for (int c = 0; c < 8; ++c) {
+            reducemax_t (*poutput)[RMAX_0__OUT_COLS] = (reducemax_t(*)[RMAX_0__OUT_COLS])outpad_01_b;
             float a = poutput[l][c];
             //float a = outpad_01_a[0][l][c];
             printf("%9.6f ", a);
+        }
+        printf("\n");
+    }
+
+
+    /*************************************/
+    /**************** RNN ****************/
+    /*************************************/
+    // GRU_1 (CLEAR)
+    for (int l = 0; l < GRU_0__OUT_LINES; ++l) {
+        for (int c = 0; c < GRU_0__OUT_COLS; ++c) {
+            reducemax_t (*poutput)[GRU_0__OUT_COLS] = (reducemax_t(*)[GRU_0__OUT_COLS])outpad_01_a;
+            poutput[l][c] = 99.9999;
+            float a = poutput[l][c];
+        }
+    }
+    /* 7 */
+    // GRU 0 (forward)
+    gru(
+        GRU_FORWARD,
+        GRU_0__IN_COLS,
+        GRU_0__KERNEL_LINES,
+        (gru_t*)outpad_01_b,
+        (gru_t*)kernel_gru0_f,           (gru_t*)bias_gru0_f,
+        (gru_t*)recurrent_kernel_gru0_f, (gru_t*)recurrent_bias_gru0_f,
+        (gru_t*)outpad_01_a
+    );
+    printf("GRU_0 (forward)\n");
+    for (int l = 0; l < GRU_0__OUT_LINES; ++l) {
+        printf("%3d ", l);
+        for (int c = 0; c < GRU_0__OUT_COLS; ++c) {
+            reducemax_t (*poutput)[GRU_0__OUT_COLS] = (reducemax_t(*)[GRU_0__OUT_COLS])outpad_01_a;
+            float a = poutput[l][c];
+            //float a = outpad_01_a[0][l][c];
+            if (a < 99)
+                printf("%9.6f ", a);
+            else
+                printf("--.------ ");
+        }
+        printf("\n");
+    }
+    // GRU 0 (backward)
+    gru(
+        GRU_BACKWARD,
+        GRU_0__IN_COLS,
+        GRU_0__KERNEL_LINES,
+        (gru_t*)outpad_01_b,
+        (gru_t*)kernel_gru0_b,           (gru_t*)bias_gru0_b,
+        (gru_t*)recurrent_kernel_gru0_b, (gru_t*)recurrent_bias_gru0_b,
+        (gru_t*)outpad_01_a
+    );
+    printf("GRU_0 (backward)\n");
+    for (int l = 0; l < GRU_0__OUT_LINES; ++l) {
+        printf("%3d ", l);
+        for (int c = 0; c < GRU_0__OUT_COLS; ++c) {
+            reducemax_t (*poutput)[GRU_0__OUT_COLS] = (reducemax_t(*)[GRU_0__OUT_COLS])outpad_01_a;
+            float a = poutput[l][c];
+            //float a = outpad_01_a[0][l][c];
+            if (a < 99)
+                printf("%9.6f ", a);
+            else
+                printf("--.------ ");
+        }
+        printf("\n");
+    }
+    // TESTED AND VALIDATED UNTIL HERE
+    // TESTED AND VALIDATED UNTIL HERE
+    // TESTED AND VALIDATED UNTIL HERE
+    // TESTED AND VALIDATED UNTIL HERE
+    /////////////////////////////////////////////////////////////////////////////////////
+
+
+    // GRU_1 (CLEAR)
+    for (int l = 0; l < GRU_0__OUT_LINES; ++l) {
+        for (int c = 0; c < GRU_0__OUT_COLS; ++c) {
+            reducemax_t (*poutput)[GRU_0__OUT_COLS] = (reducemax_t(*)[GRU_0__OUT_COLS])outpad_01_b;
+            poutput[l][c] = 99.9999;
+            float a = poutput[l][c];
+        }
+    }
+    /* 8 */
+    // GRU 1 (forward)
+    gru(
+        GRU_FORWARD,
+        GRU_1__IN_COLS,
+        GRU_1__KERNEL_LINES,
+        (gru_t*)outpad_01_a,
+        (gru_t*)kernel_gru1_f,           (gru_t*)bias_gru1_f,
+        (gru_t*)recurrent_kernel_gru1_f, (gru_t*)recurrent_bias_gru1_f,
+        (gru_t*)outpad_01_b
+    );
+    printf("GRU_1 (forward)\n");
+    for (int l = 0; l < GRU_1__OUT_LINES; ++l) {
+        printf("%3d ", l);
+        for (int c = 0; c < GRU_1__OUT_COLS; ++c) {
+            reducemax_t (*poutput)[GRU_1__OUT_COLS] = (reducemax_t(*)[GRU_1__OUT_COLS])outpad_01_b;
+            float a = poutput[l][c];
+            //float a = outpad_01_a[0][l][c];
+            if (a < 99)
+                printf("%9.6f ", a);
+            else
+                printf("--.------ ");
+        }
+        printf("\n");
+    }
+    // GRU 1 (backward)
+    gru(
+        GRU_BACKWARD,
+        GRU_1__IN_COLS,
+        GRU_1__KERNEL_LINES,
+        (gru_t*)outpad_01_a,
+        (gru_t*)kernel_gru1_b,           (gru_t*)bias_gru1_b,
+        (gru_t*)recurrent_kernel_gru1_b, (gru_t*)recurrent_bias_gru1_b,
+        (gru_t*)outpad_01_b
+    );
+    printf("GRU_1 (backward)\n");
+    for (int l = 0; l < GRU_1__OUT_LINES; ++l) {
+        printf("%3d ", l);
+        for (int c = 0; c < GRU_1__OUT_COLS; ++c) {
+            reducemax_t (*poutput)[GRU_1__OUT_COLS] = (reducemax_t(*)[GRU_1__OUT_COLS])outpad_01_b;
+            float a = poutput[l][c];
+            //float a = outpad_01_a[0][l][c];
+            if (a < 99)
+                printf("%9.6f ", a);
+            else
+                printf("--.------ ");
         }
         printf("\n");
     }
@@ -409,12 +532,12 @@ void test(
     /*************************************/
     /**************** RNN ****************/
     /*************************************/
-    /* 7 */
+    /* 7 *
     // GRU 0 (forward)
     gru_clearState();
     P_GRU_0_F_LINES: for (i512_t i = 0; i < GRU_0__IN_LINES; ++i) {
         P_GRU_0_F_COLS: for (i64_t idx = 0; idx < GRU_0__IN_COLS; ++idx) {
-            gru<GRU_0__IN_COLS, GRU_0__KERNEL_LINES, GRU_0__KERNEL_COLS, GRU_0__KERNEL_R_LINES, GRU_0__KERNEL_R_COLS, GRU_0__BIAS_SIZE>
+            gru_old<GRU_0__IN_COLS, GRU_0__KERNEL_LINES, GRU_0__KERNEL_COLS, GRU_0__KERNEL_R_LINES, GRU_0__KERNEL_R_COLS, GRU_0__BIAS_SIZE>
                 (idx, out_rmax0[i], kernel_gru0_f, bias_gru0_f, recurrent_kernel_gru0_f, recurrent_bias_gru0_f, &outgru_0[i][idx]);
         }
         gru_syncState();
@@ -423,18 +546,18 @@ void test(
     gru_clearState();
     P_GRU_0_B_LINES: for (i512_t i = GRU_0__IN_LINES-1; i >= 0; --i) {
         P_GRU_0_B_COLS: for (i64_t idx = 0; idx < GRU_0__IN_COLS; ++idx) {
-            gru<GRU_0__IN_COLS, GRU_0__KERNEL_LINES, GRU_0__KERNEL_COLS, GRU_0__KERNEL_R_LINES, GRU_0__KERNEL_R_COLS, GRU_0__BIAS_SIZE>
+            gru_old<GRU_0__IN_COLS, GRU_0__KERNEL_LINES, GRU_0__KERNEL_COLS, GRU_0__KERNEL_R_LINES, GRU_0__KERNEL_R_COLS, GRU_0__BIAS_SIZE>
                 (idx, out_rmax0[i], kernel_gru0_b, bias_gru0_b, recurrent_kernel_gru0_b, recurrent_bias_gru0_b, &outgru_0[i][idx+64]);
         }
         gru_syncState();
     }
 
-    /* 8 */
+    /* 8 *
     // GRU 1 (forward)
     gru_clearState();
     P_GRU_1_F_LINES: for (i512_t i = 0; i < GRU_1__IN_LINES; ++i) {
         P_GRU_1_F_COLS: for (i128_t idx = 0; idx < GRU_1__IN_COLS; ++idx) {
-            gru<GRU_1__IN_COLS, GRU_1__KERNEL_LINES, GRU_1__KERNEL_COLS, GRU_1__KERNEL_R_LINES, GRU_1__KERNEL_R_COLS, GRU_1__BIAS_SIZE>
+            gru_old<GRU_1__IN_COLS, GRU_1__KERNEL_LINES, GRU_1__KERNEL_COLS, GRU_1__KERNEL_R_LINES, GRU_1__KERNEL_R_COLS, GRU_1__BIAS_SIZE>
                 (idx, outgru_0[i], kernel_gru1_f, bias_gru1_f, recurrent_kernel_gru1_f, recurrent_bias_gru1_f, &outgru_1[i][idx]);
         }
         gru_syncState();
@@ -443,13 +566,13 @@ void test(
     gru_clearState();
     P_GRU_1_B_LINES: for (i512_t i = GRU_1__IN_LINES-1; i >= 0; --i) {
         P_GRU_1_B_COLS: for (i64_t idx = 0; idx < GRU_1__IN_COLS_BACK; ++idx) {
-            gru<GRU_1__IN_COLS, GRU_1__KERNEL_LINES, GRU_1__KERNEL_COLS, GRU_1__KERNEL_R_LINES, GRU_1__KERNEL_R_COLS, GRU_1__BIAS_SIZE>
+            gru_old<GRU_1__IN_COLS, GRU_1__KERNEL_LINES, GRU_1__KERNEL_COLS, GRU_1__KERNEL_R_LINES, GRU_1__KERNEL_R_COLS, GRU_1__BIAS_SIZE>
                 (idx, outgru_0[i], kernel_gru1_b, bias_gru1_b, recurrent_kernel_gru1_b, recurrent_bias_gru1_b, &outgru_1[i][idx+64]);
         }
         gru_syncState();
     }
 
-    /* 9 */
+    /* 9 *
     // TimeDistribution 0 (Dense)
     P_TDIST_0: for (i512_t i = 0; i < INPUT_LINES; ++i) {
         timedistributed_dense<TD_0__IN_LINES, TD_0__IN_COLS, TD_0__KERNEL_LINES, TD_0__KERNEL_COLS, TD_0__BIAS_SIZE, TD_0__OUT_LINES, TD_0__OUT_COLS>
@@ -462,8 +585,9 @@ void test(
             (outtd_0[i], kernel_td1, bias_td1, outputLS[i]);
     }
     
-    /* 10 */
+    /* 10 *
     reducemax_1<RMAX_1__IN_LINES>(*outputLS, outputGS);
+    */
 }
 
 
