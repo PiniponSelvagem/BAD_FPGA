@@ -3,14 +3,20 @@
 #ifndef MY_TYPES
 #define MY_TYPES
 
+/* GLOBAL TYPES */
+#ifdef __VITIS_HLS__
 #include <ap_int.h>
 #include <ap_fixed.h>
-
-/* GLOBAL TYPES */
 // margin included
 typedef ap_uint<7> i64_t;
 typedef ap_uint<8> i128_t;
 typedef ap_int<10> i512_t;  // requires signal because backward layer has check: i >= 0, and i will be -1
+#endif
+#ifdef _MSC_VER
+typedef int i64_t;
+typedef int i128_t;
+typedef int i512_t;
+#endif
 
 /* LAYER TYPES */
 #define USE_FLOAT

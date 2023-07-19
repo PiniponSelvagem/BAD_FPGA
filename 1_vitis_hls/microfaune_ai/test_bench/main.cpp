@@ -5,8 +5,6 @@
 
 #include "data_input_0.h"
 
-#include "test_utils.cpp"
-
 
 #define IN_LINES    431
 #define IN_COLS     40
@@ -42,11 +40,16 @@ void predict(
 );
 
 
-#include "weights.h"
-
 
 #include "z_outputexpected/dataout_0.h"
 int main() {
+    #ifdef __VITIS_HLS__
+    printf("VITIS HLS detected!\n");
+    #endif
+    #ifdef _MSC_VER
+    printf("Visual Studio detected!\n");
+    #endif
+
     /*
     loadWeights();
     for (int j = 0; j < 64; ++j) {
@@ -76,7 +79,6 @@ int main() {
 
     predict(input, out_local, out_global);
     
-    /*
     printf("LOCAL SCORE:\n");
     printf("      OUTPUT            --VS--            EXPECTED\n");
     for (int i = 0; i < OUT_LINES_DEBUG; ++i) {
@@ -93,7 +95,7 @@ int main() {
     float exp = dataoutexp_0_global[0];
     float difference = out - exp;
     special_print(out, difference, exp);
-    */
+    
 
     /*
     #define WIDTH 16 // Specify the total number of bits

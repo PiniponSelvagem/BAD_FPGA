@@ -1,0 +1,346 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>17.0</VCProjectVersion>
+    <ProjectGuid>{857ACC90-E82E-4E30-8781-EB7ED0F22464}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <WarningLevel>Level3</WarningLevel>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <WarningLevel>Level3</WarningLevel>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <WarningLevel>Level3</WarningLevel>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <WarningLevel>Level3</WarningLevel>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="source\predict.cpp" />
+    <ClCompile Include="test_bench\main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="source\bnorm\bnorm.h" />
+    <ClInclude Include="source\bnorm\bnorm_settings.h" />
+    <ClInclude Include="source\bnorm\data\bnorm_0.h" />
+    <ClInclude Include="source\bnorm\data\bnorm_1.h" />
+    <ClInclude Include="source\bnorm\data\bnorm_2.h" />
+    <ClInclude Include="source\bnorm\data\bnorm_3.h" />
+    <ClInclude Include="source\bnorm\data\bnorm_4.h" />
+    <ClInclude Include="source\bnorm\data\bnorm_5.h" />
+    <ClInclude Include="source\conv2d\conv2d.h" />
+    <ClInclude Include="source\conv2d\conv2d_settings.h" />
+    <ClInclude Include="source\conv2d\data\conv2d_0.h" />
+    <ClInclude Include="source\conv2d\data\conv2d_1.h" />
+    <ClInclude Include="source\conv2d\data\conv2d_2.h" />
+    <ClInclude Include="source\conv2d\data\conv2d_3.h" />
+    <ClInclude Include="source\conv2d\data\conv2d_4.h" />
+    <ClInclude Include="source\conv2d\data\conv2d_5.h" />
+    <ClInclude Include="source\global_settings.h" />
+    <ClInclude Include="source\gru\data\gru_0.h" />
+    <ClInclude Include="source\gru\data\gru_0_backward.h" />
+    <ClInclude Include="source\gru\data\gru_0_forward.h" />
+    <ClInclude Include="source\gru\data\gru_1.h" />
+    <ClInclude Include="source\gru\data\gru_1_backward.h" />
+    <ClInclude Include="source\gru\data\gru_1_forward.h" />
+    <ClInclude Include="source\gru\gru.h" />
+    <ClInclude Include="source\gru\gru_settings.h" />
+    <ClInclude Include="source\input\input.h" />
+    <ClInclude Include="source\input\input_settings.h" />
+    <ClInclude Include="source\load_weights.h" />
+    <ClInclude Include="source\mpool2d\data\maxpool2d_0.h" />
+    <ClInclude Include="source\mpool2d\data\maxpool2d_1.h" />
+    <ClInclude Include="source\mpool2d\data\maxpool2d_2.h" />
+    <ClInclude Include="source\mpool2d\maxpool2d.h" />
+    <ClInclude Include="source\output\output.h" />
+    <ClInclude Include="source\reducemax\data\reducemax_0.h" />
+    <ClInclude Include="source\reducemax\data\reducemax_1.h" />
+    <ClInclude Include="source\reducemax\reducemax.h" />
+    <ClInclude Include="source\timedist\data\timedist_0.h" />
+    <ClInclude Include="source\timedist\data\timedist_1.h" />
+    <ClInclude Include="source\timedist\timedist.h" />
+    <ClInclude Include="source\timedist\timedist_settings.h" />
+    <ClInclude Include="source\types.h" />
+    <ClInclude Include="source\utils\activation.h" />
+    <ClInclude Include="source\utils\sigmoid.h" />
+    <ClInclude Include="source\utils\tanh_rnnoise.h" />
+    <ClInclude Include="test_bench\data_input_0.h" />
+    <ClInclude Include="test_bench\z_outputexpected\dataout_0.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="test_bench\bin_weights\apf_16_7\11_conv2d_3_bias_0.bin" />
+    <None Include="test_bench\bin_weights\apf_16_7\11_conv2d_3_kernel_0.bin" />
+    <None Include="test_bench\bin_weights\apf_16_7\12_batch_normalization_3_beta_0.bin" />
+    <None Include="test_bench\bin_weights\apf_16_7\12_batch_normalization_3_gamma_0.bin" />
+    <None Include="test_bench\bin_weights\apf_16_7\12_batch_normalization_3_moving_mean_0.bin" />
+    <None Include="test_bench\bin_weights\apf_16_7\12_batch_normalization_3_moving_variance_0.bin" />
+    <None Include="test_bench\bin_weights\apf_16_7\15_conv2d_4_bias_0.bin" />
+    <None Include="test_bench\bin_weights\apf_16_7\15_conv2d_4_kernel_0.bin" />
+    <None Include="test_bench\bin_weights\apf_16_7\16_batch_normalization_4_beta_0.bin" />
+    <None Include="test_bench\bin_weights\apf_16_7\16_batch_normalization_4_gamma_0.bin" />
+    <None Include="test_bench\bin_weights\apf_16_7\16_batch_normalization_4_moving_mean_0.bin" />
+    <None Include="test_bench\bin_weights\apf_16_7\16_batch_normalization_4_moving_variance_0.bin" />
+    <None Include="test_bench\bin_weights\apf_16_7\18_conv2d_5_bias_0.bin" />
+    <None Include="test_bench\bin_weights\apf_16_7\18_conv2d_5_kernel_0.bin" />
+    <None Include="test_bench\bin_weights\apf_16_7\19_batch_normalization_5_beta_0.bin" />
+    <None Include="test_bench\bin_weights\apf_16_7\19_batch_normalization_5_gamma_0.bin" />
+    <None Include="test_bench\bin_weights\apf_16_7\19_batch_normalization_5_moving_mean_0.bin" />
+    <None Include="test_bench\bin_weights\apf_16_7\19_batch_normalization_5_moving_variance_0.bin" />
+    <None Include="test_bench\bin_weights\apf_16_7\1_conv2d_bias_0.bin" />
+    <None Include="test_bench\bin_weights\apf_16_7\1_conv2d_kernel_0.bin" />
+    <None Include="test_bench\bin_weights\apf_16_7\23_bidirectional_backward_gru_gru_cell_2_bias_0.bin" />
+    <None Include="test_bench\bin_weights\apf_16_7\23_bidirectional_backward_gru_gru_cell_2_bias_0_recurrent.bin" />
+    <None Include="test_bench\bin_weights\apf_16_7\23_bidirectional_backward_gru_gru_cell_2_kernel_0.bin" />
+    <None Include="test_bench\bin_weights\apf_16_7\23_bidirectional_backward_gru_gru_cell_2_recurrent_kernel_0.bin" />
+    <None Include="test_bench\bin_weights\apf_16_7\23_bidirectional_forward_gru_gru_cell_1_bias_0.bin" />
+    <None Include="test_bench\bin_weights\apf_16_7\23_bidirectional_forward_gru_gru_cell_1_bias_0_recurrent.bin" />
+    <None Include="test_bench\bin_weights\apf_16_7\23_bidirectional_forward_gru_gru_cell_1_kernel_0.bin" />
+    <None Include="test_bench\bin_weights\apf_16_7\23_bidirectional_forward_gru_gru_cell_1_recurrent_kernel_0.bin" />
+    <None Include="test_bench\bin_weights\apf_16_7\24_bidirectional_1_backward_gru_1_gru_cell_5_bias_0.bin" />
+    <None Include="test_bench\bin_weights\apf_16_7\24_bidirectional_1_backward_gru_1_gru_cell_5_bias_0_recurrent.bin" />
+    <None Include="test_bench\bin_weights\apf_16_7\24_bidirectional_1_backward_gru_1_gru_cell_5_kernel_0.bin" />
+    <None Include="test_bench\bin_weights\apf_16_7\24_bidirectional_1_backward_gru_1_gru_cell_5_recurrent_kernel_0.bin" />
+    <None Include="test_bench\bin_weights\apf_16_7\24_bidirectional_1_forward_gru_1_gru_cell_4_bias_0.bin" />
+    <None Include="test_bench\bin_weights\apf_16_7\24_bidirectional_1_forward_gru_1_gru_cell_4_bias_0_recurrent.bin" />
+    <None Include="test_bench\bin_weights\apf_16_7\24_bidirectional_1_forward_gru_1_gru_cell_4_kernel_0.bin" />
+    <None Include="test_bench\bin_weights\apf_16_7\24_bidirectional_1_forward_gru_1_gru_cell_4_recurrent_kernel_0.bin" />
+    <None Include="test_bench\bin_weights\apf_16_7\25_time_distributed_bias_0.bin" />
+    <None Include="test_bench\bin_weights\apf_16_7\25_time_distributed_kernel_0.bin" />
+    <None Include="test_bench\bin_weights\apf_16_7\26_time_distributed_1_bias_0.bin" />
+    <None Include="test_bench\bin_weights\apf_16_7\26_time_distributed_1_kernel_0.bin" />
+    <None Include="test_bench\bin_weights\apf_16_7\2_batch_normalization_beta_0.bin" />
+    <None Include="test_bench\bin_weights\apf_16_7\2_batch_normalization_gamma_0.bin" />
+    <None Include="test_bench\bin_weights\apf_16_7\2_batch_normalization_moving_mean_0.bin" />
+    <None Include="test_bench\bin_weights\apf_16_7\2_batch_normalization_moving_variance_0.bin" />
+    <None Include="test_bench\bin_weights\apf_16_7\4_conv2d_1_bias_0.bin" />
+    <None Include="test_bench\bin_weights\apf_16_7\4_conv2d_1_kernel_0.bin" />
+    <None Include="test_bench\bin_weights\apf_16_7\5_batch_normalization_1_beta_0.bin" />
+    <None Include="test_bench\bin_weights\apf_16_7\5_batch_normalization_1_gamma_0.bin" />
+    <None Include="test_bench\bin_weights\apf_16_7\5_batch_normalization_1_moving_mean_0.bin" />
+    <None Include="test_bench\bin_weights\apf_16_7\5_batch_normalization_1_moving_variance_0.bin" />
+    <None Include="test_bench\bin_weights\apf_16_7\8_conv2d_2_bias_0.bin" />
+    <None Include="test_bench\bin_weights\apf_16_7\8_conv2d_2_kernel_0.bin" />
+    <None Include="test_bench\bin_weights\apf_16_7\9_batch_normalization_2_beta_0.bin" />
+    <None Include="test_bench\bin_weights\apf_16_7\9_batch_normalization_2_gamma_0.bin" />
+    <None Include="test_bench\bin_weights\apf_16_7\9_batch_normalization_2_moving_mean_0.bin" />
+    <None Include="test_bench\bin_weights\apf_16_7\9_batch_normalization_2_moving_variance_0.bin" />
+    <None Include="test_bench\bin_weights\apf_32_8\11_conv2d_3_bias_0.bin" />
+    <None Include="test_bench\bin_weights\apf_32_8\11_conv2d_3_kernel_0.bin" />
+    <None Include="test_bench\bin_weights\apf_32_8\12_batch_normalization_3_beta_0.bin" />
+    <None Include="test_bench\bin_weights\apf_32_8\12_batch_normalization_3_gamma_0.bin" />
+    <None Include="test_bench\bin_weights\apf_32_8\12_batch_normalization_3_moving_mean_0.bin" />
+    <None Include="test_bench\bin_weights\apf_32_8\12_batch_normalization_3_moving_variance_0.bin" />
+    <None Include="test_bench\bin_weights\apf_32_8\15_conv2d_4_bias_0.bin" />
+    <None Include="test_bench\bin_weights\apf_32_8\15_conv2d_4_kernel_0.bin" />
+    <None Include="test_bench\bin_weights\apf_32_8\16_batch_normalization_4_beta_0.bin" />
+    <None Include="test_bench\bin_weights\apf_32_8\16_batch_normalization_4_gamma_0.bin" />
+    <None Include="test_bench\bin_weights\apf_32_8\16_batch_normalization_4_moving_mean_0.bin" />
+    <None Include="test_bench\bin_weights\apf_32_8\16_batch_normalization_4_moving_variance_0.bin" />
+    <None Include="test_bench\bin_weights\apf_32_8\18_conv2d_5_bias_0.bin" />
+    <None Include="test_bench\bin_weights\apf_32_8\18_conv2d_5_kernel_0.bin" />
+    <None Include="test_bench\bin_weights\apf_32_8\19_batch_normalization_5_beta_0.bin" />
+    <None Include="test_bench\bin_weights\apf_32_8\19_batch_normalization_5_gamma_0.bin" />
+    <None Include="test_bench\bin_weights\apf_32_8\19_batch_normalization_5_moving_mean_0.bin" />
+    <None Include="test_bench\bin_weights\apf_32_8\19_batch_normalization_5_moving_variance_0.bin" />
+    <None Include="test_bench\bin_weights\apf_32_8\1_conv2d_bias_0.bin" />
+    <None Include="test_bench\bin_weights\apf_32_8\1_conv2d_kernel_0.bin" />
+    <None Include="test_bench\bin_weights\apf_32_8\23_bidirectional_backward_gru_gru_cell_2_bias_0.bin" />
+    <None Include="test_bench\bin_weights\apf_32_8\23_bidirectional_backward_gru_gru_cell_2_bias_0_recurrent.bin" />
+    <None Include="test_bench\bin_weights\apf_32_8\23_bidirectional_backward_gru_gru_cell_2_kernel_0.bin" />
+    <None Include="test_bench\bin_weights\apf_32_8\23_bidirectional_backward_gru_gru_cell_2_recurrent_kernel_0.bin" />
+    <None Include="test_bench\bin_weights\apf_32_8\23_bidirectional_forward_gru_gru_cell_1_bias_0.bin" />
+    <None Include="test_bench\bin_weights\apf_32_8\23_bidirectional_forward_gru_gru_cell_1_bias_0_recurrent.bin" />
+    <None Include="test_bench\bin_weights\apf_32_8\23_bidirectional_forward_gru_gru_cell_1_kernel_0.bin" />
+    <None Include="test_bench\bin_weights\apf_32_8\23_bidirectional_forward_gru_gru_cell_1_recurrent_kernel_0.bin" />
+    <None Include="test_bench\bin_weights\apf_32_8\24_bidirectional_1_backward_gru_1_gru_cell_5_bias_0.bin" />
+    <None Include="test_bench\bin_weights\apf_32_8\24_bidirectional_1_backward_gru_1_gru_cell_5_bias_0_recurrent.bin" />
+    <None Include="test_bench\bin_weights\apf_32_8\24_bidirectional_1_backward_gru_1_gru_cell_5_kernel_0.bin" />
+    <None Include="test_bench\bin_weights\apf_32_8\24_bidirectional_1_backward_gru_1_gru_cell_5_recurrent_kernel_0.bin" />
+    <None Include="test_bench\bin_weights\apf_32_8\24_bidirectional_1_forward_gru_1_gru_cell_4_bias_0.bin" />
+    <None Include="test_bench\bin_weights\apf_32_8\24_bidirectional_1_forward_gru_1_gru_cell_4_bias_0_recurrent.bin" />
+    <None Include="test_bench\bin_weights\apf_32_8\24_bidirectional_1_forward_gru_1_gru_cell_4_kernel_0.bin" />
+    <None Include="test_bench\bin_weights\apf_32_8\24_bidirectional_1_forward_gru_1_gru_cell_4_recurrent_kernel_0.bin" />
+    <None Include="test_bench\bin_weights\apf_32_8\25_time_distributed_bias_0.bin" />
+    <None Include="test_bench\bin_weights\apf_32_8\25_time_distributed_kernel_0.bin" />
+    <None Include="test_bench\bin_weights\apf_32_8\26_time_distributed_1_bias_0.bin" />
+    <None Include="test_bench\bin_weights\apf_32_8\26_time_distributed_1_kernel_0.bin" />
+    <None Include="test_bench\bin_weights\apf_32_8\2_batch_normalization_beta_0.bin" />
+    <None Include="test_bench\bin_weights\apf_32_8\2_batch_normalization_gamma_0.bin" />
+    <None Include="test_bench\bin_weights\apf_32_8\2_batch_normalization_moving_mean_0.bin" />
+    <None Include="test_bench\bin_weights\apf_32_8\2_batch_normalization_moving_variance_0.bin" />
+    <None Include="test_bench\bin_weights\apf_32_8\4_conv2d_1_bias_0.bin" />
+    <None Include="test_bench\bin_weights\apf_32_8\4_conv2d_1_kernel_0.bin" />
+    <None Include="test_bench\bin_weights\apf_32_8\5_batch_normalization_1_beta_0.bin" />
+    <None Include="test_bench\bin_weights\apf_32_8\5_batch_normalization_1_gamma_0.bin" />
+    <None Include="test_bench\bin_weights\apf_32_8\5_batch_normalization_1_moving_mean_0.bin" />
+    <None Include="test_bench\bin_weights\apf_32_8\5_batch_normalization_1_moving_variance_0.bin" />
+    <None Include="test_bench\bin_weights\apf_32_8\8_conv2d_2_bias_0.bin" />
+    <None Include="test_bench\bin_weights\apf_32_8\8_conv2d_2_kernel_0.bin" />
+    <None Include="test_bench\bin_weights\apf_32_8\9_batch_normalization_2_beta_0.bin" />
+    <None Include="test_bench\bin_weights\apf_32_8\9_batch_normalization_2_gamma_0.bin" />
+    <None Include="test_bench\bin_weights\apf_32_8\9_batch_normalization_2_moving_mean_0.bin" />
+    <None Include="test_bench\bin_weights\apf_32_8\9_batch_normalization_2_moving_variance_0.bin" />
+    <None Include="test_bench\bin_weights\float\11_conv2d_3_bias_0.bin" />
+    <None Include="test_bench\bin_weights\float\11_conv2d_3_kernel_0.bin" />
+    <None Include="test_bench\bin_weights\float\12_batch_normalization_3_beta_0.bin" />
+    <None Include="test_bench\bin_weights\float\12_batch_normalization_3_gamma_0.bin" />
+    <None Include="test_bench\bin_weights\float\12_batch_normalization_3_moving_mean_0.bin" />
+    <None Include="test_bench\bin_weights\float\12_batch_normalization_3_moving_variance_0.bin" />
+    <None Include="test_bench\bin_weights\float\15_conv2d_4_bias_0.bin" />
+    <None Include="test_bench\bin_weights\float\15_conv2d_4_kernel_0.bin" />
+    <None Include="test_bench\bin_weights\float\16_batch_normalization_4_beta_0.bin" />
+    <None Include="test_bench\bin_weights\float\16_batch_normalization_4_gamma_0.bin" />
+    <None Include="test_bench\bin_weights\float\16_batch_normalization_4_moving_mean_0.bin" />
+    <None Include="test_bench\bin_weights\float\16_batch_normalization_4_moving_variance_0.bin" />
+    <None Include="test_bench\bin_weights\float\18_conv2d_5_bias_0.bin" />
+    <None Include="test_bench\bin_weights\float\18_conv2d_5_kernel_0.bin" />
+    <None Include="test_bench\bin_weights\float\19_batch_normalization_5_beta_0.bin" />
+    <None Include="test_bench\bin_weights\float\19_batch_normalization_5_gamma_0.bin" />
+    <None Include="test_bench\bin_weights\float\19_batch_normalization_5_moving_mean_0.bin" />
+    <None Include="test_bench\bin_weights\float\19_batch_normalization_5_moving_variance_0.bin" />
+    <None Include="test_bench\bin_weights\float\1_conv2d_bias_0.bin" />
+    <None Include="test_bench\bin_weights\float\1_conv2d_kernel_0.bin" />
+    <None Include="test_bench\bin_weights\float\23_bidirectional_backward_gru_gru_cell_2_bias_0.bin" />
+    <None Include="test_bench\bin_weights\float\23_bidirectional_backward_gru_gru_cell_2_bias_0_recurrent.bin" />
+    <None Include="test_bench\bin_weights\float\23_bidirectional_backward_gru_gru_cell_2_kernel_0.bin" />
+    <None Include="test_bench\bin_weights\float\23_bidirectional_backward_gru_gru_cell_2_recurrent_kernel_0.bin" />
+    <None Include="test_bench\bin_weights\float\23_bidirectional_forward_gru_gru_cell_1_bias_0.bin" />
+    <None Include="test_bench\bin_weights\float\23_bidirectional_forward_gru_gru_cell_1_bias_0_recurrent.bin" />
+    <None Include="test_bench\bin_weights\float\23_bidirectional_forward_gru_gru_cell_1_kernel_0.bin" />
+    <None Include="test_bench\bin_weights\float\23_bidirectional_forward_gru_gru_cell_1_recurrent_kernel_0.bin" />
+    <None Include="test_bench\bin_weights\float\24_bidirectional_1_backward_gru_1_gru_cell_5_bias_0.bin" />
+    <None Include="test_bench\bin_weights\float\24_bidirectional_1_backward_gru_1_gru_cell_5_bias_0_recurrent.bin" />
+    <None Include="test_bench\bin_weights\float\24_bidirectional_1_backward_gru_1_gru_cell_5_kernel_0.bin" />
+    <None Include="test_bench\bin_weights\float\24_bidirectional_1_backward_gru_1_gru_cell_5_recurrent_kernel_0.bin" />
+    <None Include="test_bench\bin_weights\float\24_bidirectional_1_forward_gru_1_gru_cell_4_bias_0.bin" />
+    <None Include="test_bench\bin_weights\float\24_bidirectional_1_forward_gru_1_gru_cell_4_bias_0_recurrent.bin" />
+    <None Include="test_bench\bin_weights\float\24_bidirectional_1_forward_gru_1_gru_cell_4_kernel_0.bin" />
+    <None Include="test_bench\bin_weights\float\24_bidirectional_1_forward_gru_1_gru_cell_4_recurrent_kernel_0.bin" />
+    <None Include="test_bench\bin_weights\float\25_time_distributed_bias_0.bin" />
+    <None Include="test_bench\bin_weights\float\25_time_distributed_kernel_0.bin" />
+    <None Include="test_bench\bin_weights\float\26_time_distributed_1_bias_0.bin" />
+    <None Include="test_bench\bin_weights\float\26_time_distributed_1_kernel_0.bin" />
+    <None Include="test_bench\bin_weights\float\2_batch_normalization_beta_0.bin" />
+    <None Include="test_bench\bin_weights\float\2_batch_normalization_gamma_0.bin" />
+    <None Include="test_bench\bin_weights\float\2_batch_normalization_moving_mean_0.bin" />
+    <None Include="test_bench\bin_weights\float\2_batch_normalization_moving_variance_0.bin" />
+    <None Include="test_bench\bin_weights\float\4_conv2d_1_bias_0.bin" />
+    <None Include="test_bench\bin_weights\float\4_conv2d_1_kernel_0.bin" />
+    <None Include="test_bench\bin_weights\float\5_batch_normalization_1_beta_0.bin" />
+    <None Include="test_bench\bin_weights\float\5_batch_normalization_1_gamma_0.bin" />
+    <None Include="test_bench\bin_weights\float\5_batch_normalization_1_moving_mean_0.bin" />
+    <None Include="test_bench\bin_weights\float\5_batch_normalization_1_moving_variance_0.bin" />
+    <None Include="test_bench\bin_weights\float\8_conv2d_2_bias_0.bin" />
+    <None Include="test_bench\bin_weights\float\8_conv2d_2_kernel_0.bin" />
+    <None Include="test_bench\bin_weights\float\9_batch_normalization_2_beta_0.bin" />
+    <None Include="test_bench\bin_weights\float\9_batch_normalization_2_gamma_0.bin" />
+    <None Include="test_bench\bin_weights\float\9_batch_normalization_2_moving_mean_0.bin" />
+    <None Include="test_bench\bin_weights\float\9_batch_normalization_2_moving_variance_0.bin" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

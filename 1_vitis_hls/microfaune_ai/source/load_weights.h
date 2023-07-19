@@ -262,12 +262,12 @@ void loadWeights() {
     load(GRU_1_BACKWARD_RECURRENT_BIAS, recurrent_bias_gru1_b, 64*3, sizeof(gru_t));
 
     // timedist_0
-    load(TDIST_0_KERNEL, kernel_td0, 128*64, sizeof(conv_t));
-    load(TDIST_0_BIAS, bias_td0, 64, sizeof(conv_t));
+    load(TDIST_0_KERNEL, kernel_td0, 128*64, sizeof(timedist_t));
+    load(TDIST_0_BIAS, bias_td0, 64, sizeof(timedist_t));
 
     // timedist_1
-    load(TDIST_1_KERNEL, kernel_td1, 64*1, sizeof(conv_t));
-    load(TDIST_1_BIAS, bias_td1, 1, sizeof(conv_t));
+    load(TDIST_1_KERNEL, kernel_td1, 64*1, sizeof(timedist_t));
+    load(TDIST_1_BIAS, bias_td1, 1, sizeof(timedist_t));
 }
 #else
 void loadWeights() {}

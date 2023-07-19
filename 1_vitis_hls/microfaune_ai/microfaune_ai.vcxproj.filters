@@ -1,0 +1,671 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="source\predict.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="test_bench\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="source\global_settings.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\load_weights.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\types.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\bnorm\bnorm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\bnorm\bnorm_settings.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\bnorm\data\bnorm_0.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\bnorm\data\bnorm_1.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\bnorm\data\bnorm_2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\bnorm\data\bnorm_3.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\bnorm\data\bnorm_4.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\bnorm\data\bnorm_5.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\conv2d\conv2d.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\conv2d\conv2d_settings.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\conv2d\data\conv2d_0.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\conv2d\data\conv2d_1.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\conv2d\data\conv2d_2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\conv2d\data\conv2d_3.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\conv2d\data\conv2d_4.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\conv2d\data\conv2d_5.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\gru\gru.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\gru\gru_settings.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\gru\data\gru_0.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\gru\data\gru_0_backward.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\gru\data\gru_0_forward.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\gru\data\gru_1.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\gru\data\gru_1_backward.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\gru\data\gru_1_forward.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\input\input.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\input\input_settings.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\mpool2d\maxpool2d.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\mpool2d\data\maxpool2d_0.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\mpool2d\data\maxpool2d_1.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\mpool2d\data\maxpool2d_2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\output\output.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\reducemax\reducemax.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\reducemax\data\reducemax_0.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\reducemax\data\reducemax_1.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\timedist\timedist.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\timedist\timedist_settings.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\timedist\data\timedist_0.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\timedist\data\timedist_1.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\utils\activation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\utils\sigmoid.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\utils\tanh_rnnoise.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="test_bench\data_input_0.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="test_bench\z_outputexpected\dataout_0.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="test_bench\bin_weights\apf_16_7\11_conv2d_3_bias_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_16_7\11_conv2d_3_kernel_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_16_7\12_batch_normalization_3_beta_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_16_7\12_batch_normalization_3_gamma_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_16_7\12_batch_normalization_3_moving_mean_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_16_7\12_batch_normalization_3_moving_variance_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_16_7\15_conv2d_4_bias_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_16_7\15_conv2d_4_kernel_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_16_7\16_batch_normalization_4_beta_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_16_7\16_batch_normalization_4_gamma_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_16_7\16_batch_normalization_4_moving_mean_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_16_7\16_batch_normalization_4_moving_variance_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_16_7\18_conv2d_5_bias_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_16_7\18_conv2d_5_kernel_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_16_7\19_batch_normalization_5_beta_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_16_7\19_batch_normalization_5_gamma_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_16_7\19_batch_normalization_5_moving_mean_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_16_7\19_batch_normalization_5_moving_variance_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_16_7\1_conv2d_bias_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_16_7\1_conv2d_kernel_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_16_7\23_bidirectional_backward_gru_gru_cell_2_bias_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_16_7\23_bidirectional_backward_gru_gru_cell_2_bias_0_recurrent.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_16_7\23_bidirectional_backward_gru_gru_cell_2_kernel_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_16_7\23_bidirectional_backward_gru_gru_cell_2_recurrent_kernel_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_16_7\23_bidirectional_forward_gru_gru_cell_1_bias_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_16_7\23_bidirectional_forward_gru_gru_cell_1_bias_0_recurrent.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_16_7\23_bidirectional_forward_gru_gru_cell_1_kernel_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_16_7\23_bidirectional_forward_gru_gru_cell_1_recurrent_kernel_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_16_7\24_bidirectional_1_backward_gru_1_gru_cell_5_bias_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_16_7\24_bidirectional_1_backward_gru_1_gru_cell_5_bias_0_recurrent.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_16_7\24_bidirectional_1_backward_gru_1_gru_cell_5_kernel_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_16_7\24_bidirectional_1_backward_gru_1_gru_cell_5_recurrent_kernel_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_16_7\24_bidirectional_1_forward_gru_1_gru_cell_4_bias_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_16_7\24_bidirectional_1_forward_gru_1_gru_cell_4_bias_0_recurrent.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_16_7\24_bidirectional_1_forward_gru_1_gru_cell_4_kernel_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_16_7\24_bidirectional_1_forward_gru_1_gru_cell_4_recurrent_kernel_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_16_7\25_time_distributed_bias_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_16_7\25_time_distributed_kernel_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_16_7\26_time_distributed_1_bias_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_16_7\26_time_distributed_1_kernel_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_16_7\2_batch_normalization_beta_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_16_7\2_batch_normalization_gamma_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_16_7\2_batch_normalization_moving_mean_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_16_7\2_batch_normalization_moving_variance_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_16_7\4_conv2d_1_bias_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_16_7\4_conv2d_1_kernel_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_16_7\5_batch_normalization_1_beta_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_16_7\5_batch_normalization_1_gamma_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_16_7\5_batch_normalization_1_moving_mean_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_16_7\5_batch_normalization_1_moving_variance_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_16_7\8_conv2d_2_bias_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_16_7\8_conv2d_2_kernel_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_16_7\9_batch_normalization_2_beta_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_16_7\9_batch_normalization_2_gamma_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_16_7\9_batch_normalization_2_moving_mean_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_16_7\9_batch_normalization_2_moving_variance_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_32_8\11_conv2d_3_bias_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_32_8\11_conv2d_3_kernel_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_32_8\12_batch_normalization_3_beta_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_32_8\12_batch_normalization_3_gamma_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_32_8\12_batch_normalization_3_moving_mean_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_32_8\12_batch_normalization_3_moving_variance_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_32_8\15_conv2d_4_bias_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_32_8\15_conv2d_4_kernel_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_32_8\16_batch_normalization_4_beta_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_32_8\16_batch_normalization_4_gamma_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_32_8\16_batch_normalization_4_moving_mean_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_32_8\16_batch_normalization_4_moving_variance_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_32_8\18_conv2d_5_bias_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_32_8\18_conv2d_5_kernel_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_32_8\19_batch_normalization_5_beta_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_32_8\19_batch_normalization_5_gamma_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_32_8\19_batch_normalization_5_moving_mean_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_32_8\19_batch_normalization_5_moving_variance_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_32_8\1_conv2d_bias_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_32_8\1_conv2d_kernel_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_32_8\23_bidirectional_backward_gru_gru_cell_2_bias_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_32_8\23_bidirectional_backward_gru_gru_cell_2_bias_0_recurrent.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_32_8\23_bidirectional_backward_gru_gru_cell_2_kernel_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_32_8\23_bidirectional_backward_gru_gru_cell_2_recurrent_kernel_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_32_8\23_bidirectional_forward_gru_gru_cell_1_bias_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_32_8\23_bidirectional_forward_gru_gru_cell_1_bias_0_recurrent.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_32_8\23_bidirectional_forward_gru_gru_cell_1_kernel_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_32_8\23_bidirectional_forward_gru_gru_cell_1_recurrent_kernel_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_32_8\24_bidirectional_1_backward_gru_1_gru_cell_5_bias_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_32_8\24_bidirectional_1_backward_gru_1_gru_cell_5_bias_0_recurrent.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_32_8\24_bidirectional_1_backward_gru_1_gru_cell_5_kernel_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_32_8\24_bidirectional_1_backward_gru_1_gru_cell_5_recurrent_kernel_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_32_8\24_bidirectional_1_forward_gru_1_gru_cell_4_bias_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_32_8\24_bidirectional_1_forward_gru_1_gru_cell_4_bias_0_recurrent.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_32_8\24_bidirectional_1_forward_gru_1_gru_cell_4_kernel_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_32_8\24_bidirectional_1_forward_gru_1_gru_cell_4_recurrent_kernel_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_32_8\25_time_distributed_bias_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_32_8\25_time_distributed_kernel_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_32_8\26_time_distributed_1_bias_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_32_8\26_time_distributed_1_kernel_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_32_8\2_batch_normalization_beta_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_32_8\2_batch_normalization_gamma_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_32_8\2_batch_normalization_moving_mean_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_32_8\2_batch_normalization_moving_variance_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_32_8\4_conv2d_1_bias_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_32_8\4_conv2d_1_kernel_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_32_8\5_batch_normalization_1_beta_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_32_8\5_batch_normalization_1_gamma_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_32_8\5_batch_normalization_1_moving_mean_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_32_8\5_batch_normalization_1_moving_variance_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_32_8\8_conv2d_2_bias_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_32_8\8_conv2d_2_kernel_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_32_8\9_batch_normalization_2_beta_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_32_8\9_batch_normalization_2_gamma_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_32_8\9_batch_normalization_2_moving_mean_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\apf_32_8\9_batch_normalization_2_moving_variance_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\float\11_conv2d_3_bias_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\float\11_conv2d_3_kernel_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\float\12_batch_normalization_3_beta_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\float\12_batch_normalization_3_gamma_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\float\12_batch_normalization_3_moving_mean_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\float\12_batch_normalization_3_moving_variance_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\float\15_conv2d_4_bias_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\float\15_conv2d_4_kernel_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\float\16_batch_normalization_4_beta_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\float\16_batch_normalization_4_gamma_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\float\16_batch_normalization_4_moving_mean_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\float\16_batch_normalization_4_moving_variance_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\float\18_conv2d_5_bias_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\float\18_conv2d_5_kernel_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\float\19_batch_normalization_5_beta_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\float\19_batch_normalization_5_gamma_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\float\19_batch_normalization_5_moving_mean_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\float\19_batch_normalization_5_moving_variance_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\float\1_conv2d_bias_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\float\1_conv2d_kernel_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\float\23_bidirectional_backward_gru_gru_cell_2_bias_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\float\23_bidirectional_backward_gru_gru_cell_2_bias_0_recurrent.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\float\23_bidirectional_backward_gru_gru_cell_2_kernel_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\float\23_bidirectional_backward_gru_gru_cell_2_recurrent_kernel_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\float\23_bidirectional_forward_gru_gru_cell_1_bias_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\float\23_bidirectional_forward_gru_gru_cell_1_bias_0_recurrent.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\float\23_bidirectional_forward_gru_gru_cell_1_kernel_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\float\23_bidirectional_forward_gru_gru_cell_1_recurrent_kernel_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\float\24_bidirectional_1_backward_gru_1_gru_cell_5_bias_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\float\24_bidirectional_1_backward_gru_1_gru_cell_5_bias_0_recurrent.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\float\24_bidirectional_1_backward_gru_1_gru_cell_5_kernel_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\float\24_bidirectional_1_backward_gru_1_gru_cell_5_recurrent_kernel_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\float\24_bidirectional_1_forward_gru_1_gru_cell_4_bias_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\float\24_bidirectional_1_forward_gru_1_gru_cell_4_bias_0_recurrent.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\float\24_bidirectional_1_forward_gru_1_gru_cell_4_kernel_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\float\24_bidirectional_1_forward_gru_1_gru_cell_4_recurrent_kernel_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\float\25_time_distributed_bias_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\float\25_time_distributed_kernel_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\float\26_time_distributed_1_bias_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\float\26_time_distributed_1_kernel_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\float\2_batch_normalization_beta_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\float\2_batch_normalization_gamma_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\float\2_batch_normalization_moving_mean_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\float\2_batch_normalization_moving_variance_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\float\4_conv2d_1_bias_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\float\4_conv2d_1_kernel_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\float\5_batch_normalization_1_beta_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\float\5_batch_normalization_1_gamma_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\float\5_batch_normalization_1_moving_mean_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\float\5_batch_normalization_1_moving_variance_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\float\8_conv2d_2_bias_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\float\8_conv2d_2_kernel_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\float\9_batch_normalization_2_beta_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\float\9_batch_normalization_2_gamma_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\float\9_batch_normalization_2_moving_mean_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test_bench\bin_weights\float\9_batch_normalization_2_moving_variance_0.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
+</Project>

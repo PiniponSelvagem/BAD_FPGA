@@ -3,11 +3,17 @@
 #ifndef INPUT_H
 #define INPUT_H
 
-#include <ap_int.h>
 #include "input_settings.h"
 
+#ifdef __VITIS_HLS__
+#include <ap_int.h>
 typedef ap_uint<9> inpreconv_h_t;
 typedef ap_uint<6> inpreconv_w_t;
+#endif
+#ifdef _MSC_VER
+typedef int inpreconv_h_t;
+typedef int inpreconv_w_t;
+#endif
 
 void input_preconv2d(const input_t input[INPUT_LINES][INPUT_COLS], input_t inputpad[CHANNELS][INPUT_PAD_LINES][INPUT_PAD_COLS]) {
 //#pragma HLS ARRAY_PARTITION variable=input type=cyclic factor=2 DIM=0
