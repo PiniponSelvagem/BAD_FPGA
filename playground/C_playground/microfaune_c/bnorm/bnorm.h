@@ -17,7 +17,8 @@ void bnorm(
 ) {
     for (int row = PADDING_OFFSET; row < (BN_LINES - PADDING_OFFSET); ++row) {
         for (int col = PADDING_OFFSET; col < (BN_COLS - PADDING_OFFSET); ++col) {
-            bnorm_t normalized = (input[row][col] - movingmean) / sqrt(movingvariance + BNORM_EPSILON);
+            bnorm_t inValue = input[row][col];
+            bnorm_t normalized = (inValue - movingmean) / sqrt(movingvariance + BNORM_EPSILON);
             bnorm_t out = gamma * normalized + beta;
 
             if (out < 0) { out = 0; } // ReLu

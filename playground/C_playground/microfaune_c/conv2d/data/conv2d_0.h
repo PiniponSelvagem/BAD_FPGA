@@ -18,7 +18,6 @@
 #define C2D_0__OUT_LINES        C2D_0__IN_LINES
 #define C2D_0__OUT_COLS         C2D_0__IN_COLS
 
-
 /**
  * @brief This was taken from "model_json/dump_weights_bias.json". (Channels first)
 */
@@ -1182,6 +1181,5 @@ const conv_t bias_0[C2D_BIAS_SIZE] = {
     0.007369477767497301,
     -0.018048156052827835
 };
-
 
 #endif // CONV2D_0_H

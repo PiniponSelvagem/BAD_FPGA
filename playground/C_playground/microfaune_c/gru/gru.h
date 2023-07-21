@@ -24,18 +24,18 @@ template
 void gru(
     int idx,
     const gru_t input[GRU_IN_COLS],
-    const gru_t kernel[GRU_KERNEL_LINES][GRU_KERNEL_COLS][GRU_SPLIT],
+    const gru_t kernel[GRU_KERNEL_LINES][GRU_SPLIT][GRU_KERNEL_COLS],
     const gru_t bias[GRU_BIAS_SIZE][GRU_SPLIT],
-    const gru_t recurrent_kernel[GRU_KERNEL_R_LINES][GRU_KERNEL_R_COLS][GRU_SPLIT],
+    const gru_t recurrent_kernel[GRU_KERNEL_R_LINES][GRU_SPLIT][GRU_KERNEL_R_COLS],
     const gru_t recurrent_bias[GRU_BIAS_SIZE][GRU_SPLIT],
     gru_t output[1]
 ) {
     gru_t matrix_x[3];
     for (int i = 0; i < 3; ++i) {
         matrix_x[i] = 0;
-        for (int j = 0; j < GRU_KERNEL_LINES; ++j) {
+        for (int j = 0; j < GRU_KERNEL_COLS; ++j) {
             gru_t iVal = input[j];
-            gru_t kVal = kernel[j][idx][i];
+            gru_t kVal = kernel[idx][i][j];
             matrix_x[i] += iVal * kVal;
         }
     }
@@ -47,9 +47,9 @@ void gru(
     gru_t matrix_inner[3];
     for (int i = 0; i < 3; ++i) {
         matrix_inner[i] = 0;
-        for (int j = 0; j < GRU_KERNEL_R_LINES; ++j) {
+        for (int j = 0; j < GRU_KERNEL_R_COLS; ++j) {
             gru_t iVal = state[0][j];
-            gru_t kVal = recurrent_kernel[j][idx][i];
+            gru_t kVal = recurrent_kernel[idx][i][j];
             matrix_inner[i] += iVal * kVal;
         }
     }

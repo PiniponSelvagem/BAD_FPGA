@@ -44,6 +44,7 @@ layerName_toChannelFirst = [
     "batch_normalization",
     "re_lu",
     "max_pooling2d",
+    "time_distributed"
 ]
 layerName_to3d = "gru"
 layerName_split_dim0 = [
@@ -135,6 +136,8 @@ for m in model.layers:
             arrayName = v.name.replace('/', '_').replace('.', '_').replace(':', '_')
             if layerName_to3d in v.name:
                 data = rearange_gru_weights(data)
+                if ("kernel" in v.name): # reorder kernel for better memory access / no jumping around when access
+                    data = data.transpose((1, 2, 0))
             #
             shouldSplit = True
             for name in layerName_split_dim0:

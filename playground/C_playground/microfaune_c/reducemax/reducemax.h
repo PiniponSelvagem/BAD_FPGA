@@ -16,8 +16,9 @@ void reducemax_0_saveTranspose(
         for (int row = 0; row < RM_IN_LINES; ++row) {
             reducemax_t maxval = INT_MIN;
             for (int col = 0; col < RM_IN_COLS; ++col) {
-                if (input[c][row][col] > maxval) {
-                    maxval = input[c][row][col];
+                reducemax_t value = input[c][row][col];
+                if (value > maxval) {
+                    maxval = value;
                 }
             }
             output[row][c] = maxval;

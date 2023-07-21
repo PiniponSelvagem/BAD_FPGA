@@ -18,8 +18,8 @@
 #define TD_0__OUT_LINES        TD_0__IN_LINES
 #define TD_0__OUT_COLS         (TD_0__IN_COLS/2)
 
-#define TD_0__KERNEL_LINES     GRU_1__OUT_COLS
-#define TD_0__KERNEL_COLS      CHANNELS
+#define TD_0__KERNEL_LINES     CHANNELS
+#define TD_0__KERNEL_COLS      GRU_1__OUT_COLS
 
 #define TD_0__BIAS_SIZE        CHANNELS
 

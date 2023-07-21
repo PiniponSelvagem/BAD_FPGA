@@ -240,24 +240,24 @@ void loadWeights() {
     load(BNORM_5_MOVINGVARIANCE, movingvariance_5, 64, sizeof(bnorm_t));
 
     // gru_0_forward
-    load(GRU_0_FORWARD_KERNEL, kernel_gru0_f, 64*64*3, sizeof(gru_t));
-    load(GRU_0_FORWARD_RECURRENT_KERNEL, recurrent_kernel_gru0_f, 64*64*3, sizeof(gru_t));
+    load(GRU_0_FORWARD_KERNEL, kernel_gru0_f, 64*3*64, sizeof(gru_t));
+    load(GRU_0_FORWARD_RECURRENT_KERNEL, recurrent_kernel_gru0_f, 64*3*64, sizeof(gru_t));
     load(GRU_0_FORWARD_BIAS, bias_gru0_f, 64*3, sizeof(gru_t));
     load(GRU_0_FORWARD_RECURRENT_BIAS, recurrent_bias_gru0_f, 64*3, sizeof(gru_t));
     // gru_0_backward
-    load(GRU_0_BACKWARD_KERNEL, kernel_gru0_b, 64*64*3, sizeof(gru_t));
-    load(GRU_0_BACKWARD_RECURRENT_KERNEL, recurrent_kernel_gru0_b, 64*64*3, sizeof(gru_t));
+    load(GRU_0_BACKWARD_KERNEL, kernel_gru0_b, 64*3*64, sizeof(gru_t));
+    load(GRU_0_BACKWARD_RECURRENT_KERNEL, recurrent_kernel_gru0_b, 64*3*64, sizeof(gru_t));
     load(GRU_0_BACKWARD_BIAS, bias_gru0_b, 64*3, sizeof(gru_t));
     load(GRU_0_BACKWARD_RECURRENT_BIAS, recurrent_bias_gru0_b, 64*3, sizeof(gru_t));
 
     // gru_1_forward
-    load(GRU_1_FORWARD_KERNEL, kernel_gru1_f, 128*64*3, sizeof(gru_t));
-    load(GRU_1_FORWARD_RECURRENT_KERNEL, recurrent_kernel_gru1_f, 128*64*3, sizeof(gru_t));
+    load(GRU_1_FORWARD_KERNEL, kernel_gru1_f, 64*3*128, sizeof(gru_t));
+    load(GRU_1_FORWARD_RECURRENT_KERNEL, recurrent_kernel_gru1_f, 64*3*64, sizeof(gru_t));
     load(GRU_1_FORWARD_BIAS, bias_gru1_f, 64*3, sizeof(gru_t));
     load(GRU_1_FORWARD_RECURRENT_BIAS, recurrent_bias_gru1_f, 64*3, sizeof(gru_t));
     // gru_1_backward
-    load(GRU_1_BACKWARD_KERNEL, kernel_gru1_b, 128*64*3, sizeof(gru_t));
-    load(GRU_1_BACKWARD_RECURRENT_KERNEL, recurrent_kernel_gru1_b, 128*64*3, sizeof(gru_t));
+    load(GRU_1_BACKWARD_KERNEL, kernel_gru1_b, 64*3*128, sizeof(gru_t));
+    load(GRU_1_BACKWARD_RECURRENT_KERNEL, recurrent_kernel_gru1_b, 64*3*64, sizeof(gru_t));
     load(GRU_1_BACKWARD_BIAS, bias_gru1_b, 64*3, sizeof(gru_t));
     load(GRU_1_BACKWARD_RECURRENT_BIAS, recurrent_bias_gru1_b, 64*3, sizeof(gru_t));
 

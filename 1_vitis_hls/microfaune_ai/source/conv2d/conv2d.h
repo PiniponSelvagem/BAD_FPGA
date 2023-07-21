@@ -38,10 +38,15 @@ void conv2d(
     // clear all prev and output
     // TODO: improve so it only clears necessary parts of the arrays
     for (i64_t c = 0; c < CHANNELS; ++c) {
+        conv_t* pprev_channel = prev + (c * CNN_LINES_PAD * CNN_COLS_PAD);
+        conv_t* poutput_channel = output + (c * CNN_LINES_PAD * CNN_COLS_PAD);
         for (conv_row_t row = 0; row < CNN_LINES_PAD; ++row) {
+            conv_t* pprev_row = pprev_channel + (row * CNN_COLS_PAD);
+            conv_t* poutput_row = poutput_channel + (row * CNN_COLS_PAD);
             for (conv_col_t col = 0; col < CNN_COLS_PAD; ++col) {
-                aux[c][row][col] = 0;
-                conv_t* poutput = output + (c * CNN_LINES_PAD * inoutCols) + (row * inoutCols) + col;
+                conv_t* pprev = pprev_row + col;
+                conv_t* poutput = poutput_row + col;
+                *pprev = 0;
                 *poutput = 0;
             }
         }
@@ -126,93 +131,5 @@ void conv2d(
         pbias = (conv_t*)++pbias_backup;
     }
 }
-
-
-
-
-
-template <int C_IN_LINES, int C_IN_COLS, int C_OUT_LINES, int C_OUT_COLS>
-void conv2d_old(
-    const conv_t input[C_IN_LINES][C_IN_COLS],
-    const conv_t kernel[C2D_KERNEL_LINES][C2D_KERNEL_COLS],
-    const conv_t bias,
-    conv_t output[C_OUT_LINES][C_OUT_COLS]
-) {
-    for (int orow = PADDING_OFFSET; orow < (C_OUT_LINES - PADDING_OFFSET); ++orow) {
-        for (int ocol = PADDING_OFFSET; ocol < (C_OUT_COLS - PADDING_OFFSET); ++ocol) {
-            conv_t acc = bias;
-            conv_t acc_sat;
-            for (int krow = 0, korow = orow - PADDING_OFFSET; krow < C2D_KERNEL_LINES; ++krow, korow++) {
-                for (int kcol = 0, kocol = ocol - PADDING_OFFSET; kcol < C2D_KERNEL_COLS; ++kcol, kocol++) {
-                    conv_t k = kernel[krow][kcol];
-                    conv_t i = input[korow][kocol];
-                    acc += k * i;
-                }
-            }
-            /*
-            for (int krow = 0; krow < C2D_KERNEL_LINES; ++krow) {
-                for (int kcol = 0; kcol < C2D_KERNEL_COLS; ++kcol) {
-                    acc += kernel[krow][kcol] * input[orow + krow - PADDING_OFFSET][ocol + kcol - PADDING_OFFSET];
-                }
-            }
-            */
-
-            /*
-            if (acc > 255)
-                acc_sat = 255;
-            else if (acc < 0)
-                acc_sat = 0;    // ReLu
-            else
-            */
-            acc_sat = acc;
-            output[orow][ocol] = acc_sat;
-        }
-    }
-}
-
-#include <stdio.h>
-template <int C_IN_LINES, int C_IN_COLS, int C_OUT_LINES, int C_OUT_COLS>
-void conv2d_multi(
-    const conv_t input[C_IN_LINES][C_IN_COLS],
-    const conv_t prev[C_IN_LINES][C_IN_COLS],
-    const conv_t kernel[C2D_KERNEL_LINES][C2D_KERNEL_COLS],
-    conv_t output[C_OUT_LINES][C_OUT_COLS]
-) {
-    for (int orow = PADDING_OFFSET; orow < (C_OUT_LINES - PADDING_OFFSET); ++orow) {
-        for (int ocol = PADDING_OFFSET; ocol < (C_OUT_COLS - PADDING_OFFSET); ++ocol) {
-            conv_t acc = 0;
-            conv_t acc_sat;
-            /*
-            conv_t acc_sat;
-            for (int krow = 0; krow < C2D_KERNEL_LINES; ++krow) {
-                for (int kcol = 0; kcol < C2D_KERNEL_COLS; ++kcol) {
-                    conv_t wg = kernel[krow][kcol];
-                    conv_t in = input[orow + krow - PADDING_OFFSET][ocol + kcol - PADDING_OFFSET];
-                    acc += wg * in;
-                }
-            }
-            */
-            for (int krow = 0, korow = orow - PADDING_OFFSET; krow < C2D_KERNEL_LINES; ++krow, korow++) {
-                for (int kcol = 0, kocol = ocol - PADDING_OFFSET; kcol < C2D_KERNEL_COLS; ++kcol, kocol++) {
-                    conv_t k = kernel[krow][kcol];
-                    conv_t i = input[korow][kocol];
-                    acc += k * i;
-                }
-            }
-
-            /*
-            if (acc > 255)
-                acc_sat = 255;
-            else if (acc < 0)
-                acc_sat = 0;    // ReLu
-            else
-            */
-            conv_t pv = prev[orow][ocol];
-            acc_sat = acc + pv;
-            output[orow][ocol] = acc_sat;
-        }
-    }
-}
-
 
 #endif // CONV2D_H

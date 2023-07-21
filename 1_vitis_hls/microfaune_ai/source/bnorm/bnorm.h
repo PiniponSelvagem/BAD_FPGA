@@ -38,8 +38,12 @@ void bnorm(
             BNORM_loop_col: for (bnrom_col_t col = PADDING_OFFSET; col < (inCols - PADDING_OFFSET); ++col) {
                 bnorm_t* pinout_col = pinout_row + col;
                 bnorm_t inValue = *pinout_col;
-                bnorm_t value = movingvariance[c] + BNORM_EPSILON;
-                bnorm_t normalized = (inValue - movingmean[c]) / sqrt(movingvariance[c] + BNORM_EPSILON);
+                bnorm_t value = movingvariance[c] + epsilon;
+                #ifdef USE_FLOAT
+                bnorm_t normalized = (inValue - movingmean[c]) / (bnorm_t)sqrt(value);
+                #else
+                bnorm_t normalized = (inValue - movingmean[c]) / (bnorm_t)sqrt(value.to_float());
+                #endif
                 bnorm_t out = gamma[c] * normalized + beta[c];
 
                 if (out < 0) { out = 0; } // ReLu
@@ -48,28 +52,5 @@ void bnorm(
         }
     }
 }
-
-
-template <int BN_LINES, int BN_COLS>
-void bnorm_old(
-    const bnorm_t input[BN_LINES][BN_COLS],
-    const bnorm_t gamma,
-    const bnorm_t beta,
-    const bnorm_t movingmean,
-    const bnorm_t movingvariance,
-    bnorm_t output[BN_LINES][BN_COLS]
-) {
-    for (int row = PADDING_OFFSET; row < (BN_LINES - PADDING_OFFSET); ++row) {
-        for (int col = PADDING_OFFSET; col < (BN_COLS - PADDING_OFFSET); ++col) {
-            bnorm_t inValue = input[row][col];
-            bnorm_t normalized = (inValue - movingmean) / sqrt(movingvariance + BNORM_EPSILON);
-            bnorm_t out = gamma * normalized + beta;
-
-            if (out < 0) { out = 0; } // ReLu
-            output[row][col] = out;
-        }
-    }
-}
-
 
 #endif // BNORM_H

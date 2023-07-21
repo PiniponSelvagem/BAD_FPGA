@@ -61,3 +61,6 @@ __pycache__/
 /1_vitis_hls/microfaune_ai/algorithm/csim/report/
 /1_vitis_hls/microfaune_ai/algorithm/algorithm.log
 /1_vitis_hls/microfaune_ai/test_bench/bin_weights/
+/1_vitis_hls/microfaune_ai/.vs/
+/1_vitis_hls/microfaune_ai/x64/
+/1_vitis_hls/microfaune_ai/Debug/

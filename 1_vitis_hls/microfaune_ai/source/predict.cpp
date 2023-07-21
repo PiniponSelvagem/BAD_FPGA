@@ -120,8 +120,7 @@ void predict(
     /**************** CNN ****************/
     /*************************************/
     /* 0 */
-    // Conv2D
-    conv2d(  // TESTED AND VALIDATED
+    conv2d( // CONV2D_0
         1/*FILTERS*/,
         C2D_0__IN_COLS,
         (conv_t*)inputpad,
@@ -129,25 +128,17 @@ void predict(
         (conv_t*)bias_0,
         (conv_t*)outarray_a
     );
-    for (int c = 0; c < CHANNELS; ++c) {
-        conv2d_old<C2D_0__IN_LINES, C2D_0__IN_COLS, C2D_0__OUT_LINES, C2D_0__OUT_COLS>(inputpad[c], kernel_0[c], bias_0[c], outpad_01_a[c]);
-    }
-    // BatchNormalization
-    bnorm(  // TESTED AND VALIDATED
+    bnorm( // BNORM_0 + ReLu
         BNORM_0__IN_COLS,
         (bnorm_t*)outarray_a,
         (bnorm_t*)gamma_0,
         (bnorm_t*)beta_0,
         (bnorm_t*)movingmean_0,
         (bnorm_t*)movingvariance_0
-    ); // BATCH NORMALIZATION + RELU
-    for (int c = 0; c < CHANNELS; ++c) {    // BATCH NORMALIZATION + RELU
-        bnorm_old<BNORM_0__IN_LINES, BNORM_0__IN_COLS>(outpad_01_a[c], gamma_0[c], beta_0[c], movingmean_0[c], movingvariance_0[c], outpad_01_b[c]);
-    }
+    );
 
     /* 1 */
-    // Conv2D
-    conv2d(  // TESTED AND VALIDATED
+    conv2d( // CONV2D_1
         FILTERS,
         C2D_1__IN_COLS,
         (conv_t*)outarray_a,
@@ -155,41 +146,23 @@ void predict(
         (conv_t*)bias_1,
         (conv_t*)outarray_b
     );
-    for (int f = 0; f < FILTERS; ++f) {
-        int c = 0;
-        conv_t biasVal = bias_1[f];
-        conv2d_old<C2D_1__IN_LINES, C2D_1__IN_COLS, C2D_1__OUT_LINES, C2D_1__OUT_COLS>(outpad_01_b[c], kernel_1[f][c], biasVal, outpad_01_a[f]);
-        ++c;
-        for (; c < CHANNELS; ++c) {
-            conv2d_multi<C2D_1__IN_LINES, C2D_1__IN_COLS, C2D_1__OUT_LINES, C2D_1__OUT_COLS>(outpad_01_b[c], outpad_01_a[f], kernel_1[f][c], outpad_01_a[f]);
-        }
-    }
-    // BatchNormalization
-    bnorm(  // TESTED AND VALIDATED
+    bnorm( // BNORM_1 + ReLu
         BNORM_1__IN_COLS,
         (bnorm_t*)outarray_b,
         (bnorm_t*)gamma_1,
         (bnorm_t*)beta_1,
         (bnorm_t*)movingmean_1,
         (bnorm_t*)movingvariance_1
-    ); // BATCH NORMALIZATION + RELU
-    for (int c = 0; c < CHANNELS; ++c) {    // BATCH NORMALIZATION + RELU
-        bnorm_old<BNORM_1__IN_LINES, BNORM_1__IN_COLS>(outpad_01_a[c], gamma_1[c], beta_1[c], movingmean_1[c], movingvariance_1[c], outpad_01_b[c]);
-    }
-    // MaxPool2D
-    maxpool2d(
+    );
+    maxpool2d( // MPOOL2D_0
         MP2D_0__IN_COLS,
         MP2D_0__OUT_COLS,
         PADDING_OFFSET,
         (mpool_t*)outarray_b
     );
-    for (int c = 0; c < CHANNELS; ++c) {    /* 0 */
-        maxpool2d_old<MP2D_0__IN_LINES, MP2D_0__IN_COLS, MP2D_0__OUT_LINES, MP2D_0__OUT_COLS, PADDING_OFFSET>(outpad_01_b[c], outpad_23_a[c]);
-    }
 
     /* 2 */
-    // Conv2D
-    conv2d(
+    conv2d( // CONV2D_2
         FILTERS,
         C2D_2__IN_COLS,
         (conv_t*)outarray_b,
@@ -197,32 +170,17 @@ void predict(
         (conv_t*)bias_2,
         (conv_t*)outarray_a
     );
-    for (int f = 0; f < FILTERS; ++f) {
-        int c = 0;
-        conv_t biasVal = bias_2[f];
-        conv2d_old<C2D_2__IN_LINES, C2D_2__IN_COLS, C2D_2__OUT_LINES, C2D_2__OUT_COLS>(outpad_23_a[c], kernel_2[f][c], biasVal, outpad_23_b[f]);
-        ++c;
-        for (; c < CHANNELS; ++c) {
-            conv2d_multi<C2D_2__IN_LINES, C2D_2__IN_COLS, C2D_2__OUT_LINES, C2D_2__OUT_COLS>(outpad_23_a[c], outpad_23_b[f], kernel_2[f][c], outpad_23_b[f]);
-        }
-    }
-    // BatchNormalization
-    bnorm(
+    bnorm( // BNORM_2 + ReLu
         BNORM_2__IN_COLS,
         (bnorm_t*)outarray_a,
         (bnorm_t*)gamma_2,
         (bnorm_t*)beta_2,
         (bnorm_t*)movingmean_2,
         (bnorm_t*)movingvariance_2
-    ); // BATCH NORMALIZATION + RELU
-    for (int c = 0; c < CHANNELS; ++c) {    // BATCH NORMALIZATION + RELU
-        bnorm_old<BNORM_2__IN_LINES, BNORM_2__IN_COLS>(outpad_23_b[c], gamma_2[c], beta_2[c], movingmean_2[c], movingvariance_2[c], outpad_23_a[c]);
-    }
-    
+    );
 
     /* 3 */
-    // Conv2D
-    conv2d(
+    conv2d( // CONV2D_3
         FILTERS,
         C2D_3__IN_COLS,
         (conv_t*)outarray_a,
@@ -230,41 +188,23 @@ void predict(
         (conv_t*)bias_3,
         (conv_t*)outarray_b
     );
-    for (int f = 0; f < FILTERS; ++f) {
-        int c = 0;
-        conv_t biasVal = bias_3[f];
-        conv2d_old<C2D_3__IN_LINES, C2D_3__IN_COLS, C2D_3__OUT_LINES, C2D_3__OUT_COLS>(outpad_23_a[c], kernel_3[f][c], biasVal, outpad_23_b[f]);
-        ++c;
-        for (; c < CHANNELS; ++c) {
-            conv2d_multi<C2D_3__IN_LINES, C2D_3__IN_COLS, C2D_3__OUT_LINES, C2D_3__OUT_COLS>(outpad_23_a[c], outpad_23_b[f], kernel_3[f][c], outpad_23_b[f]);
-        }
-    }
-    // BatchNormalization
-    bnorm(
+    bnorm( // BNORM_3 + ReLu
         BNORM_3__IN_COLS,
         (bnorm_t*)outarray_b,
         (bnorm_t*)gamma_3,
         (bnorm_t*)beta_3,
         (bnorm_t*)movingmean_3,
         (bnorm_t*)movingvariance_3
-    ); // BATCH NORMALIZATION + RELU
-    for (int c = 0; c < CHANNELS; ++c) {    // BATCH NORMALIZATION + RELU
-        bnorm_old<BNORM_3__IN_LINES, BNORM_3__IN_COLS>(outpad_23_b[c], gamma_3[c], beta_3[c], movingmean_3[c], movingvariance_3[c], outpad_23_a[c]);
-    }
-    // MaxPool2D
-    maxpool2d(
+    );
+    maxpool2d( // MPOOL2D_1
         MP2D_1__IN_COLS,
         MP2D_1__OUT_COLS,
         PADDING_OFFSET,
         (mpool_t*)outarray_b
     );
-    for (int c = 0; c < CHANNELS; ++c) {    /* 1 */
-        maxpool2d_old<MP2D_1__IN_LINES, MP2D_1__IN_COLS, MP2D_1__OUT_LINES, MP2D_1__OUT_COLS, PADDING_OFFSET>(outpad_23_a[c], outpad_45_a[c]);
-    }
     
     /* 4 */
-    // Conv2D
-    conv2d(
+    conv2d( // CONV2D_4
         FILTERS,
         C2D_4__IN_COLS,
         (conv_t*)outarray_b,
@@ -272,31 +212,17 @@ void predict(
         (conv_t*)bias_4,
         (conv_t*)outarray_a
     );
-    for (int f = 0; f < FILTERS; ++f) {
-        int c = 0;
-        conv_t biasVal = bias_4[f];
-        conv2d_old<C2D_4__IN_LINES, C2D_4__IN_COLS, C2D_4__OUT_LINES, C2D_4__OUT_COLS>(outpad_45_a[c], kernel_4[f][c], biasVal, outpad_45_b[f]);
-        ++c;
-        for (; c < CHANNELS; ++c) {
-            conv2d_multi<C2D_4__IN_LINES, C2D_4__IN_COLS, C2D_4__OUT_LINES, C2D_4__OUT_COLS>(outpad_45_a[c], outpad_45_b[f], kernel_4[f][c], outpad_45_b[f]);
-        }
-    }
-    // BatchNormalization
-    bnorm(
+    bnorm( // BNORM_4 + ReLu
         BNORM_4__IN_COLS,
         (bnorm_t*)outarray_a,
         (bnorm_t*)gamma_4,
         (bnorm_t*)beta_4,
         (bnorm_t*)movingmean_4,
         (bnorm_t*)movingvariance_4
-    ); // BATCH NORMALIZATION + RELU
-    for (int c = 0; c < CHANNELS; ++c) {    // BATCH NORMALIZATION + RELU
-        bnorm_old<BNORM_4__IN_LINES, BNORM_4__IN_COLS>(outpad_45_b[c], gamma_4[c], beta_4[c], movingmean_4[c], movingvariance_4[c], outpad_45_a[c]);
-    }
+    );
 
     /* 5 */
-    // Conv2D
-    conv2d(
+    conv2d( // CONV2D_5
         FILTERS,
         C2D_5__IN_COLS,
         (conv_t*)outarray_a,
@@ -304,273 +230,95 @@ void predict(
         (conv_t*)bias_5,
         (conv_t*)outarray_b
     );
-    for (int f = 0; f < FILTERS; ++f) {
-        int c = 0;
-        conv_t biasVal = bias_5[f];
-        conv2d_old<C2D_5__IN_LINES, C2D_5__IN_COLS, C2D_5__OUT_LINES, C2D_5__OUT_COLS>(outpad_45_a[c], kernel_5[f][c], biasVal, outpad_45_b[f]);
-        ++c;
-        for (; c < CHANNELS; ++c) {
-            conv2d_multi<C2D_5__IN_LINES, C2D_5__IN_COLS, C2D_5__OUT_LINES, C2D_5__OUT_COLS>(outpad_45_a[c], outpad_45_b[f], kernel_5[f][c], outpad_45_b[f]);
-        }
-    }
-    // BatchNormalization
-    bnorm(
+    bnorm( // BNORM_5 + ReLu
         BNORM_5__IN_COLS,
         (bnorm_t*)outarray_b,
         (bnorm_t*)gamma_5,
         (bnorm_t*)beta_5,
         (bnorm_t*)movingmean_5,
         (bnorm_t*)movingvariance_5
-    ); // BATCH NORMALIZATION + RELU
-    for (int c = 0; c < CHANNELS; ++c) {    // BATCH NORMALIZATION + RELU
-        bnorm_old<BNORM_5__IN_LINES, BNORM_5__IN_COLS>(outpad_45_b[c], gamma_5[c], beta_5[c], movingmean_5[c], movingvariance_5[c], outpad_45_a[c]);
-    }
-    // MaxPool2D
-    maxpool2d(
+    );
+    maxpool2d( // MPOOL2D_2
         MP2D_2__IN_COLS,
         MP2D_2__OUT_COLS,
         0,
         (mpool_t*)outarray_b
     );
-    for (int c = 0; c < CHANNELS; ++c) {    /* 2 */
-        maxpool2d_old<MP2D_2__IN_LINES, MP2D_2__IN_COLS, MP2D_2__OUT_LINES, MP2D_2__OUT_COLS, 0>(outpad_45_a[c], outpad_45_nopad[c]);
-    }
-    float(*arrx)[431][5] = (float(*)[431][5])outarray_b;
-    for (int c = 0; c < 64; ++c) {
-        for (int line = 0; line < 431; ++line) {
-            for (int col = 0; col < 5; ++col) {
-                float a = arrx[c][line][col];
-                float b = outpad_45_nopad[c][line][col];
-                if (a != b) {
-                    printf("[%d][%d][%d]: %f != %f\n", c, line, col, a, b);
-                }
-            }
-        }
-    }
-    printf("\n");
 
     /* 6 */
-    // ReduceMax
-    reducemax_0_saveTranspose(
+    reducemax_0_saveTranspose( // RMAX_0 + Save transposed
         (reducemax_t*)outarray_b,
         (reducemax_t*)outarray_a
     );
-    reducemax_0_saveTranspose_old<RMAX_0__IN_LINES, RMAX_0__IN_COLS, RMAX_0__OUT_LINES, RMAX_0__OUT_COLS>(outpad_45_nopad, out_rmax0);
-    float(*arr)[64] = (float(*)[64])outarray_a;
-    for (int line = 0; line < 431; ++line) {
-        for (int col = 0; col < 64; ++col) {
-            float a = arr[line][col];
-            float b = out_rmax0[line][col];
-            if (a != b) {
-                printf("[%d][%d]: %f != %f\n", line, col, a, b);
-            }
-        }
-    }
-    printf("\n");
-}
 
-void rnn() {
     /*************************************/
     /**************** RNN ****************/
     /*************************************/
-    /*
-    // GRU_0 (CLEAR WITH PATTERN)
-    for (int l = 0; l < GRU_0__OUT_LINES; ++l) {
-        for (int c = 0; c < GRU_0__OUT_COLS; ++c) {
-            reducemax_t (*poutput)[GRU_0__OUT_COLS] = (reducemax_t(*)[GRU_0__OUT_COLS])outpad_01_a;
-            poutput[l][c] = 99.9999;
-            float a = poutput[l][c];
-        }
-    }
-    /* 7 *
-    // GRU 0 (forward)
-    gru(
+    /* 7 */
+    gru( // GRU_0_F
         GRU_FORWARD,
-        GRU_0__IN_COLS,
-        GRU_0__KERNEL_LINES,
-        (gru_t*)outpad_01_b,
+        GRU_0__IN_COLS, (RNN_COLS_GRU/2),
+        GRU_0__KERNEL_COLS,
+        (gru_t*)outarray_a,
         (gru_t*)kernel_gru0_f,           (gru_t*)bias_gru0_f,
         (gru_t*)recurrent_kernel_gru0_f, (gru_t*)recurrent_bias_gru0_f,
-        (gru_t*)outpad_01_a
+        (gru_t*)outarray_b
     );
-    printf("GRU_0 (forward)\n");
-    for (int l = 0; l < 16; ++l) {
-        printf("%3d ", l);
-        gru_t(*poutput)[GRU_0__OUT_COLS] = (gru_t(*)[GRU_0__OUT_COLS])outpad_01_a;
-        for (int c = 0; c < 4; ++c) {
-            float a = poutput[l][c];
-            //float a = outpad_01_a[0][l][c];
-            if (a < 99)
-                printf("%9.6f ", a);
-            else
-                printf("--.------ ");
-        }
-        for (int c = 64; c < 4+64; ++c) {
-            float a = poutput[l][c];
-            //float a = outpad_01_a[0][l][c];
-            if (a < 99)
-                printf("%9.6f ", a);
-            else
-                printf("--.------ ");
-        }
-        printf("\n");
-    }
-    // GRU 0 (backward)
-    gru_t(*p_kernel)[GRU_KERNEL_COLS][GRU_SPLIT] = (gru_t(*)[GRU_KERNEL_COLS][GRU_SPLIT])kernel_gru0_b;
-    gru(
+    gru( // GRU_0_B
         GRU_BACKWARD,
-        GRU_0__IN_COLS,
-        GRU_0__KERNEL_LINES,
-        (gru_t*)outpad_01_b,
-        (gru_t*)kernel_gru0_b,           (gru_t*)bias_gru0_b,               // TODO: for some reason kernel_gru0_b pointer is equal to kernel_gru0_f, check this
+        GRU_0__IN_COLS, (RNN_COLS_GRU/2),
+        GRU_0__KERNEL_COLS,
+        (gru_t*)outarray_a,
+        (gru_t*)kernel_gru0_b,           (gru_t*)bias_gru0_b,
         (gru_t*)recurrent_kernel_gru0_b, (gru_t*)recurrent_bias_gru0_b,
-        (gru_t*)outpad_01_a
+        (gru_t*)outarray_b
     );
-    printf("GRU_0 (backward)\n");
-    for (int l = 0; l < 16; ++l) {
-        printf("%3d ", l);
-        gru_t(*poutput)[GRU_0__OUT_COLS] = (gru_t(*)[GRU_0__OUT_COLS])outpad_01_a;
-        for (int c = 0; c < 4; ++c) {
-            float a = poutput[l][c];
-            //float a = outpad_01_a[0][l][c];
-            if (a < 99)
-                printf("%9.6f ", a);
-            else
-                printf("--.------ ");
-        }
-        for (int c = 64; c < 4+64; ++c) {
-            float a = poutput[l][c];
-            //float a = outpad_01_a[0][l][c];
-            if (a < 99)
-                printf("%9.6f ", a);
-            else
-                printf("--.------ ");
-        }
-        printf("\n");
-    }
 
-    // GRU_1 (CLEAR WITH PATTERN)
-    for (int l = 0; l < GRU_0__OUT_LINES; ++l) {
-        for (int c = 0; c < GRU_0__OUT_COLS; ++c) {
-            reducemax_t (*poutput)[GRU_0__OUT_COLS] = (reducemax_t(*)[GRU_0__OUT_COLS])outpad_01_b;
-            poutput[l][c] = 99.9999;
-            float a = poutput[l][c];
-        }
-    }
-    /* 8 *
-    // GRU 1 (forward)
-    gru(
+    /* 8 */
+    gru( // GRU_1_F
         GRU_FORWARD,
-        GRU_1__IN_COLS,
-        GRU_1__KERNEL_LINES,
-        (gru_t*)outpad_01_a,
+        GRU_1__IN_COLS, RNN_COLS_GRU,
+        GRU_1__KERNEL_COLS,
+        (gru_t*)outarray_b,
         (gru_t*)kernel_gru1_f,           (gru_t*)bias_gru1_f,
         (gru_t*)recurrent_kernel_gru1_f, (gru_t*)recurrent_bias_gru1_f,
-        (gru_t*)outpad_01_b
+        (gru_t*)outarray_a
     );
-    printf("GRU_1 (forward)\n");
-    for (int l = 0; l < 16; ++l) {
-        printf("%3d ", l);
-        reducemax_t (*poutput)[GRU_1__OUT_COLS] = (reducemax_t(*)[GRU_1__OUT_COLS])outpad_01_b;
-        for (int c = 0; c < 4; ++c) {
-            float a = poutput[l][c];
-            //float a = outpad_01_a[0][l][c];
-            if (a < 99)
-                printf("%9.6f ", a);
-            else
-                printf("--.------ ");
-        }
-        for (int c = 64; c < 4 + 64; ++c) {
-            float a = poutput[l][c];
-            //float a = outpad_01_a[0][l][c];
-            if (a < 99)
-                printf("%9.6f ", a);
-            else
-                printf("--.------ ");
-        }
-        printf("\n");
-    }
-    // GRU 1 (backward)
-    gru(
+    gru( // GRU_1_B
         GRU_BACKWARD,
-        GRU_1__IN_COLS,
-        GRU_1__KERNEL_LINES,
-        (gru_t*)outpad_01_a,
+        GRU_1__IN_COLS_BACK, RNN_COLS_GRU,
+        GRU_1__KERNEL_COLS,
+        (gru_t*)outarray_b,
         (gru_t*)kernel_gru1_b,           (gru_t*)bias_gru1_b,
         (gru_t*)recurrent_kernel_gru1_b, (gru_t*)recurrent_bias_gru1_b,
-        (gru_t*)outpad_01_b
+        (gru_t*)outarray_a
     );
-    printf("GRU_1 (backward)\n");
-    for (int l = 0; l < 16; ++l) {
-        printf("%3d ", l);
-        reducemax_t (*poutput)[GRU_1__OUT_COLS] = (reducemax_t(*)[GRU_1__OUT_COLS])outpad_01_b;
-        for (int c = 0; c < 4; ++c) {
-            float a = poutput[l][c];
-            //float a = outpad_01_a[0][l][c];
-            if (a < 99)
-                printf("%9.6f ", a);
-            else
-                printf("--.------ ");
-        }
-        for (int c = 64; c < 4 + 64; ++c) {
-            float a = poutput[l][c];
-            //float a = outpad_01_a[0][l][c];
-            if (a < 99)
-                printf("%9.6f ", a);
-            else
-                printf("--.------ ");
-        }
-        printf("\n");
-    }
 
-    /* 9 *
-    // TimeDistribution 0 ( + Dense)
-    timedistributed_dense(
+    /* 9 */
+    timedistributed_dense( // TDIST_0 + Dense
         TD_0__IN_COLS,
         TD_0__KERNEL_LINES, TD_0__KERNEL_COLS,
         TD_0__BIAS_SIZE,
         TD_0__OUT_COLS,
-        (timedist_t*)outpad_01_b,
+        (timedist_t*)outarray_a,
         (timedist_t*)kernel_td0,
         (timedist_t*)bias_td0,
-        (timedist_t*)outpad_01_a
+        (timedist_t*)outarray_b
     );
-
-    // TimeDistribution 1 ( + Dense)
-    timedistributed_dense(
+    timedistributed_dense( // TDIST_1 + Dense
         TD_1__IN_COLS,
-        TD_1__KERNEL_LINES, TD_0__KERNEL_COLS,
+        TD_1__KERNEL_LINES, TD_1__KERNEL_COLS,
         TD_1__BIAS_SIZE,
         TD_1__OUT_COLS,
-        (timedist_t*)outpad_01_a,
+        (timedist_t*)outarray_b,
         (timedist_t*)kernel_td1,
         (timedist_t*)bias_td1,
-        (timedist_t*)outpad_01_b
+        (timedist_t*)outputLS   // LOCAL OUTPUT
     );
-    printf("\n");
-    */
-}
 
-void test(
-    const input_t input[INPUT_LINES][INPUT_COLS],
-    output_t outputLS[OUTPUT_LOCAL_SCORE_LINES][OUTPUT_LOCAL_SCORE_COLS],
-    output_t outputGS[OUTPUT_GLOBAL_SCORE]
-) {
-    /* 9 *
-    // TimeDistribution 0 (Dense)
-    P_TDIST_0: for (i512_t i = 0; i < INPUT_LINES; ++i) {
-        timedistributed_dense<TD_0__IN_LINES, TD_0__IN_COLS, TD_0__KERNEL_LINES, TD_0__KERNEL_COLS, TD_0__BIAS_SIZE, TD_0__OUT_LINES, TD_0__OUT_COLS>
-            (outgru_1[i], kernel_td0, bias_td0, outtd_0[i]);
-    }
-    // TimeDistribution 1 (Dense)
-    P_TDIST_1: for (i512_t i = 0; i < INPUT_LINES; ++i) {
-#pragma HLS PIPELINE off
-        timedistributed_dense<TD_1__IN_LINES, TD_1__IN_COLS, TD_1__KERNEL_LINES, TD_1__KERNEL_COLS, TD_1__BIAS_SIZE, TD_1__OUT_LINES, TD_1__OUT_COLS>
-            (outtd_0[i], kernel_td1, bias_td1, outputLS[i]);
-    }
-    
-    /* 10 *
-    reducemax_1<RMAX_1__IN_LINES>(*outputLS, outputGS);
-    */
+    /* 10 */
+    reducemax_1( // RMAX_1
+        (output_t*)outputLS,    // LOCAL OUTPUT -> 431
+        (output_t*)outputGS     // GLOBAL OUTPUT -> 1
+    );
 }
-

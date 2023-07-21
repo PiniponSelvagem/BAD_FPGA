@@ -20,9 +20,9 @@ void timedistributed_dense(
 ) {
     for (int ocol = 0; ocol < TD_OUT_COLS; ++ocol) {
         timedist_t acc = bias[ocol];
-        for (int krow = 0; krow < TD_KERNEL_LINES; ++krow) {
-            timedist_t k = kernel[krow][ocol];
-            timedist_t i = input[krow];
+        for (int kcol = 0; kcol < TD_KERNEL_COLS; ++kcol) {
+            timedist_t k = kernel[ocol][kcol];
+            timedist_t i = input[kcol];
             acc += k * i;
         }
         output[ocol] = SIGMOID(acc);

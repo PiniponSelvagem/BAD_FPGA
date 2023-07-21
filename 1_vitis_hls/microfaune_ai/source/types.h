@@ -43,7 +43,7 @@ typedef ap_fixed<16,7> input_t;
 typedef ap_fixed<16,7> input_t;
 typedef ap_fixed<16,7> conv_t;
 
-#define BNORM_EPSILON   (1.0/2/2/2/2/2/2/2/2/2)     // i know this is ridiculous, but atm i have no idea of a simplier way (the number of 2s is equal to the number of decimal bits)
+#define BNORM_EPSILON   0.001
 typedef ap_fixed<16,7> bnorm_t;
 
 typedef ap_fixed<16,7> mpool_t;
@@ -59,7 +59,7 @@ typedef ap_fixed<32,8> input_t;
 typedef ap_fixed<32,8> input_t;
 typedef ap_fixed<32,8> conv_t;
 
-#define BNORM_EPSILON   (1.0/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2)
+#define BNORM_EPSILON   0.001
 typedef ap_fixed<32,8> bnorm_t;
 
 typedef ap_fixed<32,8> mpool_t;

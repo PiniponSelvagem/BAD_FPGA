@@ -124,15 +124,3 @@ int main() {
     
     return 0;
 }
-
-
-
-/*
-
-Para semana de 10 Julho:
-- excel com nº de ciclos de cada layer, cada passo, etc
-- excel com estatisticas do HLS, ainda com float (baseline)
-- organizar melhor a estrutura dos pesos das GRU
-- mudar para ap_fixed 8 bits e ver as melhorias, meter no excel, escrever algum texto
-
-*/

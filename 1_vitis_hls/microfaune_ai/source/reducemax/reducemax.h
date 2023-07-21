@@ -41,38 +41,18 @@ void reducemax_0_saveTranspose(
     }
 }
 
-
-
-
-template <int RM_IN_LINES, int RM_IN_COLS, int RM_OUT_LINES, int RM_OUT_COLS>
-void reducemax_0_saveTranspose_old(
-    const reducemax_t input[CHANNELS][RM_IN_LINES][RM_IN_COLS],
-    reducemax_t output[RM_OUT_LINES][RM_OUT_COLS]
+void reducemax_1(
+    const output_t* input,
+    output_t* output
 ) {
-    for (int c = 0; c < CHANNELS; ++c) {
-        for (int row = 0; row < RM_IN_LINES; ++row) {
-            reducemax_t maxval = 0;
-            for (int col = 0; col < RM_IN_COLS; ++col) {
-                if (input[c][row][col] > maxval) {
-                    maxval = input[c][row][col];
-                }
-            }
-            output[row][c] = maxval;
-        }
-    }
-}
-
-
-template <int RM_IN_LINES>
-void reducemax_1(const output_t input[RM_IN_LINES], output_t output[1]) {
     output_t maxval = RMAX_MIN_VALUE;
-    RMAX_1_loop_row: for (rmax_row_t row = 0; row < RM_IN_LINES; ++row) {
-        if (input[row] > maxval) {
-            maxval = input[row];
+    RMAX_1_loop_row: for (rmax_row_t row = 0; row < RNN_LINES_GRU; ++row) {
+        output_t value = *(input + row);
+        if (value > maxval) {
+            maxval = value;
         }
     }
-    output[0] = maxval;
+    *output = maxval;
 }
-
 
 #endif // REDUCEMAX_H
