@@ -35,15 +35,23 @@ void conv2d(
     const conv_t* bias,         // 1D array
     conv_t* output
 ) {
+#pragma HLS INTERFACE s_axilite port=filters bundle=BUS1
+#pragma HLS INTERFACE s_axilite port=inoutCols bundle=BUS1
+#pragma HLS INTERFACE s_axilite port=input bundle=BUS1
+#pragma HLS INTERFACE s_axilite port=kernel bundle=BUS1
+#pragma HLS INTERFACE s_axilite port=bias bundle=BUS1
+#pragma HLS INTERFACE s_axilite port=output bundle=BUS1
+#pragma HLS INTERFACE s_axilite port=return bundle=BUS1
+
     // clear all prev and output
     // TODO: improve so it only clears necessary parts of the arrays
-    for (i64_t c = 0; c < CHANNELS; ++c) {
+    CONV_loop_clear_channel: for (i64_t c = 0; c < CHANNELS; ++c) {
         conv_t* pprev_channel = prev + (c * CNN_LINES_PAD * CNN_COLS_PAD);
         conv_t* poutput_channel = output + (c * CNN_LINES_PAD * CNN_COLS_PAD);
-        for (conv_row_t row = 0; row < CNN_LINES_PAD; ++row) {
+        CONV_loop_clear_row: for (conv_row_t row = 0; row < CNN_LINES_PAD; ++row) {
             conv_t* pprev_row = pprev_channel + (row * CNN_COLS_PAD);
             conv_t* poutput_row = poutput_channel + (row * CNN_COLS_PAD);
-            for (conv_col_t col = 0; col < CNN_COLS_PAD; ++col) {
+            CONV_loop_clear_col: for (conv_col_t col = 0; col < CNN_COLS_PAD; ++col) {
                 conv_t* pprev = pprev_row + col;
                 conv_t* poutput = poutput_row + col;
                 *pprev = 0;
@@ -51,6 +59,7 @@ void conv2d(
             }
         }
     }
+
 
     conv_t bias_none = 0;
     conv_t* pbias_backup = (conv_t*)bias;
@@ -75,12 +84,11 @@ void conv2d(
                 pprev_offset = prev + c * CNN_LINES_PAD * CNN_COLS_PAD;
                 poutput_offset = output + c * CNN_LINES_PAD * inoutCols;
             }
-
             CONV_loop_row: for (conv_row_t orow = PADDING_OFFSET; orow < (CNN_LINES_PAD - PADDING_OFFSET); ++orow) {
                 conv_t* pprev_offset_orow = pprev_offset + (orow * CNN_COLS_PAD);
                 conv_t* poutput_offset_orow = poutput_offset + (orow * inoutCols);
                 CONV_loop_col: for (conv_col_t ocol = PADDING_OFFSET; ocol < (inoutCols - PADDING_OFFSET); ++ocol) {
-        #pragma HLS PIPELINE
+        //#pragma HLS PIPELINE
                     conv_t acc = *pbias;
                     conv_t acc_sat;
                     conv_row_t korow = orow - PADDING_OFFSET;
@@ -109,7 +117,6 @@ void conv2d(
                     else
                     */
                     
-                    //output[orow][ocol] = acc_sat;
                     conv_t* poutput = (poutput_offset_orow + ocol);
                     conv_t* pprev = (pprev_offset_orow + ocol);
                     acc_sat = acc + *pprev;
@@ -120,13 +127,14 @@ void conv2d(
             }
             if (filters == 1) {
                 // Loop "channels" only advances bias if only 1 "filters"
-                *pbias++;
+                pbias++;
             }
             else if (c >= 0) {
                 // If "filters > 1", only 1st channel should have the bias value, others 0
                 pbias = &bias_none;
             }
         }
+
         // Set the pbias from bias_NONE to bias
         pbias = (conv_t*)++pbias_backup;
     }

@@ -77,6 +77,11 @@
 			<location>E:/Rodrigo/ISEL/2_Mestrado/2-ANO_1-sem/TFM/BAD_FPGA/1_vitis_hls/microfaune_ai/source/reducemax/reducemax.h</location>
 		</link>
 		<link>
+			<name>source/timedist.h</name>
+			<type>1</type>
+			<location>E:/Rodrigo/ISEL/2_Mestrado/2-ANO_1-sem/TFM/BAD_FPGA/1_vitis_hls/microfaune_ai/source/timedist/timedist.h</location>
+		</link>
+		<link>
 			<name>testbench/main.cpp</name>
 			<type>1</type>
 			<location>E:/Rodrigo/ISEL/2_Mestrado/2-ANO_1-sem/TFM/BAD_FPGA/1_vitis_hls/microfaune_ai/test_bench/main.cpp</location>

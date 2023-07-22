@@ -108,13 +108,6 @@ void predict(
 #pragma HLS INTERFACE s_axilite port=outputGS bundle=BUS1
 #pragma HLS INTERFACE s_axilite port=return bundle=BUS1
 
-#pragma HLS ARRAY_PARTITION variable=inputpad type=cyclic factor=4 DIM=0
-#pragma HLS ARRAY_PARTITION variable=outpad_01_b type=cyclic factor=4 DIM=0
-#pragma HLS ARRAY_PARTITION variable=outpad_23_a type=cyclic factor=4 DIM=0
-#pragma HLS ARRAY_PARTITION variable=outpad_45_a type=cyclic factor=4 DIM=0
-#pragma HLS ARRAY_PARTITION variable=outpad_45_nopad type=cyclic factor=3 DIM=0
-#pragma HLS ARRAY_PARTITION variable=outtd_0 type=cyclic factor=2 DIM=0
-
     input_preconv2d(input, inputpad);
     /*************************************/
     /**************** CNN ****************/
@@ -298,7 +291,6 @@ void predict(
     timedistributed_dense( // TDIST_0 + Dense
         TD_0__IN_COLS,
         TD_0__KERNEL_LINES, TD_0__KERNEL_COLS,
-        TD_0__BIAS_SIZE,
         TD_0__OUT_COLS,
         (timedist_t*)outarray_a,
         (timedist_t*)kernel_td0,
@@ -308,7 +300,6 @@ void predict(
     timedistributed_dense( // TDIST_1 + Dense
         TD_1__IN_COLS,
         TD_1__KERNEL_LINES, TD_1__KERNEL_COLS,
-        TD_1__BIAS_SIZE,
         TD_1__OUT_COLS,
         (timedist_t*)outarray_b,
         (timedist_t*)kernel_td1,

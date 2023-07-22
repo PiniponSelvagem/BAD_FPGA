@@ -15,8 +15,7 @@ typedef int tdist_col_t;
 
 void timedistributed_dense(
     i128_t inCols,
-    i128_t kLines, i64_t kCols,
-    i64_t biasSize,
+    i64_t kLines, i128_t kCols,
     i64_t outCols,
     const timedist_t* input,
     const timedist_t* kernel,

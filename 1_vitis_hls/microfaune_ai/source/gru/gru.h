@@ -9,7 +9,7 @@
 typedef ap_uint<1> gru_direction_t;
 typedef ap_uint<7> gru_idx_t;
 typedef ap_uint<2> gru_mtx_row_t;
-typedef ap_uint<8> gru_krl_row_t;
+typedef ap_uint<8> gru_krl_col_t;
 typedef ap_uint<9> gru_wg_col_t;
 
 typedef ap_uint<2> gru_state_row_t;
@@ -19,7 +19,7 @@ typedef ap_uint<7> gru_state_col_t;
 typedef int gru_direction_t;
 typedef int gru_idx_t;
 typedef int gru_mtx_row_t;
-typedef int gru_krl_row_t;
+typedef int gru_krl_col_t;
 typedef int gru_wg_col_t;
 
 typedef int gru_state_row_t;
@@ -60,7 +60,7 @@ void gru_syncState() {
     
 void gru_cell(
     gru_idx_t idx,
-    gru_krl_row_t kernelCols,
+    gru_krl_col_t kernelCols,
     const gru_t* input,
     const gru_t* kernel,
     const gru_t* bias,
@@ -75,7 +75,7 @@ void gru_cell(
     GRU_cell_loop_x_row: for (gru_mtx_row_t i = 0; i < GRU_SPLIT; ++i) {
         matrix_x[i] = 0;
         gru_t* pkernel_row = pkernel + (i * kernelCols);
-        GRU_cell_loop_x_col: for (gru_krl_row_t j = 0; j < GRU_KERNEL_COLS_MAX; ++j) {
+        GRU_cell_loop_x_col: for (gru_krl_col_t j = 0; j < GRU_KERNEL_COLS_MAX; ++j) {
 //#pragma HLS PIPELINE ii=3
             if (j >= kernelCols)
                 break;
@@ -94,7 +94,7 @@ void gru_cell(
     GRU_cell_loop_inner_row: for (gru_mtx_row_t i = 0; i < GRU_SPLIT; ++i) {
         matrix_inner[i] = 0;
         gru_t* preckernel_row = preckernel + (i * GRU_KERNEL_REC_COLS);
-        GRU_cell_loop_inner_col: for (gru_krl_row_t j = 0; j < GRU_KERNEL_REC_COLS; ++j) {
+        GRU_cell_loop_inner_col: for (gru_krl_col_t j = 0; j < GRU_KERNEL_REC_COLS; ++j) {
 //#pragma HLS PIPELINE ii=3
             gru_t iVal = state[0][j];
             gru_t kVal = *(preckernel_row + j);
@@ -119,7 +119,7 @@ void gru_cell(
 void gru(
     gru_direction_t isForward,
     i128_t inCols, i128_t inSize,
-    gru_krl_row_t kernelLines,
+    gru_krl_col_t kernelCols,
     gru_t* input,
     gru_t* kernel,    gru_t* bias,
     gru_t* recKernel, gru_t* recBias,
@@ -137,25 +137,25 @@ void gru(
         offset = (RNN_COLS_GRU/2);
     }
     
-    GRU_loop_row: while(true) {  // iterate LINES (TODO: this should NOT the a while true for better synthesis?)
+    GRU_loop_row: for (i512_t i = 0; i < RNN_LINES_GRU; ++i) { // while(true)
         GRU_loop_col: for (i128_t idx = 0; idx < GRU_INCOLS_MAX; ++idx) {
             if (idx >= inCols)
                 break;
             gru_t* input_row   = input + (row * inSize);
             gru_t* output_cell = output + (row * RNN_COLS_GRU) + (idx + offset);
-            gru_cell(idx, kernelLines, input_row, kernel, bias, recKernel, recBias, output_cell);
+            gru_cell(idx, kernelCols, input_row, kernel, bias, recKernel, recBias, output_cell);
         }
 
         // exit contidions and inc/dec iteration
         if (isForward) {
+            ++row;
             if (row >= RNN_LINES_GRU)
                 break;
-            ++row;
         }
         else {
+            --row;
             if (row < 0)
                 break;
-            --row;
         }
 
         gru_syncState(); // TODO: improve by not sync

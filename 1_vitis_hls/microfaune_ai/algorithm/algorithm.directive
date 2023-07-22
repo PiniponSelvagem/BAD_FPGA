@@ -1,3 +1,10 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <AutoPilot:ProjectResources xmlns:AutoPilot="com.autoesl.autopilot.ui.directiveView">
+    <sourceFile name="">
+        <directive functionName="conv2d" label="" functionLabel="">
+            <pragma name="TOP">
+                <option name="name" value="conv2d"/>
+            </pragma>
+        </directive>
+    </sourceFile>
 </AutoPilot:ProjectResources>
+
