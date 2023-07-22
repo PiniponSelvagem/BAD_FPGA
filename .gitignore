@@ -64,3 +64,6 @@ __pycache__/
 /1_vitis_hls/microfaune_ai/.vs/
 /1_vitis_hls/microfaune_ai/x64/
 /1_vitis_hls/microfaune_ai/Debug/
+*.dmp
+*.log
+/1_vitis_hls/microfaune_ai/algorithm/.debug/

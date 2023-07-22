@@ -61,20 +61,15 @@ void conv2d(
     }
 
 
-    conv_t bias_none = 0;
-    conv_t* pbias_backup = (conv_t*)bias;
-    conv_t* pbias = pbias_backup;
+    conv_t currBias = *bias;
+    i64_t bias_counter = 0;
 
     CONV_loop_filter: for (i64_t f = 0; f < filters; ++f) {
         conv_t* pkernel = (conv_t*)kernel + (f * CHANNELS * C2D_KERNEL_LINES * C2D_KERNEL_COLS);
 
         conv_c_l_c output_offset;
-        conv_t* pprev_offset;
-        conv_t* poutput_offset;
-        if (filters > 1) {
-            pprev_offset = prev + f * CNN_LINES_PAD * CNN_COLS_PAD;
-            poutput_offset = output + f * CNN_LINES_PAD * inoutCols;
-        }
+        conv_t* pprev_offset = prev + f * CNN_LINES_PAD * CNN_COLS_PAD;
+        conv_t* poutput_offset = output + f * CNN_LINES_PAD * inoutCols;
 
         CONV_loop_channel: for (i64_t c = 0; c < CHANNELS; ++c) {
             conv_t* pkernel_c = pkernel + (c * C2D_KERNEL_LINES * C2D_KERNEL_COLS);
@@ -85,11 +80,13 @@ void conv2d(
                 poutput_offset = output + c * CNN_LINES_PAD * inoutCols;
             }
             CONV_loop_row: for (conv_row_t orow = PADDING_OFFSET; orow < (CNN_LINES_PAD - PADDING_OFFSET); ++orow) {
+// TODO: HLS crashes synthesis if it tries to flatten this loop, discuss this
+        #pragma HLS LOOP_FLATTEN off
                 conv_t* pprev_offset_orow = pprev_offset + (orow * CNN_COLS_PAD);
                 conv_t* poutput_offset_orow = poutput_offset + (orow * inoutCols);
                 CONV_loop_col: for (conv_col_t ocol = PADDING_OFFSET; ocol < (inoutCols - PADDING_OFFSET); ++ocol) {
         //#pragma HLS PIPELINE
-                    conv_t acc = *pbias;
+                    conv_t acc = currBias;
                     conv_t acc_sat;
                     conv_row_t korow = orow - PADDING_OFFSET;
                     CONV_loop_k1: for (conv_k_t krow = 0; krow < C2D_KERNEL_LINES; ++krow, ++korow) {
@@ -99,10 +96,8 @@ void conv2d(
                         conv_col_t kocol = ocol - PADDING_OFFSET;
                         CONV_loop_k2: for (conv_k_t kcol = 0; kcol < C2D_KERNEL_COLS; ++kcol, ++kocol) {
         //#pragma HLS PIPELINE
-                            //conv_t k = kernelArr[f][c][krow][kcol];
-                            conv_t k = *(pkernel_c_krow + kcol);
-                            //conv_t i = input[c][korow][kocol];
-                            conv_t i = *(pinput_c_krow + kocol);
+                            conv_t k = *(pkernel_c_krow + kcol); //conv_t k = kernelArr[f][c][krow][kcol];
+                            conv_t i = *(pinput_c_krow + kocol); //conv_t i = input[c][korow][kocol];
                             acc += k * i;
                         }
                     }
@@ -127,16 +122,18 @@ void conv2d(
             }
             if (filters == 1) {
                 // Loop "channels" only advances bias if only 1 "filters"
-                pbias++;
+                ++bias_counter;
+                currBias = *(bias + bias_counter);
             }
             else if (c >= 0) {
                 // If "filters > 1", only 1st channel should have the bias value, others 0
-                pbias = &bias_none;
+                currBias = 0;
             }
         }
 
-        // Set the pbias from bias_NONE to bias
-        pbias = (conv_t*)++pbias_backup;
+        // Set the currBias from 0 to next bias
+        ++bias_counter;
+        currBias = *(bias + bias_counter);
     }
 }
 
