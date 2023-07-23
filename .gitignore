@@ -67,3 +67,5 @@ __pycache__/
 *.dmp
 *.log
 /1_vitis_hls/microfaune_ai/algorithm/.debug/
+/1_vitis_hls/microfaune_ai/algorithm/impl/
+/1_vitis_hls/microfaune_ai/algorithm/syn

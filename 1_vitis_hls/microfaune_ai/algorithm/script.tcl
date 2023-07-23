@@ -18,7 +18,7 @@ add_files -tb microfaune_ai/test_bench/main.cpp -cflags "-Wno-unknown-pragmas"
 open_solution "algorithm" -flow_target vivado
 set_part {xck26-sfvc784-2LV-c}
 create_clock -period 10 -name default
-#source "./microfaune_ai/algorithm/directives.tcl"
+source "./microfaune_ai/algorithm/directives.tcl"
 csim_design
 csynth_design
 cosim_design
