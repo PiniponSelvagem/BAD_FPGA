@@ -79,14 +79,14 @@ void gru_cell(
 //#pragma HLS PIPELINE ii=3
             if (j >= kernelCols)
                 break;
-            gru_t iVal = *(input + j);
-            gru_t kVal = *(pkernel_row + j);
-            matrix_x[i] += iVal * kVal;
+            gru_t iVal = TC(*(input + j));
+            gru_t kVal = TC(*(pkernel_row + j));
+            matrix_x[i] += TC(TC(iVal) * TC(kVal));
         }
     }
     GRU_cell_loop_x_bias: for (gru_mtx_row_t i = 0; i < GRU_SPLIT; ++i) {
 //#pragma HLS PIPELINE ii=5
-        matrix_x[i] += *(bias + (idx * GRU_SPLIT) + i);
+        matrix_x[i] += TC(*(bias + (idx * GRU_SPLIT) + i));
     }
 
 
@@ -97,21 +97,21 @@ void gru_cell(
         GRU_cell_loop_inner_col: for (gru_krl_col_t j = 0; j < GRU_KERNEL_REC_COLS; ++j) {
 //#pragma HLS PIPELINE ii=3
             gru_t iVal = state[0][j];
-            gru_t kVal = *(preckernel_row + j);
-            matrix_inner[i] += iVal * kVal;
+            gru_t kVal = TC(*(preckernel_row + j));
+            matrix_inner[i] += TC(TC(iVal) * TC(kVal));
         }
     }
     GRU_cell_loop_inner_bias: for (gru_mtx_row_t i = 0; i < GRU_SPLIT; ++i) {
 //#pragma HLS PIPELINE ii=5
-        matrix_inner[i] += *(recurrent_bias + (idx * GRU_SPLIT) + i);
+        matrix_inner[i] += TC(*(recurrent_bias + (idx * GRU_SPLIT) + i));
     }
 
 
-    gru_t z = (gru_t)SIGMOID(matrix_x[0] + matrix_inner[0]);
-    gru_t r = (gru_t)SIGMOID(matrix_x[1] + matrix_inner[1]);
-    gru_t hh = (gru_t)TANH(matrix_x[2] + (r * matrix_inner[2]));
+    gru_t z = TC((gru_t)SIGMOID(TC(TC(matrix_x[0]) + TC(matrix_inner[0]))));
+    gru_t r = TC((gru_t)SIGMOID(TC(TC(matrix_x[1]) + TC(matrix_inner[1]))));
+    gru_t hh = TC((gru_t)TANH(TC(TC(matrix_x[2]) + (TC(r * TC(matrix_inner[2]))))));
 
-    gru_t out = z * state[0][idx] + (1 - z) * hh;
+    gru_t out = TC(TC(z * state[0][idx]) + TC((1 - z) * hh));
     state[1][idx] = out;
     *output = out;
 }

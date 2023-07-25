@@ -22,7 +22,7 @@
 /**
  * @brief This was taken from "model_json/dump_weights_bias.json". (Channels first)
 */
-conv_t kernel_2[CHANNELS][FILTERS][C2D_KERNEL_LINES][C2D_KERNEL_COLS];
+conv_t kernel_2[FILTERS][CHANNELS][C2D_KERNEL_LINES][C2D_KERNEL_COLS];
 
 /**
  * @brief This was taken from "model_json/dump_weights_bias.json". (Channels first)

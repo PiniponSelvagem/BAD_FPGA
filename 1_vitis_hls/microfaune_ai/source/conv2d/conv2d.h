@@ -75,7 +75,7 @@ void conv2d(
     }
 
 
-    conv_t currBias = *bias;
+    conv_t currBias = TC(*bias);
     i64_t bias_counter = 0;
 
     CONV_loop_filter: for (i64_t f = 0; f < filters; ++f) {
@@ -117,12 +117,16 @@ void conv2d(
                             conv_p_input pinput_offset_col = pinput_offset_row + kocol;
                             conv_t k = *(kernel + pkernel_offset_col); //conv_t k = kernel[f][c][krow][kcol];
                             conv_t i = *(input + pinput_offset_col);   //conv_t i = input[c][korow][kocol];
-                            acc += k * i;
+                            acc += TC(TC(k) * TC(i));
                         }
                     }
 
 // TODO: Uncomment after removing BatchNormalization layer
 // TODO: Might require adjustments since max value might no longer be 255
+                    #ifndef USE_BNORM
+                    if (acc < 0)
+                        acc_sat = 0;    // ReLu
+                    #endif // !USE_BNORM
                     /*
                     if (acc > 255)
                         acc_sat = 255;
@@ -133,7 +137,7 @@ void conv2d(
                     
                     conv_t* poutput = (output + (poutput_offset_orow + ocol));
                     conv_t* pprev = (conv_t*)prev + (pprev_offset_orow + ocol);
-                    acc_sat = acc + *pprev;
+                    acc_sat = TC(TC(acc) + TC(*pprev));
                     *poutput = acc_sat;
                     if ((c == 0 && filters == 1) || (filters > 1))
                         *pprev = acc_sat;   // TODO: Memory dependency because of read for acc_sat, making pipeline not lower than ii=7
@@ -142,7 +146,7 @@ void conv2d(
             if (filters == 1) {
                 // Loop "channels" only advances bias if only 1 "filters"
                 ++bias_counter;
-                currBias = *(bias + bias_counter);
+                currBias = TC(*(bias + bias_counter));
             }
             else if (c >= 0) {
                 // If "filters > 1", only 1st channel should have the bias value, others 0

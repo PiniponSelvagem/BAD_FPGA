@@ -1,3 +1,5 @@
+#define USE_BNORM
+
 #include <stdio.h>
 
 #include "types.h"
@@ -121,6 +123,7 @@ void predict(
         (conv_t*)bias_0,
         (conv_t*)outarray_a
     );
+#ifdef USE_BNORM
     bnorm( // BNORM_0 + ReLu
         BNORM_0__IN_COLS,
         (bnorm_t*)outarray_a,
@@ -129,6 +132,7 @@ void predict(
         (bnorm_t*)movingmean_0,
         (bnorm_t*)movingvariance_0
     );
+#endif
 
     /* 1 */
     conv2d( // CONV2D_1
@@ -139,6 +143,7 @@ void predict(
         (conv_t*)bias_1,
         (conv_t*)outarray_b
     );
+#ifdef USE_BNORM
     bnorm( // BNORM_1 + ReLu
         BNORM_1__IN_COLS,
         (bnorm_t*)outarray_b,
@@ -147,6 +152,7 @@ void predict(
         (bnorm_t*)movingmean_1,
         (bnorm_t*)movingvariance_1
     );
+#endif
     maxpool2d( // MPOOL2D_0
         MP2D_0__IN_COLS,
         MP2D_0__OUT_COLS,
@@ -163,6 +169,7 @@ void predict(
         (conv_t*)bias_2,
         (conv_t*)outarray_a
     );
+#ifdef USE_BNORM
     bnorm( // BNORM_2 + ReLu
         BNORM_2__IN_COLS,
         (bnorm_t*)outarray_a,
@@ -171,6 +178,7 @@ void predict(
         (bnorm_t*)movingmean_2,
         (bnorm_t*)movingvariance_2
     );
+#endif
 
     /* 3 */
     conv2d( // CONV2D_3
@@ -181,6 +189,7 @@ void predict(
         (conv_t*)bias_3,
         (conv_t*)outarray_b
     );
+#ifdef USE_BNORM
     bnorm( // BNORM_3 + ReLu
         BNORM_3__IN_COLS,
         (bnorm_t*)outarray_b,
@@ -189,6 +198,7 @@ void predict(
         (bnorm_t*)movingmean_3,
         (bnorm_t*)movingvariance_3
     );
+#endif
     maxpool2d( // MPOOL2D_1
         MP2D_1__IN_COLS,
         MP2D_1__OUT_COLS,
@@ -205,6 +215,7 @@ void predict(
         (conv_t*)bias_4,
         (conv_t*)outarray_a
     );
+#ifdef USE_BNORM
     bnorm( // BNORM_4 + ReLu
         BNORM_4__IN_COLS,
         (bnorm_t*)outarray_a,
@@ -213,6 +224,7 @@ void predict(
         (bnorm_t*)movingmean_4,
         (bnorm_t*)movingvariance_4
     );
+#endif
 
     /* 5 */
     conv2d( // CONV2D_5
@@ -223,6 +235,7 @@ void predict(
         (conv_t*)bias_5,
         (conv_t*)outarray_b
     );
+#ifdef USE_BNORM
     bnorm( // BNORM_5 + ReLu
         BNORM_5__IN_COLS,
         (bnorm_t*)outarray_b,
@@ -231,6 +244,7 @@ void predict(
         (bnorm_t*)movingmean_5,
         (bnorm_t*)movingvariance_5
     );
+#endif
     maxpool2d( // MPOOL2D_2
         MP2D_2__IN_COLS,
         MP2D_2__OUT_COLS,

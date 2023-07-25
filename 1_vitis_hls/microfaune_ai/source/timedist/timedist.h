@@ -35,10 +35,10 @@ void timedistributed_dense(
                     break;
                 timedist_t k = *(pkernel_row + kcol);
                 timedist_t i = *(pinput_row + kcol);
-                acc += k * i;
+                acc += TC(TC(k) * TC(i));
             }
             timedist_t* poutput = poutput_row + ocol;
-            *poutput = SIGMOID(acc);
+            *poutput = TC(SIGMOID(TC(acc)));
         }
     }
 }

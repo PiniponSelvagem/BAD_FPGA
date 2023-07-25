@@ -52,6 +52,13 @@ layerName_split_dim0 = [
     "bias",
 ]
 
+layerName_toMerge = [
+    # hardcoded to only work with conv2d and batch_normalization
+    "conv2d",
+    "batch_normalization"
+]
+
+
 data_type = {}
 data_type["name"] = "float"
 """
@@ -114,6 +121,7 @@ class Layer:
         return self.__dict__
 
 
+layers_toMerge = []
 i = 0
 for m in model.layers:
     if any(layerName_save in m.name for layerName_save in layerName_toSave):
@@ -139,6 +147,18 @@ for m in model.layers:
                 if ("kernel" in v.name): # reorder kernel for better memory access / no jumping around when access
                     data = data.transpose((1, 2, 0))
             #
+            for name in layerName_toMerge:
+                if name in v.name:
+                    layerData = {
+                        "layerID": 0,
+                        "layerName": m.name,
+                        "layerFullName": arrayName,
+                        "layerWeightName": "/".join(v.name.split("/")[1:]).replace(':', '_'),
+                        "data": data
+                    }
+                    layers_toMerge.append(layerData)
+                    break
+            #
             shouldSplit = True
             for name in layerName_split_dim0:
                 if name not in v.name:
@@ -161,6 +181,48 @@ for m in model.layers:
     i += 1
 
 
+EPSILON = 0.0001
+merged_layers = []
+for x in range(0, len(layers_toMerge), 6):
+    conv2d_kernel_full = layers_toMerge[x]
+    conv2d_bias_full = layers_toMerge[x + 1]
+    #
+    conv2d_kernel = conv2d_kernel_full["data"]
+    conv2d_bias = layers_toMerge[x + 1]["data"]
+    #
+    bn_gamma = layers_toMerge[x + 2]["data"]
+    bn_beta = layers_toMerge[x + 3]["data"]
+    bn_moving_mean = layers_toMerge[x + 4]["data"]
+    bn_moving_variance = layers_toMerge[x + 5]["data"]
+    #
+    # Merge the Conv2D weights with BatchNormalization weights and bias terms
+    merged_kernel = np.zeros_like(conv2d_kernel)
+    merged_bias = np.zeros_like(conv2d_bias)
+    for i in range(conv2d_kernel.shape[0]):
+        for j in range(conv2d_kernel.shape[1]):
+            merged_kernel[i, j] = conv2d_kernel[i, j] / np.sqrt(bn_moving_variance[i] + EPSILON)
+        merged_bias[i] = (conv2d_bias[i] - bn_moving_mean[i]) / np.sqrt(bn_moving_variance[i] + EPSILON) * bn_gamma[i] + bn_beta[i]
+    #
+    # Create a new merged layer and append it to the list
+    merged_layer = {
+        "layerName": "conv2d",
+        "layerFullName": "merged_"+conv2d_kernel_full["layerFullName"],
+        "layerWeightName": conv2d_kernel_full["layerWeightName"],
+        "data": merged_kernel
+    }
+    merged_layers.append(merged_layer)
+    #
+    merged_layer_bias = {
+        "layerName": "conv2d",
+        "layerFullName": "merged_"+conv2d_bias_full["layerFullName"],
+        "layerWeightName": conv2d_bias_full["layerWeightName"],
+        "data": merged_bias
+    }
+    merged_layers.append(merged_layer_bias)
+
+for layer in merged_layers:
+    cutils.saveArray(folder, layer["layerFullName"], layer["data"], layer["layerFullName"], data_type)
+
 
 
 #########################################################
@@ -169,3 +231,40 @@ elapsed = end - start
 
 
 print('Time elapsed: ' + str(timedelta(seconds=elapsed)))
+
+
+
+
+
+
+""" # playing around with conv2d and batch_normalization merging
+#input
+input = 1.1
+
+#conv2d
+kernel = 0.5
+bias = 1
+
+#batch_normalization
+EPSILON = 0.001
+gamma = 0.1
+beta = 0.2
+movingvariance = 0.3
+movingmean = 0.4
+
+#conv2d
+output_conv2d = (input * kernel) + bias
+output_conv2d
+#batch_normalization
+normalized = (output_conv2d - movingmean) / np.sqrt(movingvariance + EPSILON)
+output = gamma * normalized + beta
+output
+
+# merged weights: conv2d <-> batch_normalization
+W_merged = kernel / np.sqrt(movingvariance + EPSILON) * gamma
+B_merged = (bias - movingmean) / np.sqrt(movingvariance) * gamma + beta
+
+# using merged weights
+inout = (input * W_merged) + B_merged
+inout
+"""

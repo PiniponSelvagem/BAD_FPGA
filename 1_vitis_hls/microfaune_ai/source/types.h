@@ -3,6 +3,10 @@
 #ifndef MY_TYPES
 #define MY_TYPES
 
+
+#define TRUNCATE_BITS
+
+
 /* GLOBAL TYPES */
 #ifdef __VITIS_HLS__
 #include <ap_int.h>
@@ -11,11 +15,21 @@
 typedef ap_uint<7> i64_t;
 typedef ap_uint<8> i128_t;
 typedef ap_int<10> i512_t;  // requires signal because backward layer has check: i >= 0, and i will be -1
+#define TC(x) x
 #endif
 #ifdef _MSC_VER
 typedef int i64_t;
 typedef int i128_t;
 typedef int i512_t;
+#define TRUNC_MAX_VALUE(bits) ((1 << (bits)) - 1)
+#define TRUNC_X(x, bits) ((int)((x) * TRUNC_MAX_VALUE(bits)) / (float)TRUNC_MAX_VALUE(bits))
+#ifndef TRUNCATE_BITS
+#define TC(x) x
+#else
+// 10 bits, seems to be the absolute minimum
+// 12 bits, safe bet
+#define TC(x) TRUNC_X(x, 12)
+#endif // TRUNCATE_BITS
 #endif
 
 /* LAYER TYPES */

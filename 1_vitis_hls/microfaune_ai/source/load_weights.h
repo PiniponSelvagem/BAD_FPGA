@@ -19,8 +19,13 @@
 #endif
 
 // conv2d_0
-#define CONV_0_KERNEL WEIGHTS_PATH"1_conv2d_kernel_0.bin"
-#define CONV_0_BIAS   WEIGHTS_PATH"1_conv2d_bias_0.bin"
+#ifdef USE_BNORM
+    #define CONV_0_KERNEL WEIGHTS_PATH"1_conv2d_kernel_0.bin"
+    #define CONV_0_BIAS   WEIGHTS_PATH"1_conv2d_bias_0.bin"
+#else
+    #define CONV_0_KERNEL WEIGHTS_PATH"merged_conv2d_kernel_0.bin"
+    #define CONV_0_BIAS   WEIGHTS_PATH"merged_conv2d_bias_0.bin"
+#endif
 // bnorm_0
 #define BNORM_0_GAMMA          WEIGHTS_PATH"2_batch_normalization_gamma_0.bin"
 #define BNORM_0_BETA           WEIGHTS_PATH"2_batch_normalization_beta_0.bin"
@@ -28,8 +33,13 @@
 #define BNORM_0_MOVINGVARIANCE WEIGHTS_PATH"2_batch_normalization_moving_variance_0.bin"
 
 // conv2d_1
-#define CONV_1_KERNEL WEIGHTS_PATH"4_conv2d_1_kernel_0.bin"
-#define CONV_1_BIAS   WEIGHTS_PATH"4_conv2d_1_bias_0.bin"
+#ifdef USE_BNORM
+    #define CONV_1_KERNEL WEIGHTS_PATH"4_conv2d_1_kernel_0.bin"
+    #define CONV_1_BIAS   WEIGHTS_PATH"4_conv2d_1_bias_0.bin"
+#else
+    #define CONV_1_KERNEL WEIGHTS_PATH"merged_conv2d_1_kernel_0.bin"
+    #define CONV_1_BIAS   WEIGHTS_PATH"merged_conv2d_1_bias_0.bin"
+#endif
 // bnorm_1
 #define BNORM_1_GAMMA          WEIGHTS_PATH"5_batch_normalization_1_gamma_0.bin"
 #define BNORM_1_BETA           WEIGHTS_PATH"5_batch_normalization_1_beta_0.bin"
@@ -37,8 +47,13 @@
 #define BNORM_1_MOVINGVARIANCE WEIGHTS_PATH"5_batch_normalization_1_moving_variance_0.bin"
 
 // conv2d_2
-#define CONV_2_KERNEL WEIGHTS_PATH"8_conv2d_2_kernel_0.bin"
-#define CONV_2_BIAS   WEIGHTS_PATH"8_conv2d_2_bias_0.bin"
+#ifdef USE_BNORM
+    #define CONV_2_KERNEL WEIGHTS_PATH"8_conv2d_2_kernel_0.bin"
+    #define CONV_2_BIAS   WEIGHTS_PATH"8_conv2d_2_bias_0.bin"
+#else
+    #define CONV_2_KERNEL WEIGHTS_PATH"merged_conv2d_2_kernel_0.bin"
+    #define CONV_2_BIAS   WEIGHTS_PATH"merged_conv2d_2_bias_0.bin"
+#endif
 // bnorm_2
 #define BNORM_2_GAMMA          WEIGHTS_PATH"9_batch_normalization_2_gamma_0.bin"
 #define BNORM_2_BETA           WEIGHTS_PATH"9_batch_normalization_2_beta_0.bin"
@@ -46,8 +61,13 @@
 #define BNORM_2_MOVINGVARIANCE WEIGHTS_PATH"9_batch_normalization_2_moving_variance_0.bin"
 
 // conv2d_3
-#define CONV_3_KERNEL WEIGHTS_PATH"11_conv2d_3_kernel_0.bin"
-#define CONV_3_BIAS   WEIGHTS_PATH"11_conv2d_3_bias_0.bin"
+#ifdef USE_BNORM
+    #define CONV_3_KERNEL WEIGHTS_PATH"11_conv2d_3_kernel_0.bin"
+    #define CONV_3_BIAS   WEIGHTS_PATH"11_conv2d_3_bias_0.bin"
+#else
+    #define CONV_3_KERNEL WEIGHTS_PATH"merged_conv2d_3_kernel_0.bin"
+    #define CONV_3_BIAS   WEIGHTS_PATH"merged_conv2d_3_bias_0.bin"
+#endif
 // bnorm_3
 #define BNORM_3_GAMMA          WEIGHTS_PATH"12_batch_normalization_3_gamma_0.bin"
 #define BNORM_3_BETA           WEIGHTS_PATH"12_batch_normalization_3_beta_0.bin"
@@ -55,8 +75,13 @@
 #define BNORM_3_MOVINGVARIANCE WEIGHTS_PATH"12_batch_normalization_3_moving_variance_0.bin"
 
 // conv2d_4
-#define CONV_4_KERNEL WEIGHTS_PATH"15_conv2d_4_kernel_0.bin"
-#define CONV_4_BIAS   WEIGHTS_PATH"15_conv2d_4_bias_0.bin"
+#ifdef USE_BNORM
+    #define CONV_4_KERNEL WEIGHTS_PATH"15_conv2d_4_kernel_0.bin"
+    #define CONV_4_BIAS   WEIGHTS_PATH"15_conv2d_4_bias_0.bin"
+#else
+    #define CONV_4_KERNEL WEIGHTS_PATH"merged_conv2d_4_kernel_0.bin"
+    #define CONV_4_BIAS   WEIGHTS_PATH"merged_conv2d_4_bias_0.bin"
+#endif
 // bnorm_4
 #define BNORM_4_GAMMA          WEIGHTS_PATH"16_batch_normalization_4_gamma_0.bin"
 #define BNORM_4_BETA           WEIGHTS_PATH"16_batch_normalization_4_beta_0.bin"
@@ -64,8 +89,13 @@
 #define BNORM_4_MOVINGVARIANCE WEIGHTS_PATH"16_batch_normalization_4_moving_variance_0.bin"
 
 // conv2d_5
-#define CONV_5_KERNEL WEIGHTS_PATH"18_conv2d_5_kernel_0.bin"
-#define CONV_5_BIAS   WEIGHTS_PATH"18_conv2d_5_bias_0.bin"
+#ifdef USE_BNORM
+    #define CONV_5_KERNEL WEIGHTS_PATH"18_conv2d_5_kernel_0.bin"
+    #define CONV_5_BIAS   WEIGHTS_PATH"18_conv2d_5_bias_0.bin"
+#else
+    #define CONV_5_KERNEL WEIGHTS_PATH"merged_conv2d_5_kernel_0.bin"
+    #define CONV_5_BIAS   WEIGHTS_PATH"merged_conv2d_5_bias_0.bin"
+#endif
 // bnorm_5
 #define BNORM_5_GAMMA          WEIGHTS_PATH"19_batch_normalization_5_gamma_0.bin"
 #define BNORM_5_BETA           WEIGHTS_PATH"19_batch_normalization_5_beta_0.bin"
