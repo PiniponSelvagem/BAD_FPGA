@@ -5,11 +5,6 @@
                 <option name="name" value="conv2d"/>
             </pragma>
         </directive>
-        <directive functionName="conv2d" label="" functionLabel="">
-            <pragma name="TOP">
-                <option name="name" value="conv2d"/>
-            </pragma>
-        </directive>
     </sourceFile>
 </AutoPilot:ProjectResources>
 

@@ -7,10 +7,18 @@
 #ifdef __VITIS_HLS__
 typedef ap_uint<9> tdist_row_t;
 typedef ap_uint<8> tdist_col_t;
+
+typedef ap_uint<16> tdist_p_input;
+typedef ap_uint<14> tdist_p_kernel;
+typedef ap_uint<15> tdist_p_output;
 #endif
 #ifdef _MSC_VER
 typedef int tdist_row_t;
 typedef int tdist_col_t;
+
+typedef int tdist_p_input;
+typedef int tdist_p_kernel;
+typedef int tdist_p_output;
 #endif
 
 void timedistributed_dense(
@@ -23,21 +31,21 @@ void timedistributed_dense(
     timedist_t* output
 ) {
     TDIST_loop_row: for (tdist_row_t row = 0; row < RNN_LINES_GRU; ++row) {
-        timedist_t* poutput_row = output + (row * kLines);
+        tdist_p_input pinput_offset_row  = (row * inCols);
+        tdist_p_output poutput_offset_row = (row * kLines);
         TDIST_loop_col: for (tdist_col_t ocol = 0; ocol < TD_0__OUT_COLS; ++ocol) {
             if (ocol >= outCols)
                 break;
             timedist_t acc = *(bias + ocol);
-            timedist_t* pkernel_row = (timedist_t*)kernel + (ocol * kCols);
-            timedist_t* pinput_row  = (timedist_t*)input + (row * inCols);
+            tdist_p_kernel pkernel_offset_row = (ocol * kCols);
             TDIST_loop_kcol: for (tdist_col_t kcol = 0; kcol < TD_0__KERNEL_COLS; ++kcol) {
                 if (kcol >= kCols)
                     break;
-                timedist_t k = *(pkernel_row + kcol);
-                timedist_t i = *(pinput_row + kcol);
+                timedist_t k = *((timedist_t*)kernel + pkernel_offset_row + kcol);
+                timedist_t i = *((timedist_t*)input + pinput_offset_row + kcol);
                 acc += TC(TC(k) * TC(i));
             }
-            timedist_t* poutput = poutput_row + ocol;
+            timedist_t* poutput = output + poutput_offset_row + ocol;
             *poutput = TC(SIGMOID(TC(acc)));
         }
     }

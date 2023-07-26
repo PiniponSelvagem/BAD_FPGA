@@ -3,9 +3,7 @@
 #ifndef MY_TYPES
 #define MY_TYPES
 
-
-#define TRUNCATE_BITS
-
+//#define TRUNCATE_BITS
 
 /* GLOBAL TYPES */
 #ifdef __VITIS_HLS__

@@ -14,6 +14,9 @@ typedef ap_uint<9> gru_wg_col_t;
 
 typedef ap_uint<2> gru_state_row_t;
 typedef ap_uint<7> gru_state_col_t;
+
+typedef ap_uint<15> gru_p_kernel;
+typedef ap_uint<14> gru_p_rkernel;
 #endif
 #ifdef _MSC_VER
 typedef int gru_direction_t;
@@ -24,6 +27,9 @@ typedef int gru_wg_col_t;
 
 typedef int gru_state_row_t;
 typedef int gru_state_col_t;
+
+typedef int gru_p_kernel;
+typedef int gru_p_rkernel;
 #endif
 
 
@@ -68,19 +74,19 @@ void gru_cell(
     const gru_t* recurrent_bias,
     gru_t* output
 ) {
-    gru_t* pkernel = (gru_t*)kernel + (idx * GRU_SPLIT * kernelCols);
-    gru_t* preckernel = (gru_t*)recurrent_kernel + (idx * GRU_SPLIT * GRU_KERNEL_REC_COLS);
+    gru_p_kernel pkernel_offset = (idx * GRU_SPLIT * kernelCols);
+    gru_p_rkernel preckernel_offset = (idx * GRU_SPLIT * GRU_KERNEL_REC_COLS);
 
     gru_t matrix_x[GRU_SPLIT];
     GRU_cell_loop_x_row: for (gru_mtx_row_t i = 0; i < GRU_SPLIT; ++i) {
         matrix_x[i] = 0;
-        gru_t* pkernel_row = pkernel + (i * kernelCols);
+        gru_p_kernel pkernel_offset_row = pkernel_offset + (i * kernelCols);
         GRU_cell_loop_x_col: for (gru_krl_col_t j = 0; j < GRU_KERNEL_COLS_MAX; ++j) {
 //#pragma HLS PIPELINE ii=3
             if (j >= kernelCols)
                 break;
             gru_t iVal = TC(*(input + j));
-            gru_t kVal = TC(*(pkernel_row + j));
+            gru_t kVal = TC(*((gru_t*)kernel + pkernel_offset_row + j));
             matrix_x[i] += TC(TC(iVal) * TC(kVal));
         }
     }
@@ -93,11 +99,11 @@ void gru_cell(
     gru_t matrix_inner[GRU_SPLIT];
     GRU_cell_loop_inner_row: for (gru_mtx_row_t i = 0; i < GRU_SPLIT; ++i) {
         matrix_inner[i] = 0;
-        gru_t* preckernel_row = preckernel + (i * GRU_KERNEL_REC_COLS);
+        gru_p_rkernel preckernel_offset_row = preckernel_offset + (i * GRU_KERNEL_REC_COLS);
         GRU_cell_loop_inner_col: for (gru_krl_col_t j = 0; j < GRU_KERNEL_REC_COLS; ++j) {
 //#pragma HLS PIPELINE ii=3
             gru_t iVal = state[0][j];
-            gru_t kVal = TC(*(preckernel_row + j));
+            gru_t kVal = TC(*((gru_t*)recurrent_kernel + preckernel_offset_row + j));
             matrix_inner[i] += TC(TC(iVal) * TC(kVal));
         }
     }
