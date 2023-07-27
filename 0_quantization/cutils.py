@@ -9,6 +9,7 @@ def createFolderIfNotExists(folder):
         os.makedirs(folder)
 
 
+
 def saveArray_dim1(folder, fileName, array, arrayName, dataType):
     file_path = os.path.join(folder, '{}.h'.format(fileName))
     with open(file_path, 'w') as file:
@@ -68,12 +69,11 @@ def saveArray_dim4(folder, fileName, array, arrayName, dataType):
 
 
 
-def packRow(array, dataType):
+def packRow(packed_bits, array, dataType):
     if dataType["name"] == "ap_fixed":
         bits_int = dataType["bits_int"]
         bits_dec = dataType["bits_total"] - bits_int
         #
-        packed_bits = bitarray()
         #print(array)
         for value in array:
             is_neg = value < 0
@@ -96,54 +96,66 @@ def packRow(array, dataType):
             #print(packed_bits)
             #print("value: " + str(value))
         #
-        while len(packed_bits) % 8 != 0:
-            # Pad the packed bits to a multiple of 8 if necessary
-            packed_bits.append(False)
-        #
-        pack = packed_bits.tobytes()
     else:
         # float
-        pack = struct.pack('f' * len(array), *array)
-    return pack
+        binary_representation = struct.pack('f' * len(array), *array)
+        bits = bitarray()
+        bits.frombytes(binary_representation)
+        packed_bits.extend(bits)
+    return packed_bits
 
-def packData(row, dataType):
+def packBits(packed_bits, row, dataType):
     row_data = [float(element) for element in row]
-    packed_row = packRow(row_data, dataType)
-    return packed_row
+    packed_bits = packRow(packed_bits, row_data, dataType)
+    return packed_bits
 
 
 def saveArray_dim1_bin(folder, fileName, array, dataType):
     file_path = os.path.join(folder, '{}.bin'.format(fileName))
-    packed_data = packRow(array, dataType)
-    with open(file_path, 'wb') as file:
-        file.write(packed_data)
+    packed_bits = bitarray()
+    packed_bits = packBits(packed_bits, array, dataType)
+    saveFileBin(file_path, packed_bits, dataType)
 
 def saveArray_dim2_bin(folder, fileName, array, dataType):
     file_path = os.path.join(folder, '{}.bin'.format(fileName))
-    packed_data = b''
+    packed_bits = bitarray()
     for row in array:
-        packed_data += packData(row, dataType)
-    with open(file_path, 'wb') as file:
-        file.write(packed_data)
+        packed_bits = packBits(packed_bits, row, dataType)
+    saveFileBin(file_path, packed_bits, dataType)
 
 def saveArray_dim3_bin(folder, fileName, array, dataType):
     file_path = os.path.join(folder, '{}.bin'.format(fileName))
-    packed_data = b''
+    packed_bits = bitarray()
     for matrix in array:
         for row in matrix:
-            packed_data += packData(row, dataType)
-    with open(file_path, 'wb') as file:
-        file.write(packed_data)
+            packed_bits = packBits(packed_bits, row, dataType)
+    saveFileBin(file_path, packed_bits, dataType)
 
 def saveArray_dim4_bin(folder, fileName, array, dataType):
     file_path = os.path.join(folder, '{}.bin'.format(fileName))
-    packed_data = b''
+    packed_bits = bitarray()
     for dim1 in array:
         for dim2 in dim1:
             for row in dim2:
-                packed_data += packData(row, dataType)
+                packed_bits = packBits(packed_bits, row, dataType)
+    saveFileBin(file_path, packed_bits, dataType)
+
+
+def saveFileBin(file_path, packed_bits, dataType):
+    packed_data = b''
+    if dataType["name"] == "ap_fixed":
+        while len(packed_bits) % 8 != 0:
+            # Pad the packed bits to a multiple of 8 if necessary
+            packed_bits.append(False)
+        #
+        packed_data = packed_bits.tobytes()
+    else:
+        # float
+        #packed_data = struct.pack('f' * len(array), *array)
+        packed_data = packed_bits.tobytes()
     with open(file_path, 'wb') as file:
         file.write(packed_data)
+
 
 
 def saveArray(folder, fileName, array, arrayName, dataType):
