@@ -86,8 +86,8 @@ typedef ap_fixed<W,I> output_t;
 typedef float sigmoid_t;
 typedef float tanh_t;
 #else
-#define W 30 //32 //32 //32
-#define I 6  //6  //7  //8
+#define W 30 //30 //32 //32 //32
+#define I 6  //6  //6  //7  //8
 #define Wacc W+5
 #define Iacc I+2
 

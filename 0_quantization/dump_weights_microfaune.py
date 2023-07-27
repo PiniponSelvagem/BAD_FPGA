@@ -63,8 +63,8 @@ data_type = {}
 data_type["name"] = "float"
 """
 data_type["name"] = "ap_fixed"
-data_type["bits_total"] = 16
-data_type["bits_int"] = 7
+data_type["bits_total"] = 30
+data_type["bits_int"] = 6
 """
 
 start = time.time()
@@ -181,7 +181,7 @@ for m in model.layers:
     i += 1
 
 
-EPSILON = 0.0001
+EPSILON = 0.001
 merged_layers = []
 for x in range(0, len(layers_toMerge), 6):
     conv2d_kernel_full = layers_toMerge[x]
@@ -200,7 +200,9 @@ for x in range(0, len(layers_toMerge), 6):
     merged_bias = np.zeros_like(conv2d_bias)
     for i in range(conv2d_kernel.shape[0]):
         for j in range(conv2d_kernel.shape[1]):
-            merged_kernel[i, j] = conv2d_kernel[i, j] / np.sqrt(bn_moving_variance[i] + EPSILON)
+            for x in range(conv2d_kernel.shape[2]):
+                for y in range(conv2d_kernel.shape[3]):
+                    merged_kernel[i, j, x, y] = conv2d_kernel[i, j, x, y] / np.sqrt(bn_moving_variance[i] + EPSILON) * bn_gamma[i]
         merged_bias[i] = (conv2d_bias[i] - bn_moving_mean[i]) / np.sqrt(bn_moving_variance[i] + EPSILON) * bn_gamma[i] + bn_beta[i]
     #
     # Create a new merged layer and append it to the list
@@ -263,6 +265,40 @@ output
 # merged weights: conv2d <-> batch_normalization
 W_merged = kernel / np.sqrt(movingvariance + EPSILON) * gamma
 B_merged = (bias - movingmean) / np.sqrt(movingvariance) * gamma + beta
+
+# using merged weights
+inout = (input * W_merged) + B_merged
+inout
+"""
+
+"""
+#input
+input = 1
+
+#conv2d
+kernel = 0.029623493552207947
+bias = 0.02698972076177597
+
+#batch_normalization
+EPSILON = 0.001
+gamma = 0.9056835770606995
+beta = -0.043935634195804596
+movingvariance = 3.146245944662951e-05
+movingmean = 0.02926195226609707
+
+#conv2d
+output_conv2d = (input * kernel) + bias
+output_conv2d
+#batch_normalization
+normalized = (output_conv2d - movingmean) / np.sqrt(movingvariance + EPSILON)
+output = gamma * normalized + beta
+output
+
+# merged weights: conv2d <-> batch_normalization
+W_merged = kernel / np.sqrt(movingvariance + EPSILON) * gamma
+W_merged
+B_merged = (bias - movingmean) / np.sqrt(movingvariance) * gamma + beta
+B_merged
 
 # using merged weights
 inout = (input * W_merged) + B_merged
