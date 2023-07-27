@@ -36,7 +36,7 @@ void timedistributed_dense(
         TDIST_loop_col: for (tdist_col_t ocol = 0; ocol < TD_0__OUT_COLS; ++ocol) {
             if (ocol >= outCols)
                 break;
-            timedist_t acc = *(bias + ocol);
+            timedist_acc_t acc = *(bias + ocol);
             tdist_p_kernel pkernel_offset_row = (ocol * kCols);
             TDIST_loop_kcol: for (tdist_col_t kcol = 0; kcol < TD_0__KERNEL_COLS; ++kcol) {
                 if (kcol >= kCols)
@@ -45,8 +45,9 @@ void timedistributed_dense(
                 timedist_t i = *((timedist_t*)input + pinput_offset_row + kcol);
                 acc += TC(TC(k) * TC(i));
             }
+            timedist_acc_t out = TC(SIGMOID(TC(acc)));
             timedist_t* poutput = output + poutput_offset_row + ocol;
-            *poutput = TC(SIGMOID(TC(acc)));
+            *poutput = out;
         }
     }
 }

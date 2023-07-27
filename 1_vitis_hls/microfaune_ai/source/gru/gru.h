@@ -77,7 +77,7 @@ void gru_cell(
     gru_p_kernel pkernel_offset = (idx * GRU_SPLIT * kernelCols);
     gru_p_rkernel preckernel_offset = (idx * GRU_SPLIT * GRU_KERNEL_REC_COLS);
 
-    gru_t matrix_x[GRU_SPLIT];
+    gru_acc_t matrix_x[GRU_SPLIT];
     GRU_cell_loop_x_row: for (gru_mtx_row_t i = 0; i < GRU_SPLIT; ++i) {
         matrix_x[i] = 0;
         gru_p_kernel pkernel_offset_row = pkernel_offset + (i * kernelCols);
@@ -96,7 +96,7 @@ void gru_cell(
     }
 
 
-    gru_t matrix_inner[GRU_SPLIT];
+    gru_acc_t matrix_inner[GRU_SPLIT];
     GRU_cell_loop_inner_row: for (gru_mtx_row_t i = 0; i < GRU_SPLIT; ++i) {
         matrix_inner[i] = 0;
         gru_p_rkernel preckernel_offset_row = preckernel_offset + (i * GRU_KERNEL_REC_COLS);
@@ -113,11 +113,11 @@ void gru_cell(
     }
 
 
-    gru_t z = TC((gru_t)SIGMOID(TC(TC(matrix_x[0]) + TC(matrix_inner[0]))));
-    gru_t r = TC((gru_t)SIGMOID(TC(TC(matrix_x[1]) + TC(matrix_inner[1]))));
-    gru_t hh = TC((gru_t)TANH(TC(TC(matrix_x[2]) + (TC(r * TC(matrix_inner[2]))))));
+    gru_acc_t z = TC((gru_t)SIGMOID(TC(TC(matrix_x[0]) + TC(matrix_inner[0]))));
+    gru_acc_t r = TC((gru_t)SIGMOID(TC(TC(matrix_x[1]) + TC(matrix_inner[1]))));
+    gru_acc_t hh = TC((gru_t)TANH(TC(TC(matrix_x[2]) + (TC(r * TC(matrix_inner[2]))))));
 
-    gru_t out = TC(TC(z * state[0][idx]) + TC((1 - z) * hh));
+    gru_acc_t out = TC(TC(z * state[0][idx]) + TC((1 - z) * hh));
     state[1][idx] = out;
     *output = out;
 }

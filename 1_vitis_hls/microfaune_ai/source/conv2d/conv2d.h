@@ -103,8 +103,8 @@ void conv2d(
 #pragma HLS PIPELINE ii=7
                     if (ocol >= (inoutCols - PADDING_OFFSET))
                         break;
-                    conv_t acc = currBias;
-                    conv_t acc_sat;
+                    conv_acc_t acc = currBias;
+                    conv_acc_t acc_sat;
                     conv_row_t korow = orow - PADDING_OFFSET;
                     CONV_loop_k1: for (conv_k_t krow = 0; krow < C2D_KERNEL_LINES; ++krow, ++korow) {
 //#pragma HLS PIPELINE ii=1     //WARNING: [HLS 214-189] Pipeline directive for loop 'CONV_loop_k1' ... because the loop is unrolled completely
@@ -132,12 +132,17 @@ void conv2d(
                         acc_sat = 255;
                     else if (acc < 0)
                         acc_sat = 0;    // ReLu
-                    else
                     */
                     
                     conv_t* poutput = (output + (poutput_offset_orow + ocol));
                     conv_t* pprev = (conv_t*)prev + (pprev_offset_orow + ocol);
                     acc_sat = TC(TC(acc) + TC(*pprev));
+                    /*
+                    #ifndef USE_FLOAT
+                    if (acc_sat > MAX_VALUE)
+                        acc_sat = MAX_VALUE;
+                    #endif
+                    */
                     *poutput = acc_sat;
                     if ((c == 0 && filters == 1) || (filters > 1))
                         *pprev = acc_sat;   // TODO: Memory dependency because of read for acc_sat, making pipeline not lower than ii=7

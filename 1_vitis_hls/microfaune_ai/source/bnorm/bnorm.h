@@ -38,13 +38,13 @@ void bnorm(
             BNORM_loop_col: for (bnrom_col_t col = PADDING_OFFSET; col < (inCols - PADDING_OFFSET); ++col) {
                 bnorm_t* pinout_col = pinout_row + col;
                 bnorm_t inValue = *pinout_col;
-                bnorm_t value = TC(TC(movingvariance[c]) + epsilon);
+                bnorm_acc_t value = TC(TC(movingvariance[c]) + epsilon);
                 #ifdef USE_FLOAT
-                bnorm_t normalized = TC((inValue - TC(movingmean[c])) / TC((bnorm_t)sqrt(value)));
+                bnorm_acc_t normalized = TC((inValue - TC(movingmean[c])) / TC((bnorm_acc_t)sqrt(value)));
                 #else
-                bnorm_t normalized = (inValue - movingmean[c]) / (bnorm_t)sqrt(value.to_float());
+                bnorm_acc_t normalized = (inValue - movingmean[c]) / (bnorm_acc_t)sqrt(value.to_float());
                 #endif
-                bnorm_t out = TC(TC(TC(gamma[c]) * TC(normalized)) + TC(beta[c]));
+                bnorm_acc_t out = TC(TC(TC(gamma[c]) * TC(normalized)) + TC(beta[c]));
 
                 if (out < 0) { out = 0; } // ReLu
                 *pinout_col = out;

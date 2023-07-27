@@ -36,14 +36,21 @@ typedef int i512_t;
 #ifdef USE_FLOAT
 typedef float input_t;
 typedef float conv_t;
+typedef float conv_acc_t;
 
 #define BNORM_EPSILON   0.001
 typedef float bnorm_t;
+typedef float bnorm_acc_t;
 
 typedef float mpool_t;
 typedef float reducemax_t;
+
 typedef float gru_t;
+typedef float gru_acc_t;
+
 typedef float timedist_t;
+typedef float timedist_acc_t;
+
 typedef float output_t;
 
 typedef float sigmoid_t;
@@ -51,38 +58,66 @@ typedef float tanh_t;
 
 #else
 #ifdef USE_16_7
-typedef ap_fixed<16,7> input_t;
-typedef ap_fixed<16,7> input_t;
-typedef ap_fixed<16,7> conv_t;
+#define W 16
+#define I 7
+#define Wacc W+5
+#define Iacc I+2
 
-#define BNORM_EPSILON   0.001
-typedef ap_fixed<16,7> bnorm_t;
+typedef ap_fixed<W,I> input_t;
+typedef ap_fixed<W,I> input_t;
+typedef ap_fixed<W,I> conv_t;
+typedef ap_fixed<Wacc,Iacc> conv_acc_t;
 
-typedef ap_fixed<16,7> mpool_t;
-typedef ap_fixed<16,7> reducemax_t;
-typedef ap_fixed<16,7> gru_t;
-typedef ap_fixed<16,7> timedist_t;
-typedef ap_fixed<16,7> output_t;
+#define BNORM_EPSILON   0.01
+typedef ap_fixed<W,I> bnorm_t;
+typedef ap_fixed<Wacc,Iacc> bnorm_acc_t;
+
+typedef ap_fixed<W,I> mpool_t;
+typedef ap_fixed<W,I> reducemax_t;
+
+typedef ap_fixed<W,I> gru_t;
+typedef ap_fixed<Wacc,Iacc> gru_acc_t;
+
+typedef ap_fixed<W,I> timedist_t;
+typedef ap_fixed<Wacc,Iacc> timedist_acc_t;
+
+typedef ap_fixed<W,I> output_t;
 
 typedef float sigmoid_t;
 typedef float tanh_t;
 #else
-typedef ap_fixed<32,8> input_t;
-typedef ap_fixed<32,8> input_t;
-typedef ap_fixed<32,8> conv_t;
+#define W 30 //32 //32 //32
+#define I 6  //6  //7  //8
+#define Wacc W+5
+#define Iacc I+2
+
+typedef ap_fixed<W,I, AP_RND, AP_SAT> input_t;
+typedef ap_fixed<W,I, AP_RND, AP_SAT> input_t;
+typedef ap_fixed<W,I, AP_RND, AP_SAT> conv_t;
+typedef ap_fixed<Wacc,Iacc, AP_RND, AP_SAT> conv_acc_t;
 
 #define BNORM_EPSILON   0.001
-typedef ap_fixed<32,8> bnorm_t;
+typedef ap_fixed<W,I, AP_RND, AP_SAT> bnorm_t;
+typedef ap_fixed<Wacc,Iacc, AP_RND, AP_SAT> bnorm_acc_t;
 
-typedef ap_fixed<32,8> mpool_t;
-typedef ap_fixed<32,8> reducemax_t;
-typedef ap_fixed<32,8> gru_t;
-typedef ap_fixed<32,8> timedist_t;
-typedef ap_fixed<32,8> output_t;
+typedef ap_fixed<W,I, AP_RND, AP_SAT> mpool_t;
+typedef ap_fixed<W,I, AP_RND, AP_SAT> reducemax_t;
+
+typedef ap_fixed<W,I, AP_RND, AP_SAT> gru_t;
+typedef ap_fixed<Wacc,Iacc, AP_RND, AP_SAT> gru_acc_t;
+
+typedef ap_fixed<W,I, AP_RND, AP_SAT> timedist_t;
+typedef ap_fixed<Wacc,Iacc, AP_RND, AP_SAT> timedist_acc_t;
+
+typedef ap_fixed<W,I, AP_RND, AP_SAT> output_t;
 
 typedef float sigmoid_t;
 typedef float tanh_t;
 #endif
+#endif
+
+#ifndef USE_FLOAT
+#define MAX_VALUE ((1 << (W)) - 1)
 #endif
 
 #endif // !MY_TYPES

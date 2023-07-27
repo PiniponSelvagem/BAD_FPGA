@@ -9,12 +9,8 @@
 #else
 #ifdef USE_16_7
 #define WEIGHTS_PATH    W_PATH"apf_16_7\\"
-#define W 16
-#define I 7
 #else
 #define WEIGHTS_PATH    W_PATH"apf_32_8\\"
-#define W 32
-#define I 8
 #endif
 #endif
 
