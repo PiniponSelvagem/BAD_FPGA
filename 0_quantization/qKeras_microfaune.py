@@ -54,12 +54,6 @@ config = {
     "QActivation": {
         "activation": f"quantized_po2({bits}, {max_value})"
     },
-    "QBidirectional": {
-      'recurrent_activation': f"quantized_po2({bits}, {max_value})",
-      'kernel_quantizer': f"quantized_po2({bits}, {max_value})",
-      'recurrent_quantizer': f"quantized_po2({bits}, {max_value})",
-      'bias_quantizer': f"quantized_po2({bits}, {max_value})",
-    },
     "QGru": {
         "kernel_quantizer": f"quantized_po2({bits}, {max_value})",
         "recurrent_quantizer": f"quantized_po2({bits}, {max_value})"
