@@ -20,10 +20,6 @@ np.random.seed(SEED)
 random.seed(SEED)
 
 from tensorflow import keras
-from tensorflow.keras import layers
-from tensorflow import math
-
-
 
 from qkeras import *
 
@@ -36,105 +32,23 @@ import pickle
 import glob
 from sklearn.model_selection import StratifiedShuffleSplit
 from collections import Counter
+import qkeras_microfaune_model as qmodel
+
 datasets_dir = '../../datasets'
 save_dir = "model_quantized"
-model_subname = "quantized_po2_81"
-epochs = 100
-bits = "8"
+plots_dir = "plots"
+model_subname = "quantized_po2_test"
+epochs = 1
+bits = "2"
 max_value = "1"
-config = {
-    "QConv2D": {
-        "kernel_quantizer": f"quantized_po2({bits}, {max_value})",
-        "bias_quantizer": f"quantized_po2({bits}, {max_value})"
-    },
-    "QBatchNormalization": {
-        "activation": f"quantized_relu_po2({bits}, {max_value})",   # atm cant confirm if this is necessary
-        "mean_quantizer": f"quantized_relu_po2({bits}, {max_value})",
-        "gamma_quantizer": f"quantized_relu_po2({bits}, {max_value})",
-        "variance_quantizer": f"quantized_relu_po2({bits}, {max_value})",
-        "beta_quantizer": f"quantized_relu_po2({bits}, {max_value})",
-        "inverse_quantizer": f"quantized_relu_po2({bits}, {max_value})"
-    },
-    "QActivation": {
-        "activation": f"quantized_po2({bits}, {max_value})"
-    },
-    "QGru": {
-        "kernel_quantizer": f"quantized_po2({bits}, {max_value})",
-        "recurrent_quantizer": f"quantized_po2({bits}, {max_value})",
-        "bias_quantizer": f"quantized_po2({bits}, {max_value})"
-    },
-    "QDense": {
-        "kernel_quantizer": f"quantized_po2({bits}, {max_value})",
-        "bias_quantizer": f"quantized_po2({bits}, {max_value})"
-    }
-}
+padding = "same" #"valid" #"same"
 
-#detector = RNNDetector()
-#model = detector.model
-#model.summary()
-class MicrofauneAI():
-    def model():
-        n_filter = 64
-        conv_reg = keras.regularizers.l2(1e-3)
-        #
-        spec = layers.Input(shape=[431, 40, 1], dtype=np.float32)
-        #
-        x = layers.Conv2D(n_filter, (3, 3), padding="same", kernel_regularizer=conv_reg, activation=None)(spec)
-        x = layers.BatchNormalization(momentum=0.95)(x)
-        x = layers.ReLU()(x)
-        #
-        x = layers.Conv2D(n_filter, (3, 3), padding="same", kernel_regularizer=conv_reg, activation=None)(x)
-        x = layers.BatchNormalization(momentum=0.95)(x)
-        x = layers.ReLU()(x)
-        #
-        x = layers.MaxPool2D((1, 2))(x)
-        #
-        x = layers.Conv2D(n_filter, (3, 3), padding="same", kernel_regularizer=conv_reg, activation=None)(x)
-        x = layers.BatchNormalization(momentum=0.95)(x)
-        x = layers.ReLU()(x)
-        #
-        x = layers.Conv2D(n_filter, (3, 3), padding="same", kernel_regularizer=conv_reg, activation=None)(x)
-        x = layers.BatchNormalization(momentum=0.95)(x)
-        x = layers.ReLU()(x)
-        #
-        x = layers.MaxPool2D((1, 2))(x)
-        #
-        x = layers.Conv2D(n_filter, (3, 3), padding="same", kernel_regularizer=conv_reg, activation=None)(x)
-        x = layers.BatchNormalization(momentum=0.95)(x)
-        x = layers.ReLU()(x)
-        #
-        x = layers.Conv2D(n_filter, (3, 3), padding="same", kernel_regularizer=conv_reg, activation=None)(x)
-        x = layers.BatchNormalization(momentum=0.95)(x)
-        x = layers.ReLU()(x)
-        #
-        x = layers.MaxPool2D((1, 2))(x)
-        #
-        x = math.reduce_max(x, axis=-2)
-        #
-        x = layers.Bidirectional(layers.GRU(64, return_sequences=True))(x)
-        x = layers.Bidirectional(layers.GRU(64, return_sequences=True))(x)
-        #
-        x = layers.TimeDistributed(layers.Dense(64, activation="sigmoid"))(x)
-        local_pred = layers.TimeDistributed(layers.Dense(1, activation="sigmoid"))(x)
-        pred = math.reduce_max(local_pred, axis=-2)
-        #
-        model = keras.Model(inputs=spec, outputs=pred)
-        #
-        # for predictions only
-        dual_model = keras.Model(inputs=spec, outputs=[pred, local_pred])
-        return model, dual_model
-
-
-model_original, dual_model_original = MicrofauneAI.model()
-
+#model_original, dual_model_original = qmodel.MicrofauneAI.model()
+model, dual_model = qmodel.MicrofauneAI(bits, max_value, padding).modelQuantized()
 """
 model = model_original
 dual_model = dual_model_original
 """
-from qkeras.utils import model_quantize
-model = model_quantize(model_original, config, 4, transfer_weights=True)
-dual_model = model_quantize(dual_model_original, config, 4, transfer_weights=True)
-#model.summary()
 
 
 def adjust_dataset(dataset):
@@ -295,9 +209,11 @@ history = model.fit_generator(data_generator, steps_per_epoch=100, epochs=epochs
 
 if not os.path.exists(save_dir):
     os.makedirs(save_dir)
-date_str = datetime.now().strftime("%Y%m%d_%H%M%S")
-model.save_weights(f"{save_dir}/model_weights-{model_subname}-{date_str}.h5")
+model.save_weights(f"{save_dir}/model_weights-{model_subname}.h5")
 
+
+if not os.path.exists(plots_dir):
+    os.makedirs(plots_dir)
 
 import matplotlib
 matplotlib.use('TkAgg')
@@ -309,7 +225,7 @@ plt.plot(history.history["val_loss"], label="Validation Loss")
 plt.xlabel("Epochs")
 plt.ylabel("Loss")
 plt.legend()
-plt.savefig(f"plots/{model_subname}-TvsV_loss-{date_str}.png")
+plt.savefig(f"{plots_dir}/{model_subname}-TvsV_loss.png")
 
 plt.figure(figsize=(9, 6))
 plt.title("Training / Validation Accuracy")
@@ -318,12 +234,10 @@ plt.plot(history.history["val_accuracy"], label="Validation Accuracy")
 plt.xlabel("Epochs")
 plt.ylabel("Accuracy")
 plt.legend()
-plt.savefig(f"plots/{model_subname}-TvsV_accuracy-{date_str}.png")
+plt.savefig(f"{plots_dir}/{model_subname}-TvsV_accuracy.png")
 
 
-
-
-dual_model.load_weights(f"{save_dir}/model_weights-{model_subname}-{date_str}.h5")
+dual_model.load_weights(f"{save_dir}/model_weights-{model_subname}.h5")
 wav_files = {os.path.basename(f)[:-4]: f for f in glob.glob(os.path.join(datasets_dir, "*/wav/*.wav"))}
 scores, local_scores = dual_model.predict(X_test)
 
@@ -337,16 +251,12 @@ fpr, tpr, sc = roc_curve(Y_test, scores)
 print(f"Area under ROC curve: {auc(fpr, tpr):f}")
 print("Area under ROC curve: 0.955267 -> Expected from 'learn_model.ipynb'")
 
-
-
-
 plt.figure(figsize=(9, 6))
 plt.plot(1-fpr, tpr)
 plt.title("Precision / Recall")
 plt.xlabel("Recall")
 plt.ylabel("Precision")
-plt.savefig(f"plots/{model_subname}-PR_curve-{date_str}.png")
-
+plt.savefig(f"{plots_dir}/{model_subname}-PR_curve.png")
 plt.show()
 
 
@@ -354,6 +264,7 @@ plt.show()
 
 """
 import time
+import keras.backend as K
 for layer in model.layers:
     try:
         if layer.get_quantizers():
@@ -366,3 +277,4 @@ for layer in model.layers:
     except AttributeError:
         print("warning, the weight is not quantized in the layer", layer.name)
 """
+
