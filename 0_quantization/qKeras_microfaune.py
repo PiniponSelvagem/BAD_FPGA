@@ -48,22 +48,26 @@ config = {
         "bias_quantizer": f"quantized_po2({bits}, {max_value})"
     },
     "QBatchNormalization": {
-        "axis": "-1",
-        "momentum": "0.95"
+        "activation": f"quantized_relu_po2({bits}, {max_value})",   # atm cant confirm if this is necessary
+        "mean_quantizer": f"quantized_relu_po2({bits}, {max_value})",
+        "gamma_quantizer": f"quantized_relu_po2({bits}, {max_value})",
+        "variance_quantizer": f"quantized_relu_po2({bits}, {max_value})",
+        "beta_quantizer": f"quantized_relu_po2({bits}, {max_value})",
+        "inverse_quantizer": f"quantized_relu_po2({bits}, {max_value})"
     },
     "QActivation": {
         "activation": f"quantized_po2({bits}, {max_value})"
     },
     "QGru": {
         "kernel_quantizer": f"quantized_po2({bits}, {max_value})",
-        "recurrent_quantizer": f"quantized_po2({bits}, {max_value})"
+        "recurrent_quantizer": f"quantized_po2({bits}, {max_value})",
+        "bias_quantizer": f"quantized_po2({bits}, {max_value})"
     },
     "QDense": {
         "kernel_quantizer": f"quantized_po2({bits}, {max_value})",
         "bias_quantizer": f"quantized_po2({bits}, {max_value})"
     }
 }
-
 
 #detector = RNNDetector()
 #model = detector.model
@@ -345,3 +349,20 @@ plt.savefig(f"plots/{model_subname}-PR_curve-{date_str}.png")
 
 plt.show()
 
+
+
+
+"""
+import time
+for layer in model.layers:
+    try:
+        if layer.get_quantizers():
+            q_gw_w_pairs = [(quantizer, gweight, weight) for quantizer, gweight, weight in zip(layer.get_quantizers(), layer.get_weights(), layer.weights)]
+            for _, (quantizer, gweight, weight) in enumerate(q_gw_w_pairs):
+                qweight = K.eval(quantizer(gweight))
+                print(weight.name)
+                print(qweight)
+                time.sleep(1)
+    except AttributeError:
+        print("warning, the weight is not quantized in the layer", layer.name)
+"""
