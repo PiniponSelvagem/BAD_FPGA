@@ -342,7 +342,7 @@ void predict(
     // GRU 1 (forward)
     gru_clearState();
     for (int i = 0; i < GRU_1__IN_LINES; ++i) {
-        for (int idx = 0; idx < GRU_1__IN_COLS; ++idx) {
+        for (int idx = 0; idx < 64 /*GRU_1__IN_COLS/2*/; ++idx) {
         #ifndef USE_WFILES
             gru<GRU_1__IN_COLS, GRU_1__KERNEL_LINES, GRU_1__KERNEL_COLS, GRU_1__KERNEL_R_LINES, GRU_1__KERNEL_R_COLS, GRU_1__BIAS_SIZE>
                 (idx, outgru_0[i], kernel_gru1_f, bias_gru1_f, recurrent_kernel_gru1_f, recurrent_bias_gru1_f, &outgru_1[i][idx]);

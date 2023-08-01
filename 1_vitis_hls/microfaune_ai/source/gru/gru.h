@@ -144,9 +144,9 @@ void gru(
     }
     
     GRU_loop_row: for (i512_t i = 0; i < RNN_LINES_GRU; ++i) { // while(true)
-        GRU_loop_col: for (i128_t idx = 0; idx < GRU_INCOLS_MAX; ++idx) {
-            if (idx >= inCols)
-                break;
+        GRU_loop_col: for (i128_t idx = 0; idx < 64 /*GRU_INCOLS_MAX*/; ++idx) {
+            //if (idx >= inCols)
+            //    break;
             gru_t* input_row   = input + (row * inSize);
             gru_t* output_cell = output + (row * RNN_COLS_GRU) + (idx + offset);
             gru_cell(idx, kernelCols, input_row, kernel, bias, recKernel, recBias, output_cell);
