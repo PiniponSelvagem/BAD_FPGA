@@ -7,41 +7,71 @@ from tensorflow import math
 from qkeras.utils import model_quantize
 
 class MicrofauneAI:
-    def __init__(self, bits, max_value, padding):
-        """
-        "mean_quantizer": f"quantized_po2({bits}, {max_value})",    #quantized_relu_po2
-        "gamma_quantizer": f"quantized_po2({bits}, {max_value})",   #quantized_relu_po2
-        "variance_quantizer": f"quantized_po2({bits}, {max_value})",#quantized_relu_po2
-        "beta_quantizer": f"quantized_po2({bits}, {max_value})",    #quantized_relu_po2
-        "inverse_quantizer": f"quantized_po2({bits}, {max_value})"  #quantized_relu_po2
-        """
+    def __init__(self, bits, integer, symmetric, max_value, padding):
         config = {
             "QConv2D": {
-                "kernel_quantizer": f"quantized_po2({bits}, {max_value})",
-                "bias_quantizer": f"quantized_po2({bits}, {max_value})"
+                "kernel_quantizer": f"quantized_bits({bits},{integer},{symmetric})",
+                "bias_quantizer": f"quantized_bits({bits},{integer},{symmetric})",
             },
             "QBatchNormalization": {
-                "activation": f"quantized_relu_po2({bits}, {max_value})",   # atm havent confirmed if this is necessary
-                "mean_quantizer": f"quantized_relu_po2({bits}, {max_value})",
-                "gamma_quantizer": f"quantized_relu_po2({bits}, {max_value})",
-                "variance_quantizer": f"quantized_relu_po2({bits}, {max_value})",
-                "beta_quantizer": f"quantized_relu_po2({bits}, {max_value})",
-                "inverse_quantizer": f"quantized_relu_po2({bits}, {max_value})"
-                
+                "mean_quantizer": f"quantized_bits({bits},{integer},{symmetric})",
+                "gamma_quantizer": f"quantized_bits({bits},{integer},{symmetric})",
+                "variance_quantizer": f"quantized_bits({bits},{integer},{symmetric})",
+                "beta_quantizer": f"quantized_bits({bits},{integer},{symmetric})",
+                "inverse_quantizer": f"quantized_bits({bits},{integer},{symmetric})",
             },
-            "QActivation": {
-                "relu": f"quantized_po2({bits}, {max_value})"
+            "QBidirectional": {
+                "activation": f"quantized_tanh({bits})",
+                "state_quantizer": f"quantized_bits({bits},{integer},{symmetric})",
+                "kernel_quantizer": f"quantized_bits({bits},{integer},{symmetric})",
+                "recurrent_quantizer": f"quantized_bits({bits},{integer},{symmetric})",
+                "bias_quantizer": f"quantized_bits({bits},{integer},{symmetric})",
             },
-            "QGru": {
-                "kernel_quantizer": f"quantized_po2({bits}, {max_value})",
-                "recurrent_quantizer": f"quantized_po2({bits}, {max_value})",
-                "bias_quantizer": f"quantized_po2({bits}, {max_value})"
-            },
-            "QDense": {
-                "kernel_quantizer": f"quantized_po2({bits}, {max_value})",
-                "bias_quantizer": f"quantized_po2({bits}, {max_value})"
-            }
         }
+        """ # model_weights-quant_bits411
+        config = {
+            "QConv2D": {
+                "kernel_quantizer": "quantized_bits(4,1,1)",
+                "bias_quantizer": "quantized_bits(4,1,1)",
+            },
+            "QBatchNormalization": {
+                "mean_quantizer": "quantized_bits(4,1,1)",
+                "gamma_quantizer": "quantized_bits(4,1,1)",
+                "variance_quantizer": "quantized_bits(4,1,1)",
+                "beta_quantizer": "quantized_bits(4,1,1)",
+                "inverse_quantizer": "quantized_bits(4,1,1)",
+            },
+            "QBidirectional": {
+                "activation": "quantized_tanh(4)",
+                "state_quantizer": "quantized_bits(4,1,1)",
+                "kernel_quantizer": "quantized_bits(4,1,1)",
+                "recurrent_quantizer": "quantized_bits(4,1,1)",
+                "bias_quantizer": "quantized_bits(4,1,1)",
+            },
+        }
+        """
+        """ # model_weights-quant_po2_81_conv_gru-quant_bits811_bnorm
+        config = {
+            "QConv2D": {
+                "kernel_quantizer": f"quantized_po2(8,1)",
+                "bias_quantizer": f"quantized_po2(8,1)",
+            },
+            "QBatchNormalization": {
+                "mean_quantizer": f"quantized_bits(8,1,1)",
+                "gamma_quantizer": f"quantized_bits(8,1,1)",
+                "variance_quantizer": f"quantized_bits(8,1,1)",
+                "beta_quantizer": f"quantized_bits(8,1,1)",
+                "inverse_quantizer": f"quantized_bits(8,1,1)",
+            },
+            "QBidirectional": {
+                "activation": f"quantized_tanh(8)",
+                "state_quantizer": f"quantized_po2(8,1)",
+                "kernel_quantizer": f"quantized_po2(8,1)",
+                "recurrent_quantizer": f"quantized_po2(8,1)",
+                "bias_quantizer": f"quantized_po2(8,1)",
+            },
+        }
+        """
         #
         ### model start ###
         n_filter = 64

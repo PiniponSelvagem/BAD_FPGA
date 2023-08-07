@@ -37,14 +37,16 @@ import qkeras_microfaune_model as qmodel
 datasets_dir = '../../datasets'
 save_dir = "model_quantized"
 plots_dir = "plots"
-model_subname = "quantized_po2_test"
-epochs = 1
-bits = "2"
+model_subname = "quant_bits411"
+epochs = 50
+steps_per_epoch = 100
+bits = "4"
+integer = "1"
+symmetric = "1"
 max_value = "1"
-padding = "same" #"valid" #"same"
-
+padding = "same"
 #model_original, dual_model_original = qmodel.MicrofauneAI.model()
-model, dual_model = qmodel.MicrofauneAI(bits, max_value, padding).modelQuantized()
+model, dual_model = qmodel.MicrofauneAI(bits, integer, symmetric, max_value, padding).modelQuantized()
 """
 model = model_original
 dual_model = dual_model_original
@@ -201,11 +203,10 @@ data_generator = DataGenerator(X_train, Y_train, batch_size)
 reduce_lr = keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.2,
                                 patience=5, min_lr=1e-5)
 
-history = model.fit_generator(data_generator, steps_per_epoch=100, epochs=epochs,
+history = model.fit(data_generator, steps_per_epoch=steps_per_epoch, epochs=epochs,
                                 validation_data=(X_test, Y_test),
                                 class_weight={0: alpha, 1: 1-alpha},
                                 callbacks=[reduce_lr], verbose=1)
-
 
 if not os.path.exists(save_dir):
     os.makedirs(save_dir)
@@ -216,7 +217,8 @@ if not os.path.exists(plots_dir):
     os.makedirs(plots_dir)
 
 import matplotlib
-matplotlib.use('TkAgg')
+#matplotlib.use('TkAgg')
+matplotlib.use('Agg')   # WSL
 from matplotlib import pyplot as plt
 plt.figure(figsize=(9, 6))
 plt.title("Training / Validation loss")
@@ -238,7 +240,7 @@ plt.savefig(f"{plots_dir}/{model_subname}-TvsV_accuracy.png")
 
 
 dual_model.load_weights(f"{save_dir}/model_weights-{model_subname}.h5")
-wav_files = {os.path.basename(f)[:-4]: f for f in glob.glob(os.path.join(datasets_dir, "*/wav/*.wav"))}
+#wav_files = {os.path.basename(f)[:-4]: f for f in glob.glob(os.path.join(datasets_dir, "*/wav/*.wav"))}
 scores, local_scores = dual_model.predict(X_test)
 
 Y_hat = scores.squeeze() > 0.5
@@ -251,18 +253,18 @@ fpr, tpr, sc = roc_curve(Y_test, scores)
 print(f"Area under ROC curve: {auc(fpr, tpr):f}")
 print("Area under ROC curve: 0.955267 -> Expected from 'learn_model.ipynb'")
 
+
+
 plt.figure(figsize=(9, 6))
 plt.plot(1-fpr, tpr)
 plt.title("Precision / Recall")
 plt.xlabel("Recall")
 plt.ylabel("Precision")
 plt.savefig(f"{plots_dir}/{model_subname}-PR_curve.png")
-plt.show()
+#plt.show()
 
 
 
-
-"""
 import time
 import keras.backend as K
 for layer in model.layers:
@@ -270,11 +272,11 @@ for layer in model.layers:
         if layer.get_quantizers():
             q_gw_w_pairs = [(quantizer, gweight, weight) for quantizer, gweight, weight in zip(layer.get_quantizers(), layer.get_weights(), layer.weights)]
             for _, (quantizer, gweight, weight) in enumerate(q_gw_w_pairs):
-                qweight = K.eval(quantizer(gweight))
                 print(weight.name)
-                print(qweight)
-                time.sleep(1)
+                if (quantizer != None):
+                    qweight = K.eval(quantizer(gweight))
+                    print(qweight)
+                #time.sleep(1)
     except AttributeError:
         print("warning, the weight is not quantized in the layer", layer.name)
-"""
 
