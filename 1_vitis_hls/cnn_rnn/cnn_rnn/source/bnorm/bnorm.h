@@ -22,7 +22,11 @@ void bnorm(
     BNORM_loop_row: for (bnorm_row_t row = PADDING_OFFSET; row < (BN_LINES - PADDING_OFFSET); ++row) {
         BNORM_loop_col: for (bnrom_col_t col = PADDING_OFFSET; col < (BN_COLS - PADDING_OFFSET); ++col) {
             bnorm_t sqrt_value = movingvariance + epsilon;
-            bnorm_t normalized = (input[row][col] - movingmean) / (bnorm_t)(sqrt((float)sqrt_value));
+            #ifdef USE_FLOAT
+            bnorm_t normalized = (input[row][col] - movingmean) / (bnorm_t)(sqrt(sqrt_value));
+            #else
+            bnorm_t normalized = (input[row][col] - movingmean) / (bnorm_t)(sqrt(sqrt_value.to_float()));
+            #endif
             bnorm_t out = gamma * normalized + beta;
 
             if (out < 0) { out = 0; } // ReLu

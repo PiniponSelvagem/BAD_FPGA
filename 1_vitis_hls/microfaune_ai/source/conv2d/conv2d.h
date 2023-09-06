@@ -135,8 +135,8 @@ void conv2d(
                     */
                     
                     conv_t* poutput = (output + (poutput_offset_orow + ocol));
-                    conv_t* pprev = (conv_t*)prev + (pprev_offset_orow + ocol);
-                    acc_sat = TC(TC(acc) + TC(*pprev));
+                    //conv_t* pprev = (conv_t*)prev + (pprev_offset_orow + ocol);
+                    acc_sat = TC(TC(acc) + TC(*poutput));
                     /*
                     #ifndef USE_FLOAT
                     if (acc_sat > MAX_VALUE)
@@ -144,8 +144,8 @@ void conv2d(
                     #endif
                     */
                     *poutput = acc_sat;
-                    if ((c == 0 && filters == 1) || (filters > 1))
-                        *pprev = acc_sat;   // TODO: Memory dependency because of read for acc_sat, making pipeline not lower than ii=7
+                    //if ((c == 0 && filters == 1) || (filters > 1))
+                    //    *pprev = acc_sat;   // TODO: Memory dependency because of read for acc_sat, making pipeline not lower than ii=7
                 }
             }
             if (filters == 1) {

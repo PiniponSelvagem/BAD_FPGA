@@ -5,14 +5,14 @@
 
 
 /**
- * @brief This was taken from "dump_io__channel_last/1_a_bird__27__tf_math_reduce_max_1.json". (Channels last)
+ * @brief This was taken from "1_a_bird_input".
 */
 const output_t dataoutexp_0_global[1] = {
     0.9871193766593933
 };
 
 /**
- * @brief This was taken from "dump_io__channel_last/1_a_bird__26_time_distributed_1.json". (Channels last)
+ * @brief This was taken from "1_a_bird_input".
 */
 const output_t dataoutexp_0_local[431][1] = {
     {

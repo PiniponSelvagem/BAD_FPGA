@@ -7,7 +7,7 @@ https://stackoverflow.com/questions/56262735/how-to-see-tensor-value-of-a-layer-
 https://stackoverflow.com/questions/43448029/how-can-i-print-the-values-of-keras-tensors
 """
 
-
+from keras import backend as K
 
 kernel = []
 recurrent_kernel = []

@@ -15,6 +15,8 @@ for gpu in gpus:
 import numpy as np
 import json
 
+import cutils
+
 # Extend the JSONEncoder class
 class NumpyEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -32,7 +34,7 @@ model = detector.model
 
 audiofile = "1_a_bird"
 audiofile_w_ext = audiofile+".wav"
-folder = "dump_io"
+folder = "features_inout"
 filepath = folder+"/"+audiofile
 ext = ".json"
 
@@ -67,9 +69,10 @@ def compute_features(audio_signals):
 #### original code, but here for convinience ####
 fs, data = audio.load_wav(audiofile_w_ext)
 X = compute_features([data])
+input = np.array(X)
 
 #### predicting with the model ####
-scores, local_scores = model.predict(np.array(X))
+scores, local_scores = model.predict(input)
 print(audiofile+" -> score="+str(scores[0][0]))
 
 
@@ -80,70 +83,15 @@ print("Dumping input and outputs of each layer to: "+filepath+ext)
 start = time.time()
 #########################################################
 
-intermediate_models = []
-layers_names = []
-for layer in model.layers:
-    layers_names.append(layer.name)
-    intermediate_model = keras.Model(inputs=model.input, outputs=layer.output)
-    intermediate_models.append(intermediate_model)
+data_type = {}
+data_type["name"] = "float"
 
-class Layer:
-    def __init__(self, name, shape, type, output):
-        self.name = name
-        self.shape = shape
-        self.type = type
-        self.output = output
-    def encode(self):
-        return self.__dict__
+# save input
+cutils.saveArray(folder, audiofile+"_input", input.reshape((431,40)), "input", data_type)
 
-def getOutputOfLayer(layer_name):
-    features = tf.keras.models.Model(
-        inputs=model.inputs,
-        outputs=model.get_layer(name=layer_name).output,
-    )
-    return features(np.array(X))
-
-layersIO = []
-layersIOflat = []
-i = 0
-for layer_name in layers_names:
-    print(layer_name)
-    out = getOutputOfLayer(layer_name)
-    sdim = len(out.shape)
-    # rearrange for channel first, ex: [1, 40, 10, 64] -> [1, 64, 40, 10]
-    if sdim == 4:
-        out = tf.transpose(out, perm=[0, 3, 1, 2])
-    elif sdim == 3:
-        out = tf.transpose(out, perm=[0, 2, 1])
-    #elif sdim == 2:
-    #    out = tf.transpose(out, perm=[1, 0])
-    #
-    layer = Layer(
-        str(layer_name),
-        out.shape.as_list(),
-        out.dtype.name,
-        out.numpy().tolist()
-    )
-    layersIO.append(layer)
-    jLayer = json.dumps(layer, indent=4, default=lambda o: o.encode())
-    open(filepath+"__"+str(i)+"__"+layer_name.replace(".", "_")+ext, "w").write(jLayer)
-    layerflat = Layer(
-        str(layer_name),
-        out.shape.as_list(),
-        out.dtype.name,
-        out.numpy().ravel().tolist()
-    )
-    layersIOflat.append(layerflat)
-    jLayerFlat = json.dumps(layerflat, indent=4, default=lambda o: o.encode())
-    open(filepath+"_flat__"+str(i)+"__"+layer_name.replace(".", "_")+ext, "w").write(jLayerFlat)
-    i += 1
-
-"""
-jLayersIO = json.dumps(layersIO, indent=4, default=lambda o: o.encode())
-open(filepath+ext, "w").write(jLayersIO)
-jLayersIOflat = json.dumps(layersIOflat, indent=4, default=lambda o: o.encode())
-open(filepath+"_flat"+ext, "w").write(jLayersIOflat)
-"""
+# save outputs
+cutils.saveArray(folder, audiofile+"_output_global", scores.reshape((1)), "output_global", data_type)
+cutils.saveArray(folder, audiofile+"_output_local", local_scores.reshape((431,1)), "output_local", data_type)
 
 #########################################################
 end = time.time()

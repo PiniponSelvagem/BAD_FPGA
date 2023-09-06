@@ -15,7 +15,6 @@ import numpy as np
 from tensorflow import keras
 from tensorflow.keras import layers
 
-
 #initializer = tf.keras.initializers.Orthogonal(gain=1.0, seed=123)
 initializer = tf.keras.initializers.Zeros()
 
@@ -36,8 +35,6 @@ input = np.array([[[-2, 1]]])
 
 predict = model.predict(input)
 print(predict)
-
-
 
 
 """

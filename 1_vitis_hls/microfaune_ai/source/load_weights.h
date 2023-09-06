@@ -14,6 +14,122 @@
 #endif
 #endif
 
+
+// conv2d_0
+#ifdef USE_BNORM
+#define CONV_0_KERNEL WEIGHTS_PATH"0_conv2d_kernel.bin"
+#define CONV_0_BIAS   WEIGHTS_PATH"0_conv2d_bias.bin"
+#else
+#define CONV_0_KERNEL WEIGHTS_PATH"merged_conv2d_kernel_0.bin"
+#define CONV_0_BIAS   WEIGHTS_PATH"merged_conv2d_bias_0.bin"
+#endif
+// bnorm_0
+#define BNORM_0_GAMMA          WEIGHTS_PATH"1_batch_normalization_gamma.bin"
+#define BNORM_0_BETA           WEIGHTS_PATH"1_batch_normalization_beta.bin"
+#define BNORM_0_MOVINGMEAN     WEIGHTS_PATH"1_batch_normalization_mean.bin"
+#define BNORM_0_MOVINGVARIANCE WEIGHTS_PATH"1_batch_normalization_variance.bin"
+
+// conv2d_1
+#ifdef USE_BNORM
+#define CONV_1_KERNEL WEIGHTS_PATH"2_conv2d_1_kernel.bin"
+#define CONV_1_BIAS   WEIGHTS_PATH"2_conv2d_1_bias.bin"
+#else
+#define CONV_1_KERNEL WEIGHTS_PATH"merged_conv2d_1_kernel_0.bin"
+#define CONV_1_BIAS   WEIGHTS_PATH"merged_conv2d_1_bias_0.bin"
+#endif
+// bnorm_1
+#define BNORM_1_GAMMA          WEIGHTS_PATH"3_batch_normalization_1_gamma.bin"
+#define BNORM_1_BETA           WEIGHTS_PATH"3_batch_normalization_1_beta.bin"
+#define BNORM_1_MOVINGMEAN     WEIGHTS_PATH"3_batch_normalization_1_mean.bin"
+#define BNORM_1_MOVINGVARIANCE WEIGHTS_PATH"3_batch_normalization_1_variance.bin"
+
+// conv2d_2
+#ifdef USE_BNORM
+#define CONV_2_KERNEL WEIGHTS_PATH"4_conv2d_2_kernel.bin"
+#define CONV_2_BIAS   WEIGHTS_PATH"4_conv2d_2_bias.bin"
+#else
+#define CONV_2_KERNEL WEIGHTS_PATH"merged_conv2d_2_kernel_0.bin"
+#define CONV_2_BIAS   WEIGHTS_PATH"merged_conv2d_2_bias_0.bin"
+#endif
+// bnorm_2
+#define BNORM_2_GAMMA          WEIGHTS_PATH"5_batch_normalization_2_gamma.bin"
+#define BNORM_2_BETA           WEIGHTS_PATH"5_batch_normalization_2_beta.bin"
+#define BNORM_2_MOVINGMEAN     WEIGHTS_PATH"5_batch_normalization_2_mean.bin"
+#define BNORM_2_MOVINGVARIANCE WEIGHTS_PATH"5_batch_normalization_2_variance.bin"
+
+// conv2d_3
+#ifdef USE_BNORM
+#define CONV_3_KERNEL WEIGHTS_PATH"6_conv2d_3_kernel.bin"
+#define CONV_3_BIAS   WEIGHTS_PATH"6_conv2d_3_bias.bin"
+#else
+#define CONV_3_KERNEL WEIGHTS_PATH"merged_conv2d_3_kernel_0.bin"
+#define CONV_3_BIAS   WEIGHTS_PATH"merged_conv2d_3_bias_0.bin"
+#endif
+// bnorm_3
+#define BNORM_3_GAMMA          WEIGHTS_PATH"7_batch_normalization_3_gamma.bin"
+#define BNORM_3_BETA           WEIGHTS_PATH"7_batch_normalization_3_beta.bin"
+#define BNORM_3_MOVINGMEAN     WEIGHTS_PATH"7_batch_normalization_3_mean.bin"
+#define BNORM_3_MOVINGVARIANCE WEIGHTS_PATH"7_batch_normalization_3_variance.bin"
+
+// conv2d_4
+#ifdef USE_BNORM
+#define CONV_4_KERNEL WEIGHTS_PATH"8_conv2d_4_kernel.bin"
+#define CONV_4_BIAS   WEIGHTS_PATH"8_conv2d_4_bias.bin"
+#else
+#define CONV_4_KERNEL WEIGHTS_PATH"merged_conv2d_4_kernel_0.bin"
+#define CONV_4_BIAS   WEIGHTS_PATH"merged_conv2d_4_bias_0.bin"
+#endif
+// bnorm_4
+#define BNORM_4_GAMMA          WEIGHTS_PATH"9_batch_normalization_4_gamma.bin"
+#define BNORM_4_BETA           WEIGHTS_PATH"9_batch_normalization_4_beta.bin"
+#define BNORM_4_MOVINGMEAN     WEIGHTS_PATH"9_batch_normalization_4_mean.bin"
+#define BNORM_4_MOVINGVARIANCE WEIGHTS_PATH"9_batch_normalization_4_variance.bin"
+
+// conv2d_5
+#ifdef USE_BNORM
+#define CONV_5_KERNEL WEIGHTS_PATH"10_conv2d_5_kernel.bin"
+#define CONV_5_BIAS   WEIGHTS_PATH"10_conv2d_5_bias.bin"
+#else
+#define CONV_5_KERNEL WEIGHTS_PATH"merged_conv2d_5_kernel_0.bin"
+#define CONV_5_BIAS   WEIGHTS_PATH"merged_conv2d_5_bias_0.bin"
+#endif
+// bnorm_5
+#define BNORM_5_GAMMA          WEIGHTS_PATH"11_batch_normalization_5_gamma.bin"
+#define BNORM_5_BETA           WEIGHTS_PATH"11_batch_normalization_5_beta.bin"
+#define BNORM_5_MOVINGMEAN     WEIGHTS_PATH"11_batch_normalization_5_mean.bin"
+#define BNORM_5_MOVINGVARIANCE WEIGHTS_PATH"11_batch_normalization_5_variance.bin"
+
+// gru_0_forward
+#define GRU_0_FORWARD_KERNEL            WEIGHTS_PATH"12_bidirectional_gru_forward_kernel.bin"
+#define GRU_0_FORWARD_RECURRENT_KERNEL  WEIGHTS_PATH"12_bidirectional_gru_forward_recurrent_kernel.bin"
+#define GRU_0_FORWARD_BIAS              WEIGHTS_PATH"12_bidirectional_gru_forward_bias.bin"
+#define GRU_0_FORWARD_RECURRENT_BIAS    WEIGHTS_PATH"12_bidirectional_gru_forward_bias_recurrent.bin"
+// gru_0_backward
+#define GRU_0_BACKWARD_KERNEL            WEIGHTS_PATH"12_bidirectional_gru_backward_kernel.bin"
+#define GRU_0_BACKWARD_RECURRENT_KERNEL  WEIGHTS_PATH"12_bidirectional_gru_backward_recurrent_kernel.bin"
+#define GRU_0_BACKWARD_BIAS              WEIGHTS_PATH"12_bidirectional_gru_backward_bias.bin"
+#define GRU_0_BACKWARD_RECURRENT_BIAS    WEIGHTS_PATH"12_bidirectional_gru_backward_bias_recurrent.bin"
+
+// gru_1_forward
+#define GRU_1_FORWARD_KERNEL            WEIGHTS_PATH"13_bidirectional_1_gru_forward_kernel.bin"
+#define GRU_1_FORWARD_RECURRENT_KERNEL  WEIGHTS_PATH"13_bidirectional_1_gru_forward_recurrent_kernel.bin"
+#define GRU_1_FORWARD_BIAS              WEIGHTS_PATH"13_bidirectional_1_gru_forward_bias.bin"
+#define GRU_1_FORWARD_RECURRENT_BIAS    WEIGHTS_PATH"13_bidirectional_1_gru_forward_bias_recurrent.bin"
+// gru_1_backward
+#define GRU_1_BACKWARD_KERNEL            WEIGHTS_PATH"13_bidirectional_1_gru_backward_kernel.bin"
+#define GRU_1_BACKWARD_RECURRENT_KERNEL  WEIGHTS_PATH"13_bidirectional_1_gru_backward_recurrent_kernel.bin"
+#define GRU_1_BACKWARD_BIAS              WEIGHTS_PATH"13_bidirectional_1_gru_backward_bias.bin"
+#define GRU_1_BACKWARD_RECURRENT_BIAS    WEIGHTS_PATH"13_bidirectional_1_gru_backward_bias_recurrent.bin"
+
+// timedist_0
+#define TDIST_0_KERNEL WEIGHTS_PATH"14_time_distributed_kernel.bin"
+#define TDIST_0_BIAS   WEIGHTS_PATH"14_time_distributed_bias.bin"
+
+// timedist_1
+#define TDIST_1_KERNEL WEIGHTS_PATH"15_time_distributed_1_kernel.bin"
+#define TDIST_1_BIAS   WEIGHTS_PATH"15_time_distributed_1_bias.bin"
+
+/*
 // conv2d_0
 #ifdef USE_BNORM
     #define CONV_0_KERNEL WEIGHTS_PATH"1_conv2d_kernel_0.bin"
@@ -99,26 +215,26 @@
 #define BNORM_5_MOVINGVARIANCE WEIGHTS_PATH"19_batch_normalization_5_moving_variance_0.bin"
 
 // gru_0_forward
-#define GRU_0_FORWARD_KERNEL            WEIGHTS_PATH"23_bidirectional_forward_gru_gru_cell_1_kernel_0.bin"
-#define GRU_0_FORWARD_RECURRENT_KERNEL  WEIGHTS_PATH"23_bidirectional_forward_gru_gru_cell_1_recurrent_kernel_0.bin"
-#define GRU_0_FORWARD_BIAS              WEIGHTS_PATH"23_bidirectional_forward_gru_gru_cell_1_bias_0.bin"
-#define GRU_0_FORWARD_RECURRENT_BIAS    WEIGHTS_PATH"23_bidirectional_forward_gru_gru_cell_1_bias_0_recurrent.bin"
+#define GRU_0_FORWARD_KERNEL            WEIGHTS_PATH"23_bidirectional_forward_gru_qgru_cell_7_kernel_0.bin"
+#define GRU_0_FORWARD_RECURRENT_KERNEL  WEIGHTS_PATH"23_bidirectional_forward_gru_qgru_cell_7_recurrent_kernel_0.bin"
+#define GRU_0_FORWARD_BIAS              WEIGHTS_PATH"23_bidirectional_forward_gru_qgru_cell_7_bias_0.bin"
+#define GRU_0_FORWARD_RECURRENT_BIAS    WEIGHTS_PATH"23_bidirectional_forward_gru_qgru_cell_7_bias_0_recurrent.bin"
 // gru_0_backward
-#define GRU_0_BACKWARD_KERNEL            WEIGHTS_PATH"23_bidirectional_backward_gru_gru_cell_2_kernel_0.bin"
-#define GRU_0_BACKWARD_RECURRENT_KERNEL  WEIGHTS_PATH"23_bidirectional_backward_gru_gru_cell_2_recurrent_kernel_0.bin"
-#define GRU_0_BACKWARD_BIAS              WEIGHTS_PATH"23_bidirectional_backward_gru_gru_cell_2_bias_0.bin"
-#define GRU_0_BACKWARD_RECURRENT_BIAS    WEIGHTS_PATH"23_bidirectional_backward_gru_gru_cell_2_bias_0_recurrent.bin"
+#define GRU_0_BACKWARD_KERNEL            WEIGHTS_PATH"23_bidirectional_backward_gru_qgru_cell_8_kernel_0.bin"
+#define GRU_0_BACKWARD_RECURRENT_KERNEL  WEIGHTS_PATH"23_bidirectional_backward_gru_qgru_cell_8_recurrent_kernel_0.bin"
+#define GRU_0_BACKWARD_BIAS              WEIGHTS_PATH"23_bidirectional_backward_gru_qgru_cell_8_bias_0.bin"
+#define GRU_0_BACKWARD_RECURRENT_BIAS    WEIGHTS_PATH"23_bidirectional_backward_gru_qgru_cell_8_bias_0_recurrent.bin"
 
 // gru_1_forward
-#define GRU_1_FORWARD_KERNEL            WEIGHTS_PATH"24_bidirectional_1_forward_gru_1_gru_cell_4_kernel_0.bin"
-#define GRU_1_FORWARD_RECURRENT_KERNEL  WEIGHTS_PATH"24_bidirectional_1_forward_gru_1_gru_cell_4_recurrent_kernel_0.bin"
-#define GRU_1_FORWARD_BIAS              WEIGHTS_PATH"24_bidirectional_1_forward_gru_1_gru_cell_4_bias_0.bin"
-#define GRU_1_FORWARD_RECURRENT_BIAS    WEIGHTS_PATH"24_bidirectional_1_forward_gru_1_gru_cell_4_bias_0_recurrent.bin"
+#define GRU_1_FORWARD_KERNEL            WEIGHTS_PATH"24_bidirectional_1_forward_gru_1_qgru_cell_10_kernel_0.bin"
+#define GRU_1_FORWARD_RECURRENT_KERNEL  WEIGHTS_PATH"24_bidirectional_1_forward_gru_1_qgru_cell_10_recurrent_kernel_0.bin"
+#define GRU_1_FORWARD_BIAS              WEIGHTS_PATH"24_bidirectional_1_forward_gru_1_qgru_cell_10_bias_0.bin"
+#define GRU_1_FORWARD_RECURRENT_BIAS    WEIGHTS_PATH"24_bidirectional_1_forward_gru_1_qgru_cell_10_bias_0_recurrent.bin"
 // gru_1_backward
-#define GRU_1_BACKWARD_KERNEL            WEIGHTS_PATH"24_bidirectional_1_backward_gru_1_gru_cell_5_kernel_0.bin"
-#define GRU_1_BACKWARD_RECURRENT_KERNEL  WEIGHTS_PATH"24_bidirectional_1_backward_gru_1_gru_cell_5_recurrent_kernel_0.bin"
-#define GRU_1_BACKWARD_BIAS              WEIGHTS_PATH"24_bidirectional_1_backward_gru_1_gru_cell_5_bias_0.bin"
-#define GRU_1_BACKWARD_RECURRENT_BIAS    WEIGHTS_PATH"24_bidirectional_1_backward_gru_1_gru_cell_5_bias_0_recurrent.bin"
+#define GRU_1_BACKWARD_KERNEL            WEIGHTS_PATH"24_bidirectional_1_backward_gru_1_qgru_cell_11_kernel_0.bin"
+#define GRU_1_BACKWARD_RECURRENT_KERNEL  WEIGHTS_PATH"24_bidirectional_1_backward_gru_1_qgru_cell_11_recurrent_kernel_0.bin"
+#define GRU_1_BACKWARD_BIAS              WEIGHTS_PATH"24_bidirectional_1_backward_gru_1_qgru_cell_11_bias_0.bin"
+#define GRU_1_BACKWARD_RECURRENT_BIAS    WEIGHTS_PATH"24_bidirectional_1_backward_gru_1_qgru_cell_11_bias_0_recurrent.bin"
 
 // timedist_0
 #define TDIST_0_KERNEL WEIGHTS_PATH"25_time_distributed_kernel_0.bin"
@@ -127,7 +243,7 @@
 // timedist_1
 #define TDIST_1_KERNEL WEIGHTS_PATH"26_time_distributed_1_kernel_0.bin"
 #define TDIST_1_BIAS   WEIGHTS_PATH"26_time_distributed_1_bias_0.bin"
-
+*/
 
 void load(const char* path, void* array, int arraysize, int typesize) {
     FILE* file = fopen(path, "rb");

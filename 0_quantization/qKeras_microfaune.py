@@ -1,4 +1,4 @@
-SEED = 43
+SEED = 43   # 4
 
 import os
 os.environ['PYTHONHASHSEED']=str(SEED)

@@ -12,6 +12,10 @@ for gpu in gpus:
 import numpy as np
 import json
 
+from tensorflow import keras
+from tensorflow.keras import layers
+from tensorflow import math
+
 # Extend the JSONEncoder class
 class NumpyEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -23,8 +27,121 @@ class NumpyEncoder(json.JSONEncoder):
             return float(obj)
         return json.JSONEncoder.default(self, obj)
 
-detector = RNNDetector()
-model = detector.model
+save_dir = "model_quantized"
+model_name = "model_weights-quantized_po2_81-20230729_192505"
+
+#detector = RNNDetector()
+#model = detector.model
+#model.summary()
+class MicrofauneAI():
+    def model():
+        n_filter = 64
+        conv_reg = keras.regularizers.l2(1e-3)
+        #
+        spec = layers.Input(shape=[431, 40, 1], dtype=np.float32)
+        #
+        x = layers.Conv2D(n_filter, (3, 3), padding="same", kernel_regularizer=conv_reg, activation=None)(spec)
+        x = layers.BatchNormalization(momentum=0.95)(x)
+        x = layers.ReLU()(x)
+        #
+        x = layers.Conv2D(n_filter, (3, 3), padding="same", kernel_regularizer=conv_reg, activation=None)(x)
+        x = layers.BatchNormalization(momentum=0.95)(x)
+        x = layers.ReLU()(x)
+        #
+        x = layers.MaxPool2D((1, 2))(x)
+        #
+        x = layers.Conv2D(n_filter, (3, 3), padding="same", kernel_regularizer=conv_reg, activation=None)(x)
+        x = layers.BatchNormalization(momentum=0.95)(x)
+        x = layers.ReLU()(x)
+        #
+        x = layers.Conv2D(n_filter, (3, 3), padding="same", kernel_regularizer=conv_reg, activation=None)(x)
+        x = layers.BatchNormalization(momentum=0.95)(x)
+        x = layers.ReLU()(x)
+        #
+        x = layers.MaxPool2D((1, 2))(x)
+        #
+        x = layers.Conv2D(n_filter, (3, 3), padding="same", kernel_regularizer=conv_reg, activation=None)(x)
+        x = layers.BatchNormalization(momentum=0.95)(x)
+        x = layers.ReLU()(x)
+        #
+        x = layers.Conv2D(n_filter, (3, 3), padding="same", kernel_regularizer=conv_reg, activation=None)(x)
+        x = layers.BatchNormalization(momentum=0.95)(x)
+        x = layers.ReLU()(x)
+        #
+        x = layers.MaxPool2D((1, 2))(x)
+        #
+        x = math.reduce_max(x, axis=-2)
+        #
+        x = layers.Bidirectional(layers.GRU(64, return_sequences=True))(x)
+        x = layers.Bidirectional(layers.GRU(64, return_sequences=True))(x)
+        #
+        x = layers.TimeDistributed(layers.Dense(64, activation="sigmoid"))(x)
+        local_pred = layers.TimeDistributed(layers.Dense(1, activation="sigmoid"))(x)
+        pred = math.reduce_max(local_pred, axis=-2)
+        #
+        model = keras.Model(inputs=spec, outputs=pred)
+        #
+        # for predictions only
+        dual_model = keras.Model(inputs=spec, outputs=[pred, local_pred])
+        return model, dual_model
+
+
+model_original, dual_model_original = MicrofauneAI.model()
+
+bits = "2"
+max_value = "1"
+config = {
+    "QConv2D": {
+        "kernel_quantizer": f"quantized_po2({bits}, {max_value})",
+        "bias_quantizer": f"quantized_po2({bits}, {max_value})"
+    },
+    "QBatchNormalization": {
+        "axis": "-1",
+        "momentum": "0.95"
+    },
+    "QActivation": {
+        "activation": f"quantized_po2({bits}, {max_value})"
+    },
+    "QGru": {
+        "kernel_quantizer": f"quantized_po2({bits}, {max_value})",
+        "recurrent_quantizer": f"quantized_po2({bits}, {max_value})"
+    },
+    "QDense": {
+        "kernel_quantizer": f"quantized_po2({bits}, {max_value})",
+        "bias_quantizer": f"quantized_po2({bits}, {max_value})"
+    }
+}
+
+
+"""
+model = model_original
+dual_model = dual_model_original
+"""
+from qkeras.utils import model_quantize
+model = model_quantize(dual_model_original, config, 4, transfer_weights=True)
+#model.summary()
+
+model.load_weights(f"{save_dir}/{model_name}.h5")
+
+import keras.backend as K
+import qkeras
+for layer in model.layers:
+  try:
+    if layer.get_quantizers():
+      q_w_pairs = zip(layer.get_quantizers(), layer.get_weights())
+      for _, (quantizer, weight) in enumerate(q_w_pairs):
+        qweight = K.eval(quantizer(weight))
+        print(f"quantized weight ({layer.name})")
+        print(qweight)
+  except AttributeError:
+    print("warning, the weight is not quantized in the layer ", layer.name)
+
+
+
+
+
+
+
 
 
 

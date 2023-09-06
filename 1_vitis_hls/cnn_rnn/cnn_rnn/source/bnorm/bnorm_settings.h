@@ -6,7 +6,4 @@
 #include "../types.h"
 
 
-#define BNORM_EPSILON       0.001
-
-
 #endif // BNORM_SETTINGS_H

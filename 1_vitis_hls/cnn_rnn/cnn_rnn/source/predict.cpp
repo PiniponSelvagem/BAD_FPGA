@@ -117,8 +117,6 @@ void predict(
 #pragma HLS ARRAY_PARTITION variable=outtd_0 type=cyclic factor=2 DIM=0
 
     input_preconv2d(input, inputpad);
-
-
     /*************************************/
     /**************** CNN ****************/
     /*************************************/
@@ -128,6 +126,23 @@ void predict(
 #pragma HLS PIPELINE off
         conv2d<C2D_0__IN_LINES, C2D_0__IN_COLS, C2D_0__OUT_LINES, C2D_0__OUT_COLS>(inputpad, kernel_0[c], bias_0[c], outpad_01_a[c]);
     }
+
+    for (int x = 0; x < 10; ++x) {
+        for (int y = 0; y < 6; ++y) {
+            float a = outpad_01_a[0][x][y];
+            printf("%9.6f ", a);
+        }
+        printf("\n");
+    }
+    
+}
+
+void test(
+    const input_t input[INPUT_LINES][INPUT_COLS],
+    output_t outputLS[OUTPUT_LOCAL_SCORE_LINES][OUTPUT_LOCAL_SCORE_COLS],
+    output_t outputGS[OUTPUT_GLOBAL_SCORE]
+) {
+
     // BatchNormalization
     P_BNORM_0: for (i64_t c = 0; c < CHANNELS; ++c) {    // BATCH NORMALIZATION + RELU
         bnorm<BNORM_0__IN_LINES, BNORM_0__IN_COLS>(outpad_01_a[c], gamma_0[c], beta_0[c], movingmean_0[c], movingvariance_0[c], outpad_01_b[c]);

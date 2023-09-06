@@ -29,7 +29,19 @@ void conv2d(
                 conv_col_t kocol = ocol - PADDING_OFFSET;
             	CONV_loop_k2: for (conv_k_t kcol = 0; kcol < C2D_KERNEL_COLS; ++kcol, ++kocol) {
 //#pragma HLS PIPELINE
-                    acc += kernel[krow][kcol] * input[korow][kocol];
+                    conv_t k = kernel[krow][kcol];
+                    conv_t i = input[korow][kocol];
+                    acc += k * i;
+/*
+                    float bias_ = bias.to_float();
+                    float korow_ = korow.to_float();
+                    float kocol_ = kocol.to_float();
+                    float k_ = k.to_float();
+                    float i_ = i.to_float();
+                    float acc_ = acc.to_float();
+
+                    int abc = 0;
+*/
                 }
             }
 

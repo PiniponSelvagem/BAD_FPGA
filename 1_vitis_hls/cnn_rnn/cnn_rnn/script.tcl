@@ -11,7 +11,7 @@ add_files -tb cnn_rnn/cnn_rnn/test_bench/main.cpp -cflags "-Wno-unknown-pragmas"
 open_solution "cnn_rnn" -flow_target vivado
 set_part {xck26-sfvc784-2LV-c}
 create_clock -period 10 -name default
-#source "./cnn_rnn/cnn_rnn/directives.tcl"
+source "./cnn_rnn/cnn_rnn/directives.tcl"
 csim_design
 csynth_design
 cosim_design

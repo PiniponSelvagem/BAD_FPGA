@@ -425,9 +425,9 @@ const input_t input_small[10][40] = {
 };
 
 /**
- * @brief This was taken from "dump_io/1_a_bird__0_input_1.json". (Channels first)
+ * @brief This was taken from "1_a_bird_input".
 */
-const input_t input[431][40] = {
+const input_t input_0[431][40] = {
     {
         0.4088122546672821,
         0.36376163363456726,

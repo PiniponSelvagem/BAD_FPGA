@@ -1,9 +1,22 @@
 #ifndef LOAD_WEIGHTS_H
 #define LOAD_WEIGHTS_H
 
-#define SYNTHESIS
+//#define SYNTHESIS
 #ifndef SYNTHESIS
-#define WEIGHTS_PATH "E:\\Rodrigo\\ISEL\\2_Mestrado\\2-ANO_1-sem\\TFM\\BAD_FPGA\\1_vitis_hls\\cnn_rnn\\cnn_rnn\\test_bench\\bin_weights\\"
+#define W_PATH          "E:\\Rodrigo\\ISEL\\2_Mestrado\\2-ANO_1-sem\\TFM\\BAD_FPGA\\1_vitis_hls\\cnn_rnn\\cnn_rnn\\test_bench\\bin_weights\\"
+#ifdef USE_FLOAT
+#define WEIGHTS_PATH    W_PATH"float\\"
+#else
+#ifdef USE_16_7
+#define WEIGHTS_PATH    W_PATH"apf_16_7\\"
+#define W 16
+#define I 7
+#else
+#define WEIGHTS_PATH    W_PATH"apf_32_8\\"
+#define W 32
+#define I 8
+#endif
+#endif
 
 // conv2d_0
 #define CONV_0_KERNEL WEIGHTS_PATH"1_conv2d_kernel_0.bin"
@@ -94,8 +107,39 @@ void load(const char* path, void* array, int arraysize, int typesize) {
     FILE* file = fopen(path, "rb");
 
     if (file != NULL) {
+        #ifdef USE_FLOAT
         fread(array, typesize, arraysize, file);
         fclose(file);
+        #else
+        // Calculate the number of bytes to read
+        size_t numBytes = (W + 7) / 8 * arraysize;
+
+        // Read the binary data into a temporary buffer
+        char* buffer = new char[numBytes];
+        fread(buffer, sizeof(char), numBytes, file);
+        fclose(file);
+
+        ap_fixed<W,I>* p_array = (ap_fixed<W,I>*)array;
+
+        // Copy the binary data from the temporary buffer to the array
+        size_t offset = 0;
+        for (size_t i = 0; i < arraysize; ++i) {
+            ap_fixed<W,I> value = 0;
+            for (size_t j = 0; j < W; ++j) {
+                // Read the bits from the buffer
+                bool bit = (buffer[offset / 8] >> (7 - (offset % 8))) & 1;
+                //printf("%d", bit);
+                // Assign the bit to the corresponding position in the value
+                value[W - 1 - j] = bit;
+                offset++;
+            }
+            //printf(" - %f\n", value.to_float());
+            p_array[i] = value;
+        }
+
+        delete[] buffer;
+        #endif
+        
         printf("Loaded: %s\n", path);
     }
     else {
@@ -104,6 +148,43 @@ void load(const char* path, void* array, int arraysize, int typesize) {
 }
 
 void loadWeights() {
+    /*
+    load(CONV_0_BIAS, bias_0, 9, sizeof(conv_t));
+
+    for (int i = 0; i < 9; ++i) {
+        conv_t b = bias_0[i];
+        printf(" %15.12f\n", b.to_float());
+    }
+
+    printf("##########\n");
+    ap_fixed<32,8> v = 0.625;
+    for (int i = 0; i < 32; ++i) {
+        bool bit = v[i];
+        printf("%d", bit);
+    }
+    printf(" - %15.12f\n", v.to_float());
+    for (int i = 31; i >= 0; i--) {
+        bool bit = v[i];
+        printf("%d", bit);
+    }
+    printf(" - %15.12f\n", v.to_float());
+
+    printf("$$$$$$$$$$\n");
+    #define Aw 32
+    #define Ai 8
+    ap_fixed<Aw,Ai> a = -0.005151249002665281;
+    //a[0] = 0;
+    //a[1] = 1;
+    //a[31-8] = 1;
+    //a[31-9] = 1;
+    //a[31-10] = 1;
+    for (int i = Aw-1; i >= 0; i--) {
+        bool bit = a[i];
+        printf("%d", bit);
+    }
+    printf(" - %15.24f\n", a.to_float());
+    */
+    
     // conv2d_0
     load(CONV_0_KERNEL, kernel_0, 64*3*3, sizeof(conv_t));
     load(CONV_0_BIAS, bias_0, 64, sizeof(conv_t));

@@ -4,8 +4,6 @@
 
 #include "../source/global_settings.h"
 
-#include "data_input_0.h"
-
 
 clock_t start_time;
 
@@ -63,7 +61,46 @@ void predict(
 
 
 
-#include "z_outputexpected/dataout_0.h"
+#include "data_input_0.h"
+#include "data_input_1.h"
+#include "data_input_2_no.h"
+#include "data_input_3_no.h"
+
+#include "data_out_0.h"
+#include "data_out_1.h"
+#include "data_out_2_no.h"
+#include "data_out_3_no.h"
+
+#define INPUT_0 0
+#define INPUT_1 1
+#define INPUT_2 2
+#define INPUT_3 3
+
+// SELECT INPUT
+#define SELECTED_INPUT INPUT_3
+
+#if SELECTED_INPUT == INPUT_0
+    #define INPUT input_0
+    #define OUTPUT_GLOBAL dataoutexp_0_global
+    #define OUTPUT_LOCAL dataoutexp_0_local
+#elif SELECTED_INPUT == INPUT_1
+    #define INPUT input_1
+    #define OUTPUT_GLOBAL dataoutexp_1_global
+    #define OUTPUT_LOCAL dataoutexp_1_local
+#elif SELECTED_INPUT == INPUT_2
+    #define INPUT input_2
+    #define OUTPUT_GLOBAL dataoutexp_2_global
+    #define OUTPUT_LOCAL dataoutexp_2_local
+#elif SELECTED_INPUT == INPUT_3
+    #define INPUT input_3
+    #define OUTPUT_GLOBAL dataoutexp_3_global
+    #define OUTPUT_LOCAL dataoutexp_3_local
+#else
+    #error "Invalid INPUT definition"
+#endif
+
+
+
 int main() {
     #ifdef __VITIS_HLS__
     printf("VITIS HLS detected!\n");
@@ -79,7 +116,7 @@ int main() {
     output_t out_global[OUT_SINGLE_DEBUG] = { 0 };
 
     startTimer();
-    predict(input, out_local, out_global);
+    predict(INPUT, out_local, out_global);
     double elapsed_time = stopTimer();
 
     printf("LOCAL SCORE:\n");
@@ -87,7 +124,7 @@ int main() {
     for (int i = 0; i < OUT_LINES_DEBUG; ++i) {
         for (int j = 0; j < OUT_COLS_DEBUG; ++j) {
             float out = out_local[i][j];
-            float exp = dataoutexp_0_local[i][j];
+            float exp = OUTPUT_LOCAL[i][j];
             float difference = out - exp;
             special_print(out, difference, exp);
         }
@@ -95,7 +132,7 @@ int main() {
 
     printf("GLOBAL SCORE:\n");
     float out = out_global[0];
-    float exp = dataoutexp_0_global[0];
+    float exp = OUTPUT_GLOBAL[0];
     float difference = out - exp;
     special_print(out, difference, exp);
 

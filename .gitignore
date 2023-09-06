@@ -69,3 +69,8 @@ __pycache__/
 /1_vitis_hls/microfaune_ai/algorithm/.debug/
 /1_vitis_hls/microfaune_ai/algorithm/impl/
 /1_vitis_hls/microfaune_ai/algorithm/syn
+/0_quantization/dump_io_quantized_BACKUP/
+/0_quantization/features_inout
+/0_quantization/model_dump__BACKUP/
+/0_quantization/model_quantized__BACKUP/
+/0_quantization/model_quantized_weights
