@@ -61,40 +61,36 @@ void predict(
 
 
 
-#include "data_input_0.h"
-#include "data_input_1.h"
-#include "data_input_2_no.h"
-#include "data_input_3_no.h"
 
-#include "data_out_0.h"
-#include "data_out_1.h"
-#include "data_out_2_no.h"
-#include "data_out_3_no.h"
+#define INPUT_BIRD_0 0
+#define INPUT_BIRD_1 1
+#define INPUT_BIRD_2 2
+#define INPUT_BIRD_3 3
 
-#define INPUT_0 0
-#define INPUT_1 1
-#define INPUT_2 2
-#define INPUT_3 3
+#define INPUT_NO_BIRD_0 4
+#define INPUT_NO_BIRD_1 5
+#define INPUT_NO_BIRD_2 6
+#define INPUT_NO_BIRD_3 7
 
 // SELECT INPUT
-#define SELECTED_INPUT INPUT_3
+#define SELECTED_INPUT INPUT_NO_BIRD_0
 
-#if SELECTED_INPUT == INPUT_0
-    #define INPUT input_0
-    #define OUTPUT_GLOBAL dataoutexp_0_global
-    #define OUTPUT_LOCAL dataoutexp_0_local
-#elif SELECTED_INPUT == INPUT_1
-    #define INPUT input_1
-    #define OUTPUT_GLOBAL dataoutexp_1_global
-    #define OUTPUT_LOCAL dataoutexp_1_local
-#elif SELECTED_INPUT == INPUT_2
-    #define INPUT input_2
-    #define OUTPUT_GLOBAL dataoutexp_2_global
-    #define OUTPUT_LOCAL dataoutexp_2_local
-#elif SELECTED_INPUT == INPUT_3
-    #define INPUT input_3
-    #define OUTPUT_GLOBAL dataoutexp_3_global
-    #define OUTPUT_LOCAL dataoutexp_3_local
+#if SELECTED_INPUT == INPUT_BIRD_0
+    #include "data_bird_0.h"
+#elif SELECTED_INPUT == INPUT_BIRD_1
+    #include "data_bird_1.h"
+#elif SELECTED_INPUT == INPUT_BIRD_2
+    #include "data_bird_2.h"
+#elif SELECTED_INPUT == INPUT_BIRD_3
+    #include "data_bird_3.h"
+#elif SELECTED_INPUT == INPUT_NO_BIRD_0
+    #include "data_no_bird_0.h"
+#elif SELECTED_INPUT == INPUT_NO_BIRD_1
+    #include "data_no_bird_1.h"
+#elif SELECTED_INPUT == INPUT_NO_BIRD_2
+    #include "data_no_bird_2.h"
+#elif SELECTED_INPUT == INPUT_NO_BIRD_3
+    #include "data_no_bird_3.h"
 #else
     #error "Invalid INPUT definition"
 #endif
@@ -111,12 +107,11 @@ int main() {
 
 
     loadWeights();
-
     output_t out_local[OUT_LINES_DEBUG][OUT_COLS_DEBUG] = { 0 };
     output_t out_global[OUT_SINGLE_DEBUG] = { 0 };
 
     startTimer();
-    predict(INPUT, out_local, out_global);
+    predict(input, out_local, out_global);
     double elapsed_time = stopTimer();
 
     printf("LOCAL SCORE:\n");
@@ -124,7 +119,7 @@ int main() {
     for (int i = 0; i < OUT_LINES_DEBUG; ++i) {
         for (int j = 0; j < OUT_COLS_DEBUG; ++j) {
             float out = out_local[i][j];
-            float exp = OUTPUT_LOCAL[i][j];
+            float exp = dataoutexp_local[i][j];
             float difference = out - exp;
             special_print(out, difference, exp);
         }
@@ -132,19 +127,40 @@ int main() {
 
     printf("GLOBAL SCORE:\n");
     float out = out_global[0];
-    float exp = OUTPUT_GLOBAL[0];
+    float exp = dataoutexp_global[0];
     float difference = out - exp;
     special_print(out, difference, exp);
 
     printTimer(elapsed_time);
 
-
     /*
-    #define WIDTH 16 // Specify the total number of bits
-    #define INT_BITS 7 // Specify the number of integer bits
+    #define WIDTH 8 // Specify the total number of bits
+    #define INT_BITS 1 // Specify the number of integer bits
 
     // Test values
-    ap_fixed<WIDTH, INT_BITS> numbers[] = {0.5, -0.25, 0.75, 0.001, 0.01, 1.0/2/2/2/2/2/2/2/2/2};
+    ap_fixed<WIDTH, INT_BITS, AP_RND, AP_SAT> numbers[] = {
+    		-0.109375,
+    		-0.09375,
+    		0.0625,
+    		0.015625,
+    		-0.078125,
+    		0.0,
+    		-0.0625,
+    		0.03125,
+    		0.046875,
+
+    		-0.01171875,
+    		-0.001953125,
+
+			10,
+			0.5,
+			-10,
+			0.5,
+			0.000001,
+			0.5,
+			-0.000001
+    };
+    //ap_fixed<WIDTH, INT_BITS> numbers[] = {-0.109375, -0.09375, 0.0625, 0.015625, -0.078125, 0.0, -0.0625, 0.03125, 0.046875};
     //numbers[5][0] = 1; // Set the lowest bit of the decimal part to 1
 
     int numElements = sizeof(numbers) / sizeof(numbers[0]);
@@ -163,6 +179,7 @@ int main() {
         std::cout << " (" << numbers[i] << ")" << std::endl;
     }
     */
+
 
     return 0;
 }

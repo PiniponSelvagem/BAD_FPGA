@@ -7,127 +7,131 @@
 #ifdef USE_FLOAT
 #define WEIGHTS_PATH    W_PATH"float\\"
 #else
+#ifdef USE_8_1
+#define WEIGHTS_PATH    W_PATH"apf_8_1\\"
+#else
 #ifdef USE_16_7
 #define WEIGHTS_PATH    W_PATH"apf_16_7\\"
 #else
 #define WEIGHTS_PATH    W_PATH"apf_32_8\\"
 #endif
 #endif
+#endif
 
 
 // conv2d_0
 #ifdef USE_BNORM
-#define CONV_0_KERNEL WEIGHTS_PATH"0_conv2d_kernel.bin"
-#define CONV_0_BIAS   WEIGHTS_PATH"0_conv2d_bias.bin"
+#define CONV_0_KERNEL WEIGHTS_PATH"conv2d_kernel.bin"
+#define CONV_0_BIAS   WEIGHTS_PATH"conv2d_bias.bin"
 #else
 #define CONV_0_KERNEL WEIGHTS_PATH"merged_conv2d_kernel_0.bin"
 #define CONV_0_BIAS   WEIGHTS_PATH"merged_conv2d_bias_0.bin"
 #endif
 // bnorm_0
-#define BNORM_0_GAMMA          WEIGHTS_PATH"1_batch_normalization_gamma.bin"
-#define BNORM_0_BETA           WEIGHTS_PATH"1_batch_normalization_beta.bin"
-#define BNORM_0_MOVINGMEAN     WEIGHTS_PATH"1_batch_normalization_mean.bin"
-#define BNORM_0_MOVINGVARIANCE WEIGHTS_PATH"1_batch_normalization_variance.bin"
+#define BNORM_0_GAMMA          WEIGHTS_PATH"batch_normalization_gamma.bin"
+#define BNORM_0_BETA           WEIGHTS_PATH"batch_normalization_beta.bin"
+#define BNORM_0_MOVINGMEAN     WEIGHTS_PATH"batch_normalization_mean.bin"
+#define BNORM_0_MOVINGVARIANCE WEIGHTS_PATH"batch_normalization_variance.bin"
 
 // conv2d_1
 #ifdef USE_BNORM
-#define CONV_1_KERNEL WEIGHTS_PATH"2_conv2d_1_kernel.bin"
-#define CONV_1_BIAS   WEIGHTS_PATH"2_conv2d_1_bias.bin"
+#define CONV_1_KERNEL WEIGHTS_PATH"conv2d_1_kernel.bin"
+#define CONV_1_BIAS   WEIGHTS_PATH"conv2d_1_bias.bin"
 #else
 #define CONV_1_KERNEL WEIGHTS_PATH"merged_conv2d_1_kernel_0.bin"
 #define CONV_1_BIAS   WEIGHTS_PATH"merged_conv2d_1_bias_0.bin"
 #endif
 // bnorm_1
-#define BNORM_1_GAMMA          WEIGHTS_PATH"3_batch_normalization_1_gamma.bin"
-#define BNORM_1_BETA           WEIGHTS_PATH"3_batch_normalization_1_beta.bin"
-#define BNORM_1_MOVINGMEAN     WEIGHTS_PATH"3_batch_normalization_1_mean.bin"
-#define BNORM_1_MOVINGVARIANCE WEIGHTS_PATH"3_batch_normalization_1_variance.bin"
+#define BNORM_1_GAMMA          WEIGHTS_PATH"batch_normalization_1_gamma.bin"
+#define BNORM_1_BETA           WEIGHTS_PATH"batch_normalization_1_beta.bin"
+#define BNORM_1_MOVINGMEAN     WEIGHTS_PATH"batch_normalization_1_mean.bin"
+#define BNORM_1_MOVINGVARIANCE WEIGHTS_PATH"batch_normalization_1_variance.bin"
 
 // conv2d_2
 #ifdef USE_BNORM
-#define CONV_2_KERNEL WEIGHTS_PATH"4_conv2d_2_kernel.bin"
-#define CONV_2_BIAS   WEIGHTS_PATH"4_conv2d_2_bias.bin"
+#define CONV_2_KERNEL WEIGHTS_PATH"conv2d_2_kernel.bin"
+#define CONV_2_BIAS   WEIGHTS_PATH"conv2d_2_bias.bin"
 #else
 #define CONV_2_KERNEL WEIGHTS_PATH"merged_conv2d_2_kernel_0.bin"
 #define CONV_2_BIAS   WEIGHTS_PATH"merged_conv2d_2_bias_0.bin"
 #endif
 // bnorm_2
-#define BNORM_2_GAMMA          WEIGHTS_PATH"5_batch_normalization_2_gamma.bin"
-#define BNORM_2_BETA           WEIGHTS_PATH"5_batch_normalization_2_beta.bin"
-#define BNORM_2_MOVINGMEAN     WEIGHTS_PATH"5_batch_normalization_2_mean.bin"
-#define BNORM_2_MOVINGVARIANCE WEIGHTS_PATH"5_batch_normalization_2_variance.bin"
+#define BNORM_2_GAMMA          WEIGHTS_PATH"batch_normalization_2_gamma.bin"
+#define BNORM_2_BETA           WEIGHTS_PATH"batch_normalization_2_beta.bin"
+#define BNORM_2_MOVINGMEAN     WEIGHTS_PATH"batch_normalization_2_mean.bin"
+#define BNORM_2_MOVINGVARIANCE WEIGHTS_PATH"batch_normalization_2_variance.bin"
 
 // conv2d_3
 #ifdef USE_BNORM
-#define CONV_3_KERNEL WEIGHTS_PATH"6_conv2d_3_kernel.bin"
-#define CONV_3_BIAS   WEIGHTS_PATH"6_conv2d_3_bias.bin"
+#define CONV_3_KERNEL WEIGHTS_PATH"conv2d_3_kernel.bin"
+#define CONV_3_BIAS   WEIGHTS_PATH"conv2d_3_bias.bin"
 #else
 #define CONV_3_KERNEL WEIGHTS_PATH"merged_conv2d_3_kernel_0.bin"
 #define CONV_3_BIAS   WEIGHTS_PATH"merged_conv2d_3_bias_0.bin"
 #endif
 // bnorm_3
-#define BNORM_3_GAMMA          WEIGHTS_PATH"7_batch_normalization_3_gamma.bin"
-#define BNORM_3_BETA           WEIGHTS_PATH"7_batch_normalization_3_beta.bin"
-#define BNORM_3_MOVINGMEAN     WEIGHTS_PATH"7_batch_normalization_3_mean.bin"
-#define BNORM_3_MOVINGVARIANCE WEIGHTS_PATH"7_batch_normalization_3_variance.bin"
+#define BNORM_3_GAMMA          WEIGHTS_PATH"batch_normalization_3_gamma.bin"
+#define BNORM_3_BETA           WEIGHTS_PATH"batch_normalization_3_beta.bin"
+#define BNORM_3_MOVINGMEAN     WEIGHTS_PATH"batch_normalization_3_mean.bin"
+#define BNORM_3_MOVINGVARIANCE WEIGHTS_PATH"batch_normalization_3_variance.bin"
 
 // conv2d_4
 #ifdef USE_BNORM
-#define CONV_4_KERNEL WEIGHTS_PATH"8_conv2d_4_kernel.bin"
-#define CONV_4_BIAS   WEIGHTS_PATH"8_conv2d_4_bias.bin"
+#define CONV_4_KERNEL WEIGHTS_PATH"conv2d_4_kernel.bin"
+#define CONV_4_BIAS   WEIGHTS_PATH"conv2d_4_bias.bin"
 #else
 #define CONV_4_KERNEL WEIGHTS_PATH"merged_conv2d_4_kernel_0.bin"
 #define CONV_4_BIAS   WEIGHTS_PATH"merged_conv2d_4_bias_0.bin"
 #endif
 // bnorm_4
-#define BNORM_4_GAMMA          WEIGHTS_PATH"9_batch_normalization_4_gamma.bin"
-#define BNORM_4_BETA           WEIGHTS_PATH"9_batch_normalization_4_beta.bin"
-#define BNORM_4_MOVINGMEAN     WEIGHTS_PATH"9_batch_normalization_4_mean.bin"
-#define BNORM_4_MOVINGVARIANCE WEIGHTS_PATH"9_batch_normalization_4_variance.bin"
+#define BNORM_4_GAMMA          WEIGHTS_PATH"batch_normalization_4_gamma.bin"
+#define BNORM_4_BETA           WEIGHTS_PATH"batch_normalization_4_beta.bin"
+#define BNORM_4_MOVINGMEAN     WEIGHTS_PATH"batch_normalization_4_mean.bin"
+#define BNORM_4_MOVINGVARIANCE WEIGHTS_PATH"batch_normalization_4_variance.bin"
 
 // conv2d_5
 #ifdef USE_BNORM
-#define CONV_5_KERNEL WEIGHTS_PATH"10_conv2d_5_kernel.bin"
-#define CONV_5_BIAS   WEIGHTS_PATH"10_conv2d_5_bias.bin"
+#define CONV_5_KERNEL WEIGHTS_PATH"conv2d_5_kernel.bin"
+#define CONV_5_BIAS   WEIGHTS_PATH"conv2d_5_bias.bin"
 #else
 #define CONV_5_KERNEL WEIGHTS_PATH"merged_conv2d_5_kernel_0.bin"
 #define CONV_5_BIAS   WEIGHTS_PATH"merged_conv2d_5_bias_0.bin"
 #endif
 // bnorm_5
-#define BNORM_5_GAMMA          WEIGHTS_PATH"11_batch_normalization_5_gamma.bin"
-#define BNORM_5_BETA           WEIGHTS_PATH"11_batch_normalization_5_beta.bin"
-#define BNORM_5_MOVINGMEAN     WEIGHTS_PATH"11_batch_normalization_5_mean.bin"
-#define BNORM_5_MOVINGVARIANCE WEIGHTS_PATH"11_batch_normalization_5_variance.bin"
+#define BNORM_5_GAMMA          WEIGHTS_PATH"batch_normalization_5_gamma.bin"
+#define BNORM_5_BETA           WEIGHTS_PATH"batch_normalization_5_beta.bin"
+#define BNORM_5_MOVINGMEAN     WEIGHTS_PATH"batch_normalization_5_mean.bin"
+#define BNORM_5_MOVINGVARIANCE WEIGHTS_PATH"batch_normalization_5_variance.bin"
 
 // gru_0_forward
-#define GRU_0_FORWARD_KERNEL            WEIGHTS_PATH"12_bidirectional_gru_forward_kernel.bin"
-#define GRU_0_FORWARD_RECURRENT_KERNEL  WEIGHTS_PATH"12_bidirectional_gru_forward_recurrent_kernel.bin"
-#define GRU_0_FORWARD_BIAS              WEIGHTS_PATH"12_bidirectional_gru_forward_bias.bin"
-#define GRU_0_FORWARD_RECURRENT_BIAS    WEIGHTS_PATH"12_bidirectional_gru_forward_bias_recurrent.bin"
+#define GRU_0_FORWARD_KERNEL            WEIGHTS_PATH"bidirectional_gru_forward_kernel.bin"
+#define GRU_0_FORWARD_RECURRENT_KERNEL  WEIGHTS_PATH"bidirectional_gru_forward_recurrent_kernel.bin"
+#define GRU_0_FORWARD_BIAS              WEIGHTS_PATH"bidirectional_gru_forward_bias.bin"
+#define GRU_0_FORWARD_RECURRENT_BIAS    WEIGHTS_PATH"bidirectional_gru_forward_bias_recurrent.bin"
 // gru_0_backward
-#define GRU_0_BACKWARD_KERNEL            WEIGHTS_PATH"12_bidirectional_gru_backward_kernel.bin"
-#define GRU_0_BACKWARD_RECURRENT_KERNEL  WEIGHTS_PATH"12_bidirectional_gru_backward_recurrent_kernel.bin"
-#define GRU_0_BACKWARD_BIAS              WEIGHTS_PATH"12_bidirectional_gru_backward_bias.bin"
-#define GRU_0_BACKWARD_RECURRENT_BIAS    WEIGHTS_PATH"12_bidirectional_gru_backward_bias_recurrent.bin"
+#define GRU_0_BACKWARD_KERNEL            WEIGHTS_PATH"bidirectional_gru_backward_kernel.bin"
+#define GRU_0_BACKWARD_RECURRENT_KERNEL  WEIGHTS_PATH"bidirectional_gru_backward_recurrent_kernel.bin"
+#define GRU_0_BACKWARD_BIAS              WEIGHTS_PATH"bidirectional_gru_backward_bias.bin"
+#define GRU_0_BACKWARD_RECURRENT_BIAS    WEIGHTS_PATH"bidirectional_gru_backward_bias_recurrent.bin"
 
 // gru_1_forward
-#define GRU_1_FORWARD_KERNEL            WEIGHTS_PATH"13_bidirectional_1_gru_forward_kernel.bin"
-#define GRU_1_FORWARD_RECURRENT_KERNEL  WEIGHTS_PATH"13_bidirectional_1_gru_forward_recurrent_kernel.bin"
-#define GRU_1_FORWARD_BIAS              WEIGHTS_PATH"13_bidirectional_1_gru_forward_bias.bin"
-#define GRU_1_FORWARD_RECURRENT_BIAS    WEIGHTS_PATH"13_bidirectional_1_gru_forward_bias_recurrent.bin"
+#define GRU_1_FORWARD_KERNEL            WEIGHTS_PATH"bidirectional_1_gru_forward_kernel.bin"
+#define GRU_1_FORWARD_RECURRENT_KERNEL  WEIGHTS_PATH"bidirectional_1_gru_forward_recurrent_kernel.bin"
+#define GRU_1_FORWARD_BIAS              WEIGHTS_PATH"bidirectional_1_gru_forward_bias.bin"
+#define GRU_1_FORWARD_RECURRENT_BIAS    WEIGHTS_PATH"bidirectional_1_gru_forward_bias_recurrent.bin"
 // gru_1_backward
-#define GRU_1_BACKWARD_KERNEL            WEIGHTS_PATH"13_bidirectional_1_gru_backward_kernel.bin"
-#define GRU_1_BACKWARD_RECURRENT_KERNEL  WEIGHTS_PATH"13_bidirectional_1_gru_backward_recurrent_kernel.bin"
-#define GRU_1_BACKWARD_BIAS              WEIGHTS_PATH"13_bidirectional_1_gru_backward_bias.bin"
-#define GRU_1_BACKWARD_RECURRENT_BIAS    WEIGHTS_PATH"13_bidirectional_1_gru_backward_bias_recurrent.bin"
+#define GRU_1_BACKWARD_KERNEL            WEIGHTS_PATH"bidirectional_1_gru_backward_kernel.bin"
+#define GRU_1_BACKWARD_RECURRENT_KERNEL  WEIGHTS_PATH"bidirectional_1_gru_backward_recurrent_kernel.bin"
+#define GRU_1_BACKWARD_BIAS              WEIGHTS_PATH"bidirectional_1_gru_backward_bias.bin"
+#define GRU_1_BACKWARD_RECURRENT_BIAS    WEIGHTS_PATH"bidirectional_1_gru_backward_bias_recurrent.bin"
 
 // timedist_0
-#define TDIST_0_KERNEL WEIGHTS_PATH"14_time_distributed_kernel.bin"
-#define TDIST_0_BIAS   WEIGHTS_PATH"14_time_distributed_bias.bin"
+#define TDIST_0_KERNEL WEIGHTS_PATH"time_distributed_kernel.bin"
+#define TDIST_0_BIAS   WEIGHTS_PATH"time_distributed_bias.bin"
 
 // timedist_1
-#define TDIST_1_KERNEL WEIGHTS_PATH"15_time_distributed_1_kernel.bin"
-#define TDIST_1_BIAS   WEIGHTS_PATH"15_time_distributed_1_bias.bin"
+#define TDIST_1_KERNEL WEIGHTS_PATH"time_distributed_1_kernel.bin"
+#define TDIST_1_BIAS   WEIGHTS_PATH"time_distributed_1_bias.bin"
 
 /*
 // conv2d_0
@@ -248,6 +252,7 @@
 void load(const char* path, void* array, int arraysize, int typesize) {
     FILE* file = fopen(path, "rb");
 
+    int idx = 0;
     if (file != NULL) {
         #ifdef USE_FLOAT
         fread(array, typesize, arraysize, file);
@@ -261,21 +266,22 @@ void load(const char* path, void* array, int arraysize, int typesize) {
         fread(buffer, sizeof(char), numBytes, file);
         fclose(file);
 
-        ap_fixed<W,I>* p_array = (ap_fixed<W,I>*)array;
+        ap_fixed<W,I, AP_RND, AP_SAT>* p_array = (ap_fixed<W,I, AP_RND, AP_SAT>*)array;
 
         // Copy the binary data from the temporary buffer to the array
         size_t offset = 0;
         for (size_t i = 0; i < arraysize; ++i) {
-            ap_fixed<W,I> value = 0;
+            printf("%4d > ", idx++);
+            ap_fixed<W,I, AP_RND, AP_SAT> value = 0;
             for (size_t j = 0; j < W; ++j) {
                 // Read the bits from the buffer
                 bool bit = (buffer[offset / 8] >> (7 - (offset % 8))) & 1;
-                //printf("%d", bit);
+                printf("%d", bit);
                 // Assign the bit to the corresponding position in the value
                 value[W - 1 - j] = bit;
                 offset++;
             }
-            //printf(" - %f\n", value.to_float());
+            printf(" - %f\n", value.to_float());
             p_array[i] = value;
         }
 
@@ -299,7 +305,7 @@ void loadWeights() {
     }
 
     printf("##########\n");
-    ap_fixed<32,8> v = 0.625;
+    ap_fixed<32,8, AP_RND, AP_SAT> v = 0.625;
     for (int i = 0; i < 32; ++i) {
         bool bit = v[i];
         printf("%d", bit);
@@ -314,7 +320,7 @@ void loadWeights() {
     printf("$$$$$$$$$$\n");
     #define Aw 32
     #define Ai 8
-    ap_fixed<Aw,Ai> a = -0.005151249002665281;
+    ap_fixed<Aw,Ai, AP_RND, AP_SAT> a = -0.005151249002665281;
     //a[0] = 0;
     //a[1] = 1;
     //a[31-8] = 1;
@@ -329,7 +335,9 @@ void loadWeights() {
     
     // conv2d_0
     load(CONV_0_KERNEL, kernel_0, 64*3*3, sizeof(conv_t));
+    /*
     load(CONV_0_BIAS, bias_0, 64, sizeof(conv_t));
+
     // bnorm_0
     load(BNORM_0_GAMMA, gamma_0, 64, sizeof(bnorm_t));
     load(BNORM_0_BETA, beta_0, 64, sizeof(bnorm_t));
@@ -410,6 +418,7 @@ void loadWeights() {
     // timedist_1
     load(TDIST_1_KERNEL, kernel_td1, 64*1, sizeof(timedist_t));
     load(TDIST_1_BIAS, bias_td1, 1, sizeof(timedist_t));
+    */
 }
 #else
 void loadWeights() {}

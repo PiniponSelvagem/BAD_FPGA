@@ -71,36 +71,30 @@ def saveArray_dim4(folder, fileName, array, arrayName, dataType):
 
 def packRow(packed_bits, array, dataType):
     if dataType["name"] == "ap_fixed":
-        bits_total = dataType["bits_total"]
         bits_int = dataType["bits_int"]
-        bits_dec = bits_total - bits_int
-        #
-        max_bits = bitarray('0' + '1' * (bits_total - 1))  # All bits except sign bit set to 1
-        #
-        # Convert the binary back to a float for max and min values
-        max_value = int(max_bits.to01(), 2) / (2 ** bits_dec)
-        min_value = -(1 << (bits_total - 1)) / (2 ** bits_dec)
+        bits_dec = dataType["bits_total"] - bits_int
         #
         #print(array)
         for value in array:
-            #print(value)
-            # Check for overflow and underflow
-            if value > max_value:
-                value = max_value
-            elif value < min_value:
-                value = min_value
+            is_neg = value < 0
+            integer_part = abs(int(value))
+            decimal_part = abs(int(round((value - integer_part) * (1 << bits_dec))))
             #
-            # Scale the value to fit within the specified decimal_bits
-            scaled_value = round(value * (2 ** bits_dec))
+            if is_neg:  # Convert to one's complement
+                integer_part = ~integer_part & ((1 << bits_int) - 1)
+                integer_part |= 1 << (bits_int - 1)
+                #
+                decimal_part = ~decimal_part
+                decimal_part = decimal_part+1
             #
-            # Convert to one's complement binary
-            if scaled_value >= 0:
-                binary = bin(scaled_value)[2:].zfill(bits_total)
-            else:
-                # For negative values, calculate the one's complement
-                complement = (1 << bits_total) + scaled_value
-                binary = bin(complement)[2:].zfill(bits_total)
-            packed_bits.extend(binary)
+            integer_part &= (1 << bits_int) - 1
+            decimal_part &= (1 << bits_dec) - 1
+            #
+            packed_bits.extend(format(integer_part, '0{}b'.format(bits_int)))
+            #print(packed_bits)
+            packed_bits.extend(format(decimal_part, '0{}b'.format(bits_dec)))
+            #print("packed_bits: "+str(packed_bits))
+            print("int_part: "+str(format(integer_part, '0{}b'.format(bits_int)))+" | dec_part: "+str(format(decimal_part, '0{}b'.format(bits_dec)))+" || value: " + str(value))
         #
     else:
         # float

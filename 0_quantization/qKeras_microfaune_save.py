@@ -1,11 +1,7 @@
-import os
 import time
 from datetime import timedelta
 
-from microfaune import audio
 import tensorflow as tf
-from tensorflow import keras
-import librosa
 
 gpus = tf.config.experimental.list_physical_devices('GPU')
 for gpu in gpus:
@@ -13,10 +9,8 @@ for gpu in gpus:
 
 import numpy as np
 import json
-import qkeras
 import qkeras.utils as qutils
 import qkeras_microfaune_model as qmodel
-import keras as K
 import cutils
 
 # Extend the JSONEncoder class
@@ -31,7 +25,6 @@ class NumpyEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 model_dir = "model_quantized"
-plots_dir = "plots"
 model_subname = "quant_bits411"
 bits = "4"
 integer = "1"
@@ -57,14 +50,14 @@ layerName_split_dim0 = [
 ]
 
 
-
+save_merged = False
 data_type = {}
+"""
 data_type["name"] = "float"
 """
 data_type["name"] = "ap_fixed"
-data_type["bits_total"] = 30
-data_type["bits_int"] = 6
-"""
+data_type["bits_total"] = 8
+data_type["bits_int"] = 1
 
 start = time.time()
 #########################################################
@@ -121,7 +114,7 @@ class Layer:
 
 
 
-def processLayerWeight(i, layerName, weightName, weight):
+def processLayerWeight(layerName, weightName, weight):
     shape = weight.shape
     sdim = len(shape)
     data = np.array(weight)
@@ -154,37 +147,40 @@ def processLayerWeight(i, layerName, weightName, weight):
         rbias = np.squeeze(rbias)
         biasName = weightName
         rbiasBias = weightName+"_recurrent"
-        cutils.saveArray(folder, str(i)+"_"+biasName, bias, biasName, data_type)
-        cutils.saveArray(folder, str(i)+"_"+rbiasBias, rbias, rbiasBias, data_type)
+        cutils.saveArray(folder, biasName, bias, biasName, data_type)
+        cutils.saveArray(folder, rbiasBias, rbias, rbiasBias, data_type)
     else:
-        cutils.saveArray(folder, str(i)+"_"+weightName, data, weightName, data_type)
+        cutils.saveArray(folder, weightName, data, weightName, data_type)
 
 
 
 model_quant = qutils.model_save_quantized_weights(dual_model)
 
-i = 0
+print("save_merged == "+str(save_merged))
+#processLayerWeight("conv2d","conv2d_kernel", model_quant["conv2d"]["weights"][0])
 for layerName in model_quant:
     layer = model_quant[layerName]
     #for weight in layer:
     weight = layer["weights"]
     if "conv2d" in layerName:
-        processLayerWeight(i, layerName, layerName+"_kernel", weight[0])
-        processLayerWeight(i, layerName, layerName+"_bias", weight[1])
+        if save_merged:
+            processLayerWeight(layerName, layerName+"_kernel", weight[0])
+            processLayerWeight(layerName, layerName+"_bias", layer["fused_bias"])
+        else:
+            processLayerWeight(layerName, layerName+"_kernel", weight[0])
+            processLayerWeight(layerName, layerName+"_bias", weight[1])
     if "batch_normalization" in layerName:
-        processLayerWeight(i, layerName, layerName+"_gamma", weight[0])
-        processLayerWeight(i, layerName, layerName+"_beta", weight[1])
-        processLayerWeight(i, layerName, layerName+"_mean", weight[2])
-        processLayerWeight(i, layerName, layerName+"_variance", weight[3])
+        processLayerWeight(layerName, layerName+"_gamma", weight[0])
+        processLayerWeight(layerName, layerName+"_beta", weight[1])
+        processLayerWeight(layerName, layerName+"_mean", weight[2])
+        processLayerWeight(layerName, layerName+"_variance", weight[3])
     if "bidirectional" in layerName:
-        processLayerWeight(i, layerName, layerName+"_gru_forward_kernel", weight[0])
-        processLayerWeight(i, layerName, layerName+"_gru_forward_recurrent_kernel", weight[1])
-        processLayerWeight(i, layerName, layerName+"_gru_forward_bias", weight[2])
-        processLayerWeight(i, layerName, layerName+"_gru_backward_kernel", weight[3])
-        processLayerWeight(i, layerName, layerName+"_gru_backward_recurrent_kernel", weight[4])
-        processLayerWeight(i, layerName, layerName+"_gru_backward_bias", weight[5])
-    i += 1
-
+        processLayerWeight(layerName, layerName+"_gru_forward_kernel", weight[0])
+        processLayerWeight(layerName, layerName+"_gru_forward_recurrent_kernel", weight[1])
+        processLayerWeight(layerName, layerName+"_gru_forward_bias", weight[2])
+        processLayerWeight(layerName, layerName+"_gru_backward_kernel", weight[3])
+        processLayerWeight(layerName, layerName+"_gru_backward_recurrent_kernel", weight[4])
+        processLayerWeight(layerName, layerName+"_gru_backward_bias", weight[5])
 
 
 # save non quantized layers: time_distributed and time_distributed_1
@@ -192,9 +188,9 @@ for layer in dual_model.layers:
     layerName = layer.name
     weight = layer.weights
     if "time_distributed" in layerName:
-        processLayerWeight(i, layerName, layerName+"_kernel", weight[0])
-        processLayerWeight(i, layerName, layerName+"_bias", weight[1])
-        i += 1
+        processLayerWeight(layerName, layerName+"_kernel", weight[0])
+        processLayerWeight(layerName, layerName+"_bias", weight[1])
+
 
 
 

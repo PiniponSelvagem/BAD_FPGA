@@ -74,3 +74,5 @@ __pycache__/
 /0_quantization/model_dump__BACKUP/
 /0_quantization/model_quantized__BACKUP/
 /0_quantization/model_quantized_weights
+/0_quantization/dump_io_quantized/
+/0_quantization/model_quantized_weights_float/

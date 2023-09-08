@@ -31,11 +31,10 @@ class NumpyEncoder(json.JSONEncoder):
 detector = RNNDetector()
 model = detector.model
 
-
-audiofile = "1_a_bird"
-audiofile_w_ext = audiofile+".wav"
+audiofile = "no_bird_79266"
+audiofolder = "audio_samples"
+audiofilePath_w_ext = audiofolder+"/"+audiofile+".wav"
 folder = "features_inout"
-filepath = folder+"/"+audiofile
 ext = ".json"
 
 if not os.path.isdir(folder):
@@ -67,16 +66,13 @@ def compute_features(audio_signals):
     return X
 
 #### original code, but here for convinience ####
-fs, data = audio.load_wav(audiofile_w_ext)
+fs, data = audio.load_wav(audiofilePath_w_ext)
 X = compute_features([data])
 input = np.array(X)
 
 #### predicting with the model ####
 scores, local_scores = model.predict(input)
 print(audiofile+" -> score="+str(scores[0][0]))
-
-
-print("Dumping input and outputs of each layer to: "+filepath+ext)
 
 
 

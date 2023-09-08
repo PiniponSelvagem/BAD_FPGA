@@ -2,7 +2,6 @@ import os
 import time
 from datetime import timedelta
 
-from microfaune.detection import RNNDetector
 from microfaune import audio
 import tensorflow as tf
 from tensorflow import keras
@@ -14,6 +13,9 @@ for gpu in gpus:
 
 import numpy as np
 import json
+import qkeras
+import qkeras_microfaune_model as qmodel
+import keras as K
 
 # Extend the JSONEncoder class
 class NumpyEncoder(json.JSONEncoder):
@@ -26,12 +28,21 @@ class NumpyEncoder(json.JSONEncoder):
             return float(obj)
         return json.JSONEncoder.default(self, obj)
 
-detector = RNNDetector()
-model = detector.model
+model_dir = "model_quantized"
+plots_dir = "plots"
+model_subname = "quant_bits411"
+bits = "4"
+integer = "1"
+symmetric = "1"
+max_value = "1"
+padding = "same"
+#model_original, dual_model_original = qmodel.MicrofauneAI.model()
+model, dual_model = qmodel.MicrofauneAI(bits, integer, symmetric, max_value, padding).modelQuantized()
+dual_model.load_weights(f"{model_dir}/model_weights-{model_subname}.h5")
 
-
-audiofile = "audio_samples/bird_50124.wav"
-folder = "dump_io"
+audiofile = "bird_50124"
+audiofilepath = "audio_samples/"+audiofile+".wav"
+folder = "dump_io_quantized"
 filepath = folder+"/"+audiofile
 ext = ".json"
 
@@ -63,27 +74,30 @@ def compute_features(audio_signals):
         X.append(x[..., np.newaxis].astype(np.float32)/255)
     return X
 
-#### original code, but here for convinience ####
-fs, data = audio.load_wav(audiofile)
-X = compute_features([data])
-
-#### predicting with the model ####
-scores, local_scores = model.predict(np.array(X))
-print(audiofile+" -> score="+str(scores[0][0]))
-
-
-print("Dumping input and outputs of each layer to: "+filepath+ext)
-
-
-
 start = time.time()
 #########################################################
 
+#### original code, but here for convinience ####
+print("Loading wav... If it gets locked here, try to run as administrator.")
+fs, data = audio.load_wav(audiofilepath)
+X = compute_features([data])
+
+#### predicting with the model ####
+print("Predicting...")
+scores, local_scores = dual_model.predict(np.array(X))
+print(audiofile+" -> score="+str(scores[0][0]))
+
+
+print("Dumping input and outputs of each layer to: "+audiofile)
+
+
+
+
 intermediate_models = []
 layers_names = []
-for layer in model.layers:
+for layer in dual_model.layers:
     layers_names.append(layer.name)
-    intermediate_model = keras.Model(inputs=model.input, outputs=layer.output)
+    intermediate_model = keras.Model(inputs=dual_model.input, outputs=layer.output)
     intermediate_models.append(intermediate_model)
 
 class Layer:
@@ -97,8 +111,8 @@ class Layer:
 
 def getOutputOfLayer(layer_name):
     features = tf.keras.models.Model(
-        inputs=model.inputs,
-        outputs=model.get_layer(name=layer_name).output,
+        inputs=dual_model.inputs,
+        outputs=dual_model.get_layer(name=layer_name).output,
     )
     return features(np.array(X))
 
@@ -143,6 +157,7 @@ open(filepath+ext, "w").write(jLayersIO)
 jLayersIOflat = json.dumps(layersIOflat, indent=4, default=lambda o: o.encode())
 open(filepath+"_flat"+ext, "w").write(jLayersIOflat)
 """
+
 
 #########################################################
 end = time.time()
