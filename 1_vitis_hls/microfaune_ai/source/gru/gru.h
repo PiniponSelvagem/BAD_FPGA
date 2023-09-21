@@ -49,6 +49,27 @@ typedef int gru_p_rkernel;
 gru_t state[GRU_MAX_STATE][GRU_STATE_SIZE];     // 0 -> current, 1 -> next
 
 
+/**
+ * @brief Converts a value to quantized 4 bits.
+ * @param state: Value to be quantized.
+ * @return Quantized state value
+*/
+static inline gru_t stateQuant(gru_t state) {
+#define OFFSET_STATE    0.125   //0.0625
+#define STEP_SIZE_STATE 0.25    //0.125
+#define MIN_STATE       -1
+#define MAX_STATE       0.75
+
+    state = state + OFFSET_STATE;
+    if (state <= MIN_STATE)
+        return MIN_STATE;
+    else if (state >= MAX_STATE)
+        return MAX_STATE;
+    int step = int((state + 1) / STEP_SIZE_STATE);
+    return (step * STEP_SIZE_STATE) - 1.0;
+}
+
+
 void gru_clearState() {
     GRU_clearstate_loop_row: for (gru_state_row_t i = 0; i < GRU_MAX_STATE; ++i) {
         GRU_clearstate_loop_col: for (gru_state_col_t j = 0; j < GRU_STATE_SIZE; ++j) {
@@ -62,7 +83,6 @@ void gru_syncState() {
         state[0][i] = state[1][i];
     }
 }
-
     
 void gru_cell(
     gru_idx_t idx,
@@ -115,10 +135,14 @@ void gru_cell(
 
     gru_acc_t z = TC((gru_t)SIGMOID(TC(TC(matrix_x[0]) + TC(matrix_inner[0]))));
     gru_acc_t r = TC((gru_t)SIGMOID(TC(TC(matrix_x[1]) + TC(matrix_inner[1]))));
-    gru_acc_t hh = TC((gru_t)TANH(TC(TC(matrix_x[2]) + (TC(r * TC(matrix_inner[2]))))));
-
+    gru_acc_t hh = TC((gru_t)TANH(TC(TC(matrix_x[2]) + (TC(r * TC(matrix_inner[2]))))));    // matrix_x[2] + (r * matrix_inner[2])
+    
     gru_acc_t out = TC(TC(z * state[0][idx]) + TC((1 - z) * hh));
+#ifdef LOAD_ORIGINAL
     state[1][idx] = out;
+#else
+    state[1][idx] = stateQuant(out);
+#endif
     *output = out;
 }
 
@@ -169,3 +193,56 @@ void gru(
 }
 
 #endif // GRU_H
+
+
+
+
+
+/*
+void gru_cell(
+    int idx 64,
+    const float input[64],
+    const float kernel[64][3][64],
+    const float bias[64][3],
+    const float recurrent_kernel[64][3][64],
+    const float recurrent_bias[64][3],
+    float output
+) {
+
+    float matrix_x[3];
+    GRU_cell_loop_x_row: for (int i = 0; i < 3; ++i) {
+        matrix_x[i] = 0;
+        GRU_cell_loop_x_col: for (int j = 0; j < 64; ++j) {
+            float iVal = input[j];
+            float kVal = kernel[idx][i][j];
+            matrix_x[i] += iVal * kVal;
+        }
+    }
+    GRU_cell_loop_x_bias: for (int i = 0; i < 3; ++i) {
+        matrix_x[i] += bias[idx][i];
+    }
+
+
+    float matrix_inner[3];
+    GRU_cell_loop_inner_row: for (int i = 0; i < 3; ++i) {
+        matrix_inner[i] = 0;
+        GRU_cell_loop_inner_col: for (int j = 0; j < 64; ++j) {
+            float iVal = state[0][j];
+            float kVal = recurrent_kernel[idx][i][j];
+            matrix_inner[i] += iVal * kVal;
+        }
+    }
+    GRU_cell_loop_inner_bias: for (int i = 0; i < 3; ++i) {
+        matrix_inner[i] += recurrent_bias[idx][i];
+    }
+
+
+    float z = SIGMOID(matrix_x[0] + matrix_inner[0]);
+    float r = SIGMOID(matrix_x[1] + matrix_inner[1]);
+    float hh = TANH(matrix_x[2] + (r * matrix_inner[2]));
+
+    float out = (z * state[0][idx]) + ((1 - z) * hh);
+    state[1][idx] = out;
+    *output = out;
+}
+*/

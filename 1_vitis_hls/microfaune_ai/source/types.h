@@ -10,8 +10,8 @@
 #include <ap_int.h>
 #include <ap_fixed.h>
 //#define USE_FLOAT
-#define USE_8_1
-//#define USE_16_7
+//#define USE_8_1
+#define USE_16_8
 // margin included
 typedef ap_uint<7> i64_t;
 typedef ap_uint<8> i128_t;
@@ -88,9 +88,9 @@ typedef ap_fixed<W,I, AP_RND, AP_SAT> output_t;
 typedef float sigmoid_t;
 typedef float tanh_t;
 #else
-#ifdef USE_16_7
+#ifdef USE_16_8
 #define W 16
-#define I 7
+#define I 8
 #define Wacc W+5
 #define Iacc I+2
 

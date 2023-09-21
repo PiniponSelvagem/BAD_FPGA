@@ -100,6 +100,7 @@ def packRow(packed_bits, array, dataType):
                 # For negative values, calculate the one's complement
                 complement = (1 << bits_total) + scaled_value
                 binary = bin(complement)[2:].zfill(bits_total)
+            #
             packed_bits.extend(binary)
         #
     else:

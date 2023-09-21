@@ -117,7 +117,15 @@ void conv2d(
                             conv_p_input pinput_offset_col = pinput_offset_row + kocol;
                             conv_t k = *(kernel + pkernel_offset_col); //conv_t k = kernel[f][c][krow][kcol];
                             conv_t i = *(input + pinput_offset_col);   //conv_t i = input[c][korow][kocol];
+                        #ifdef __VITIS_HLS__
+                            float kF = k.to_float();
+                            float iF = i.to_float();
+                        #endif // __VITIS_HLS__
                             acc += TC(TC(k) * TC(i));
+						#ifdef __VITIS_HLS__
+                            float accF = acc.to_float();
+                        #endif // __VITIS_HLS__
+                            float a = 0;
                         }
                     }
 
@@ -143,6 +151,9 @@ void conv2d(
                         acc_sat = MAX_VALUE;
                     #endif
                     */
+					#ifdef __VITIS_HLS__
+						float acc_satF = acc_sat.to_float();
+					#endif // __VITIS_HLS__
                     *poutput = acc_sat;
                     //if ((c == 0 && filters == 1) || (filters > 1))
                     //    *pprev = acc_sat;   // TODO: Memory dependency because of read for acc_sat, making pipeline not lower than ii=7

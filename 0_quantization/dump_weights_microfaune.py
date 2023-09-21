@@ -11,6 +11,7 @@ for gpu in gpus:
 
 import numpy as np
 import json
+import re
 
 import cutils
 
@@ -116,6 +117,16 @@ class Layer:
         return self.__dict__
 
 
+def processName(name):
+    name = v.name.replace('/', '_').replace('.', '_').replace(':', '_')[:-2]
+    name = name.replace("moving_", "")  # BNORM
+    name = re.sub(r'_forward_gru_\d_gru_cell_\d', "_gru_forward", name)    # BGRU
+    name = re.sub(r'_backward_gru_\d_gru_cell_\d', "_gru_backward", name)    # BGRU
+    name = re.sub(r'_forward_gru_gru_cell_\d', "_gru_forward", name)    # BGRU
+    name = re.sub(r'_backward_gru_gru_cell_\d', "_gru_backward", name)    # BGRU
+    return name
+
+
 layers_toMerge = []
 i = 0
 for m in model.layers:
@@ -135,7 +146,7 @@ for m in model.layers:
                 elif sdim == 2:
                     [shape[i] for i in (1, 0)]
                     data = data.transpose((1, 0))
-            arrayName = v.name.replace('/', '_').replace('.', '_').replace(':', '_')
+            arrayName = processName(v.name)
             if layerName_to3d in v.name:
                 data = rearange_gru_weights(data)
                 if ("kernel" in v.name): # reorder kernel for better memory access / no jumping around when access
@@ -164,14 +175,14 @@ for m in model.layers:
                 rbias = np.squeeze(rbias)
                 biasName = arrayName
                 rbiasBias = arrayName+"_recurrent"
-                cutils.saveArray(folder, str(i)+"_"+biasName, bias, biasName, data_type)
-                cutils.saveArray(folder, str(i)+"_"+rbiasBias, rbias, rbiasBias, data_type)
+                cutils.saveArray(folder, biasName, bias, biasName, data_type)
+                cutils.saveArray(folder, rbiasBias, rbias, rbiasBias, data_type)
             #
             else:
                 #data = [-35.51, 2.5, -0.5, 0.125, -0.125, 0.05, 0.625, -0.625, 0.02698972076177597]
                 #data = np.array(data)
                 #if "conv2d_bias_0" in arrayName:
-                cutils.saveArray(folder, str(i)+"_"+arrayName, data, arrayName, data_type)
+                cutils.saveArray(folder, arrayName, data, arrayName, data_type)
     i += 1
 
 

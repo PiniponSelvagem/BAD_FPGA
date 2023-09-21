@@ -62,18 +62,18 @@ void predict(
 
 
 
-#define INPUT_BIRD_0 0
-#define INPUT_BIRD_1 1
-#define INPUT_BIRD_2 2
-#define INPUT_BIRD_3 3
+#define INPUT_BIRD_0 0      // expected: 0.98303944
+#define INPUT_BIRD_1 1      // expected: 0.8675719
+#define INPUT_BIRD_2 2      // expected: 0.921088
+#define INPUT_BIRD_3 3      // expected: 0.9579106
 
-#define INPUT_NO_BIRD_0 4
-#define INPUT_NO_BIRD_1 5
-#define INPUT_NO_BIRD_2 6
-#define INPUT_NO_BIRD_3 7
+#define INPUT_NO_BIRD_0 4   // expected: 0.04347346
+#define INPUT_NO_BIRD_1 5   // expected: 0.05368349
+#define INPUT_NO_BIRD_2 6   // expected: 0.07247392
+#define INPUT_NO_BIRD_3 7   // expected: 0.11154108
 
 // SELECT INPUT
-#define SELECTED_INPUT INPUT_NO_BIRD_0
+#define SELECTED_INPUT 1
 
 #if SELECTED_INPUT == INPUT_BIRD_0
     #include "data_bird_0.h"

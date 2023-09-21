@@ -37,16 +37,6 @@
 			<location>E:/Rodrigo/ISEL/2_Mestrado/2-ANO_1-sem/TFM/BAD_FPGA/1_vitis_hls/microfaune_ai/.apc/.tb</location>
 		</link>
 		<link>
-			<name>.reference/global_settings.h</name>
-			<type>1</type>
-			<location>E:/Rodrigo/ISEL/2_Mestrado/2-ANO_1-sem/TFM/BAD_FPGA/1_vitis_hls/microfaune_ai/source/global_settings.h</location>
-		</link>
-		<link>
-			<name>.reference/types.h</name>
-			<type>1</type>
-			<location>E:/Rodrigo/ISEL/2_Mestrado/2-ANO_1-sem/TFM/BAD_FPGA/1_vitis_hls/microfaune_ai/source/types.h</location>
-		</link>
-		<link>
 			<name>algorithm/constraints</name>
 			<type>2</type>
 			<location>E:/Rodrigo/ISEL/2_Mestrado/2-ANO_1-sem/TFM/BAD_FPGA/1_vitis_hls/microfaune_ai/algorithm/.tcls</location>

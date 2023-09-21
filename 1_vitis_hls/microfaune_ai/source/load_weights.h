@@ -5,13 +5,17 @@
 #ifndef SYNTHESIS
 #define W_PATH          "E:\\Rodrigo\\ISEL\\2_Mestrado\\2-ANO_1-sem\\TFM\\BAD_FPGA\\1_vitis_hls\\microfaune_ai\\test_bench\\bin_weights\\"
 #ifdef USE_FLOAT
+#ifdef LOAD_ORIGINAL
+#define WEIGHTS_PATH    W_PATH"float_original\\"
+#else
 #define WEIGHTS_PATH    W_PATH"float\\"
+#endif
 #else
 #ifdef USE_8_1
 #define WEIGHTS_PATH    W_PATH"apf_8_1\\"
 #else
-#ifdef USE_16_7
-#define WEIGHTS_PATH    W_PATH"apf_16_7\\"
+#ifdef USE_16_8
+#define WEIGHTS_PATH    W_PATH"apf_16_8\\"
 #else
 #define WEIGHTS_PATH    W_PATH"apf_32_8\\"
 #endif
@@ -271,17 +275,17 @@ void load(const char* path, void* array, int arraysize, int typesize) {
         // Copy the binary data from the temporary buffer to the array
         size_t offset = 0;
         for (size_t i = 0; i < arraysize; ++i) {
-            printf("%4d > ", idx++);
+            //printf("%4d > ", idx++);
             ap_fixed<W,I, AP_RND, AP_SAT> value = 0;
             for (size_t j = 0; j < W; ++j) {
                 // Read the bits from the buffer
                 bool bit = (buffer[offset / 8] >> (7 - (offset % 8))) & 1;
-                printf("%d", bit);
+                //printf("%d", bit);
                 // Assign the bit to the corresponding position in the value
                 value[W - 1 - j] = bit;
                 offset++;
             }
-            printf(" - %f\n", value.to_float());
+            //printf(" - %f\n", value.to_float());
             p_array[i] = value;
         }
 
@@ -333,9 +337,19 @@ void loadWeights() {
     printf(" - %15.24f\n", a.to_float());
     */
     
-    // conv2d_0
-    load(CONV_0_KERNEL, kernel_0, 64*3*3, sizeof(conv_t));
     /*
+    for (int i = 0; i < 64; i++) {
+        printf("%2d:", i);
+        for (int j = 0; j < 3; j++) {
+            for (int k = 0; k < 3; k++) {
+            	printf(" %11.8f", kernel_0[i][j][k].to_float());
+            }
+        }
+        printf("\n");
+    }
+    */
+    // conv2d_0
+	load(CONV_0_KERNEL, kernel_0, 64*3*3, sizeof(conv_t));
     load(CONV_0_BIAS, bias_0, 64, sizeof(conv_t));
 
     // bnorm_0
@@ -418,7 +432,6 @@ void loadWeights() {
     // timedist_1
     load(TDIST_1_KERNEL, kernel_td1, 64*1, sizeof(timedist_t));
     load(TDIST_1_BIAS, bias_td1, 1, sizeof(timedist_t));
-    */
 }
 #else
 void loadWeights() {}

@@ -34,19 +34,18 @@ from sklearn.model_selection import StratifiedShuffleSplit
 from collections import Counter
 import qkeras_microfaune_model as qmodel
 
+from model_config.config_test import ModelConfig      # model_test
+#from model_config.config_0 import ModelConfig       # model_quant_411
+#from model_config.config_1 import ModelConfig       # model_quant__conv-po2-81_gru-po2-81_bnorm-811
+
 datasets_dir = '../../datasets'
-save_dir = "model_quantized"
+save_dir = ModelConfig.folder
+model_name = ModelConfig.name
 plots_dir = "plots"
-model_subname = "quant_bits411"
-epochs = 50
-steps_per_epoch = 100
-bits = "4"
-integer = "1"
-symmetric = "1"
-max_value = "1"
-padding = "same"
+epochs = ModelConfig.epochs
+steps_per_epoch = ModelConfig.steps_per_epoch
 #model_original, dual_model_original = qmodel.MicrofauneAI.model()
-model, dual_model = qmodel.MicrofauneAI(bits, integer, symmetric, max_value, padding).modelQuantized()
+model, dual_model = qmodel.MicrofauneAI(ModelConfig).modelQuantized()
 """
 model = model_original
 dual_model = dual_model_original
@@ -210,7 +209,7 @@ history = model.fit(data_generator, steps_per_epoch=steps_per_epoch, epochs=epoc
 
 if not os.path.exists(save_dir):
     os.makedirs(save_dir)
-model.save_weights(f"{save_dir}/model_weights-{model_subname}.h5")
+model.save_weights(f"{save_dir}/{model_name}.h5")
 
 
 if not os.path.exists(plots_dir):
@@ -227,7 +226,7 @@ plt.plot(history.history["val_loss"], label="Validation Loss")
 plt.xlabel("Epochs")
 plt.ylabel("Loss")
 plt.legend()
-plt.savefig(f"{plots_dir}/{model_subname}-TvsV_loss.png")
+plt.savefig(f"{plots_dir}/{model_name}-TvsV_loss.png")
 
 plt.figure(figsize=(9, 6))
 plt.title("Training / Validation Accuracy")
@@ -236,10 +235,10 @@ plt.plot(history.history["val_accuracy"], label="Validation Accuracy")
 plt.xlabel("Epochs")
 plt.ylabel("Accuracy")
 plt.legend()
-plt.savefig(f"{plots_dir}/{model_subname}-TvsV_accuracy.png")
+plt.savefig(f"{plots_dir}/{model_name}-TvsV_accuracy.png")
 
 
-dual_model.load_weights(f"{save_dir}/model_weights-{model_subname}.h5")
+dual_model.load_weights(f"{save_dir}/model_weights-{model_name}.h5")
 #wav_files = {os.path.basename(f)[:-4]: f for f in glob.glob(os.path.join(datasets_dir, "*/wav/*.wav"))}
 scores, local_scores = dual_model.predict(X_test)
 
@@ -260,7 +259,7 @@ plt.plot(1-fpr, tpr)
 plt.title("Precision / Recall")
 plt.xlabel("Recall")
 plt.ylabel("Precision")
-plt.savefig(f"{plots_dir}/{model_subname}-PR_curve.png")
+plt.savefig(f"{plots_dir}/{model_name}-PR_curve.png")
 #plt.show()
 
 

@@ -71,6 +71,32 @@ input_t inputpad[CHANNELS][C2D_0__IN_LINES][C2D_0__IN_COLS] = { 0 };
 /* 10 */
 // outputLS
 // outputGS
+#define D_C 0
+#ifdef __VITIS_HLS__
+#define DEBUG_PRINT(label, outarray, dim1, dim2, dim3) \
+    do { \
+        conv_t(*out)[dim2][dim3] = (conv_t(*)[dim2][dim3])outarray; \
+        printf("%s:\n", label); \
+        for (int b = 0; b < 4; ++b) { \
+            for (int c = 0; c < 4; ++c) { \
+                printf("%12.8f ", out[D_C][b][c].to_float()); \
+            } \
+            printf("\n"); \
+        } \
+    } while (0)
+#else
+#define DEBUG_PRINT(label, outarray, dim1, dim2, dim3) \
+    do { \
+        conv_t(*out)[dim2][dim3] = (conv_t(*)[dim2][dim3])outarray; \
+        printf("%s:\n", label); \
+        for (int b = 0; b < 4; ++b) { \
+            for (int c = 0; c < 4; ++c) { \
+                printf("%12.8f ", out[D_C][b][c]); \
+            } \
+            printf("\n"); \
+        } \
+    } while (0)
+#endif
 
 
 void predict(
@@ -96,6 +122,7 @@ void predict(
         (conv_t*)bias_0,
         (conv_t*)outarray_a
     );
+    DEBUG_PRINT("CONV2D_0", outarray_a, 64, 433, 42);
 #ifdef USE_BNORM
     bnorm( // BNORM_0 + ReLu
         BNORM_0__IN_COLS,
@@ -105,6 +132,7 @@ void predict(
         (bnorm_t*)movingmean_0,
         (bnorm_t*)movingvariance_0
     );
+    DEBUG_PRINT("BNORM_0", outarray_a, 64, 433, 42);
 #endif
 
     /* 1 */
@@ -116,6 +144,7 @@ void predict(
         (conv_t*)bias_1,
         (conv_t*)outarray_b
     );
+    DEBUG_PRINT("CONV2D_1", outarray_b, 64, 433, 42);
 #ifdef USE_BNORM
     bnorm( // BNORM_1 + ReLu
         BNORM_1__IN_COLS,
@@ -125,6 +154,7 @@ void predict(
         (bnorm_t*)movingmean_1,
         (bnorm_t*)movingvariance_1
     );
+    DEBUG_PRINT("BNORM_1", outarray_b, 64, 433, 42);
 #endif
     maxpool2d( // MPOOL2D_0
         MP2D_0__IN_COLS,
@@ -132,6 +162,7 @@ void predict(
         PADDING_OFFSET,
         (mpool_t*)outarray_b
     );
+    DEBUG_PRINT("MPOOL2D_0", outarray_b, 64, 433, 22);
 
     /* 2 */
     conv2d( // CONV2D_2
@@ -142,6 +173,7 @@ void predict(
         (conv_t*)bias_2,
         (conv_t*)outarray_a
     );
+    DEBUG_PRINT("CONV2D_2", outarray_a, 64, 433, 22);
 #ifdef USE_BNORM
     bnorm( // BNORM_2 + ReLu
         BNORM_2__IN_COLS,
@@ -151,6 +183,7 @@ void predict(
         (bnorm_t*)movingmean_2,
         (bnorm_t*)movingvariance_2
     );
+    DEBUG_PRINT("BNORM_2", outarray_a, 64, 433, 22);
 #endif
 
     /* 3 */
@@ -162,6 +195,7 @@ void predict(
         (conv_t*)bias_3,
         (conv_t*)outarray_b
     );
+    DEBUG_PRINT("CONV2D_3", outarray_b, 64, 433, 22);
 #ifdef USE_BNORM
     bnorm( // BNORM_3 + ReLu
         BNORM_3__IN_COLS,
@@ -171,6 +205,7 @@ void predict(
         (bnorm_t*)movingmean_3,
         (bnorm_t*)movingvariance_3
     );
+    DEBUG_PRINT("BNORM_3", outarray_b, 64, 433, 22);
 #endif
     maxpool2d( // MPOOL2D_1
         MP2D_1__IN_COLS,
@@ -178,6 +213,7 @@ void predict(
         PADDING_OFFSET,
         (mpool_t*)outarray_b
     );
+    DEBUG_PRINT("MPOOL2D_1", outarray_b, 64, 433, 12);
     
     /* 4 */
     conv2d( // CONV2D_4
@@ -188,6 +224,7 @@ void predict(
         (conv_t*)bias_4,
         (conv_t*)outarray_a
     );
+    DEBUG_PRINT("CONV2D_4", outarray_a, 64, 433, 12);
 #ifdef USE_BNORM
     bnorm( // BNORM_4 + ReLu
         BNORM_4__IN_COLS,
@@ -197,6 +234,7 @@ void predict(
         (bnorm_t*)movingmean_4,
         (bnorm_t*)movingvariance_4
     );
+    DEBUG_PRINT("BNORM_4", outarray_a, 64, 433, 12);
 #endif
 
     /* 5 */
@@ -208,6 +246,7 @@ void predict(
         (conv_t*)bias_5,
         (conv_t*)outarray_b
     );
+    DEBUG_PRINT("CONV2D_5", outarray_b, 64, 433, 12);
 #ifdef USE_BNORM
     bnorm( // BNORM_5 + ReLu
         BNORM_5__IN_COLS,
@@ -217,6 +256,7 @@ void predict(
         (bnorm_t*)movingmean_5,
         (bnorm_t*)movingvariance_5
     );
+    DEBUG_PRINT("BNORM_5", outarray_b, 64, 433, 12);
 #endif
     maxpool2d( // MPOOL2D_2
         MP2D_2__IN_COLS,
@@ -224,12 +264,14 @@ void predict(
         0,
         (mpool_t*)outarray_b
     );
+    DEBUG_PRINT("MPOOL2D_2", outarray_b, 64, 433, 5);
 
     /* 6 */
     reducemax_0_saveTranspose( // RMAX_0 + Save transposed
         (reducemax_t*)outarray_b,
         (reducemax_t*)outarray_a
     );
+    DEBUG_PRINT("RMAX_0", outarray_a, 1, 433, 64);
 
     /*************************************/
     /**************** RNN ****************/
@@ -253,6 +295,30 @@ void predict(
         (gru_t*)recurrent_kernel_gru0_b, (gru_t*)recurrent_bias_gru0_b,
         (gru_t*)outarray_b
     );
+
+    /*
+    ///////////////////////////////////////////////////////////////////////////////////
+    // Open the log file in write mode
+    FILE* logFile = fopen("OUTPUT_C.log", "w");
+
+    if (logFile == NULL) {
+        printf("Error opening file");
+    }
+
+    gru_t* ptr = (gru_t*)outarray_b;
+
+    // Loop through the array using pointer arithmetic and print each value to the log file
+    for (int i = 0; i < 128; i++) {
+        for (int j = 0; j < 431; j++) {
+            fprintf(logFile, "%f ", *(ptr + i * 431 + j));
+        }
+        fprintf(logFile, "\n"); // Newline after each row
+    }
+
+    // Close the log file
+    fclose(logFile);
+    /////////////////////////////////////////////////////////////////////////////////
+    */
 
     /* 8 */
     gru( // GRU_1_F

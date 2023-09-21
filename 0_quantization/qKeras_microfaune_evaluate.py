@@ -11,26 +11,24 @@ from qkeras import *
 import qkeras_microfaune_model as qmodel
 
 
-#wav_file = "audio_samples/bird_50124.wav" # data_bird_0
-#wav_file = "audio_samples/bird_52046.wav" # data_bird_1
-#wav_file = "audio_samples/bird_16835.wav" # data_bird_2
-#wav_file = "audio_samples/bird_80705.wav" # data_bird_3
+wav_file = "audio_samples/bird_50124.wav" # data_bird_0     # 0.98303944
+#wav_file = "audio_samples/bird_52046.wav" # data_bird_1     # 0.8675719
+#wav_file = "audio_samples/bird_16835.wav" # data_bird_2     # 0.921088
+#wav_file = "audio_samples/bird_80705.wav" # data_bird_3     # 0.9579106
 
-#wav_file = "audio_samples/no_bird_50678.wav" # data_no_bird_0
-#wav_file = "audio_samples/no_bird_51034.wav" # data_no_bird_1
-#wav_file = "audio_samples/no_bird_1931.wav" # data_no_bird_2
-wav_file = "audio_samples/no_bird_79266.wav" # data_no_bird_3
+#wav_file = "audio_samples/no_bird_50678.wav" # data_no_bird_0       # 0.04347346
+#wav_file = "audio_samples/no_bird_51034.wav" # data_no_bird_1       # 0.05368349
+#wav_file = "audio_samples/no_bird_1931.wav"  # data_no_bird_2       # 0.07247392
+#wav_file = "audio_samples/no_bird_79266.wav" # data_no_bird_3       # 0.11154108
 
 
-model_dir = "model_quantized"
-model_subname = "quant_bits411"
-bits = "4"
-integer = "1"
-symmetric = "1"
-max_value = "1"
-padding = "same"
-#model_original, dual_model_original = qmodel.MicrofauneAI.model()
-model, dual_model = qmodel.MicrofauneAI(bits, integer, symmetric, max_value, padding).modelQuantized()
+from model_config.config_test import ModelConfig      # model_test
+#from model_config.config_0 import ModelConfig       # model_quant_411
+#from model_config.config_1 import ModelConfig       # model_quant__conv-po2-81_gru-po2-81_bnorm-811
+
+model_folder = ModelConfig.folder
+model_name = ModelConfig.name
+model, dual_model = qmodel.MicrofauneAI(ModelConfig).modelQuantized()
 """
 model = model_original
 dual_model = dual_model_original
@@ -72,7 +70,7 @@ fs, data = load_wav(wav_file)
 X = compute_features([data])
 
 
-dual_model.load_weights(f"{model_dir}/model_weights-{model_subname}.h5")
+dual_model.load_weights(f"{model_folder}/{model_name}.h5")
 #wav_files = {os.path.basename(f)[:-4]: f for f in glob.glob(os.path.join(datasets_dir, "*/wav/*.wav"))}
 scores, local_scores = dual_model.predict(np.array(X))
 
