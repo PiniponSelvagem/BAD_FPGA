@@ -22,6 +22,7 @@ random.seed(SEED)
 from tensorflow import keras
 
 from qkeras import *
+import qkeras.utils as qutils
 
 import csv
 import pickle
@@ -34,9 +35,13 @@ from sklearn.model_selection import StratifiedShuffleSplit
 from collections import Counter
 import qkeras_microfaune_model as qmodel
 
-from model_config.config_test import ModelConfig      # model_test
-#from model_config.config_0 import ModelConfig       # model_quant_411
-#from model_config.config_1 import ModelConfig       # model_quant__conv-po2-81_gru-po2-81_bnorm-811
+#from model_config.config_test import ModelConfig            # model_test
+#from model_config.config_0 import ModelConfig               # model_quant_411
+#from model_config.config_0_noQuantState import ModelConfig  # model_quant_411_noQuantState
+from model_config.config_0_quantState_401 import ModelConfig  # model_quant_411_quantState_401
+#from model_config.config_0_quantState_801 import ModelConfig  # model_quant_411_quantState_801
+#from model_config.config_0_qconvbnorm import ModelConfig    # model_quant_411_qconvbnorm
+#from model_config.config_1 import ModelConfig               # model_quant__conv-po2-81_gru-po2-81_bnorm-811
 
 datasets_dir = '../../datasets'
 save_dir = ModelConfig.folder
@@ -51,6 +56,11 @@ model = model_original
 dual_model = dual_model_original
 """
 
+def keep_percentage_of_array(arr, percentage):
+    # Calculate the index up to which to keep elements
+    index_to_keep = int(len(arr) * percentage)
+    new_array = arr[:index_to_keep]
+    return new_array
 
 def adjust_dataset(dataset):
     """
@@ -138,6 +148,15 @@ def split_dataset(X, Y, random_state=0):
 X0, Y0, uids0 = load_dataset(os.path.join(datasets_dir, "ff1010bird_wav"))
 X1, Y1, uids1 = load_dataset(os.path.join(datasets_dir, "warblrb10k_public_wav"))
 
+#### ModelConfig training_dataset_percentage ####
+X0 = keep_percentage_of_array(X0, ModelConfig.training_dataset_percentage)
+Y0 = keep_percentage_of_array(Y0, ModelConfig.training_dataset_percentage)
+uids0 = keep_percentage_of_array(uids0, ModelConfig.training_dataset_percentage)
+
+X1 = keep_percentage_of_array(X1, ModelConfig.training_dataset_percentage)
+Y1 = keep_percentage_of_array(Y1, ModelConfig.training_dataset_percentage)
+uids1 = keep_percentage_of_array(uids1, ModelConfig.training_dataset_percentage)
+#################################################
 
 X = np.concatenate([X0, X1]).astype(np.float32)/255
 Y = np.concatenate([Y0, Y1])
@@ -210,7 +229,7 @@ history = model.fit(data_generator, steps_per_epoch=steps_per_epoch, epochs=epoc
 if not os.path.exists(save_dir):
     os.makedirs(save_dir)
 model.save_weights(f"{save_dir}/{model_name}.h5")
-
+qutils.model_save_quantized_weights(model, f"{save_dir}/{model_name}__quantweights.h5")
 
 if not os.path.exists(plots_dir):
     os.makedirs(plots_dir)
@@ -238,7 +257,7 @@ plt.legend()
 plt.savefig(f"{plots_dir}/{model_name}-TvsV_accuracy.png")
 
 
-dual_model.load_weights(f"{save_dir}/model_weights-{model_name}.h5")
+dual_model.load_weights(f"{save_dir}/{model_name}.h5")
 #wav_files = {os.path.basename(f)[:-4]: f for f in glob.glob(os.path.join(datasets_dir, "*/wav/*.wav"))}
 scores, local_scores = dual_model.predict(X_test)
 

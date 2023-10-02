@@ -71,7 +71,10 @@ input_t inputpad[CHANNELS][C2D_0__IN_LINES][C2D_0__IN_COLS] = { 0 };
 /* 10 */
 // outputLS
 // outputGS
+
+//#define DEBUG_PRINT_OUTPUT
 #define D_C 0
+#ifdef DEBUG_PRINT_OUTPUT
 #ifdef __VITIS_HLS__
 #define DEBUG_PRINT(label, outarray, dim1, dim2, dim3) \
     do { \
@@ -96,6 +99,9 @@ input_t inputpad[CHANNELS][C2D_0__IN_LINES][C2D_0__IN_COLS] = { 0 };
             printf("\n"); \
         } \
     } while (0)
+#endif
+#else
+#define DEBUG_PRINT(label, outarray, dim1, dim2, dim3) ;
 #endif
 
 

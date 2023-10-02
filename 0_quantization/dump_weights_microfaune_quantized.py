@@ -15,11 +15,18 @@ import json
 import cutils
 import qkeras_microfaune_model as qmodel
 
-models_folder = "model_quantized"
-model_name = "model_weights-quantized_po2_test"
-bits = "2"
-max_value = "1"
-padding = "same"
+#from model_config.config_test import ModelConfig            # model_test
+#from model_config.config_0 import ModelConfig               # model_quant_411
+from model_config.config_0_noQuantState import ModelConfig  # model_quant_411_noQuantState
+#from model_config.config_0_qconvbnorm import ModelConfig    # model_quant_411_qconvbnorm
+#from model_config.config_1 import ModelConfig               # model_quant__conv-po2-81_gru-po2-81_bnorm-811
+
+models_folder = ModelConfig.folder
+model_name = ModelConfig.name
+
+model_folder = ModelConfig.folder
+model_name = ModelConfig.name
+model, dual_model = qmodel.MicrofauneAI(ModelConfig).modelQuantized()
 
 # Extend the JSONEncoder class
 class NumpyEncoder(json.JSONEncoder):
@@ -32,7 +39,6 @@ class NumpyEncoder(json.JSONEncoder):
             return float(obj)
         return json.JSONEncoder.default(self, obj)
 
-model, _ = qmodel.MicrofauneAI(bits, max_value, padding).modelQuantized()
 model.load_weights(f"{models_folder}/{model_name}.h5")
 
 folder = "model_dump_quantized"

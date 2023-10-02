@@ -28,17 +28,21 @@ class NumpyEncoder(json.JSONEncoder):
             return float(obj)
         return json.JSONEncoder.default(self, obj)
 
-model_dir = "model_quantized"
+#from model_config.config_test import ModelConfig            # model_test
+#from model_config.config_0 import ModelConfig               # model_quant_411
+#from model_config.config_0_noQuantState import ModelConfig  # model_quant_411_noQuantState
+from model_config.config_0_qconvbnorm import ModelConfig    # model_quant_411_qconvbnorm
+#from model_config.config_1 import ModelConfig               # model_quant__conv-po2-81_gru-po2-81_bnorm-811
+
+datasets_dir = '../../datasets'
+model_dir = ModelConfig.folder
+model_name = ModelConfig.name
 plots_dir = "plots"
-model_subname = "quant_bits411"
-bits = "4"
-integer = "1"
-symmetric = "1"
-max_value = "1"
-padding = "same"
+epochs = ModelConfig.epochs
+steps_per_epoch = ModelConfig.steps_per_epoch
 #model_original, dual_model_original = qmodel.MicrofauneAI.model()
-model, dual_model = qmodel.MicrofauneAI(bits, integer, symmetric, max_value, padding).modelQuantized()
-dual_model.load_weights(f"{model_dir}/model_weights-{model_subname}.h5")
+model, dual_model = qmodel.MicrofauneAI(ModelConfig).modelQuantized()
+dual_model.load_weights(f"{model_dir}/{model_name}.h5")
 
 audiofile = "bird_50124"
 audiofilepath = "audio_samples/"+audiofile+".wav"
@@ -165,3 +169,4 @@ elapsed = end - start
 
 
 print('Time elapsed: ' + str(timedelta(seconds=elapsed)))
+

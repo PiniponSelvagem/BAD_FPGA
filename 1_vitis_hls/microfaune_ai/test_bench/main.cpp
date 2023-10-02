@@ -105,7 +105,6 @@ int main() {
     printf("Visual Studio detected!\n");
     #endif
 
-
     loadWeights();
     output_t out_local[OUT_LINES_DEBUG][OUT_COLS_DEBUG] = { 0 };
     output_t out_global[OUT_SINGLE_DEBUG] = { 0 };

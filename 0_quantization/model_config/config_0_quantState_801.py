@@ -4,20 +4,21 @@ class ModelConfig:
     # MAKE SURE 'name' IS UNIQUE, OR DURING TRAINING #
     # IT WILL REPLACE AN OTHER MODEL WITH SAME NAME. #
     ##################################################
-    name = "model_quant_411"    # model file name
-    folder = "model_quantized"  # model saved location
+    name = "model_quant_801_quantState"    # model file name
+    folder = "model_quantized"               # model saved location
 
     use_custom_model = False            # if False use microfaune original model, if True use customModel
-    training_dataset_percentage = 1.0   # range [0.0, 1.0]
+    training_dataset_percentage = 0.05   # range [0.0, 1.0]
 
-    bits = 4
+    bits = 8
     integer = 1
+    integer_state = 0
     symmetric = 1
     padding = "same"
     enable_bn_folding = False    # merge Conv with BNorm
 
-    epochs = 50
-    steps_per_epoch = 100
+    epochs = 1
+    steps_per_epoch = 1
 
     config = {
         "QConv2D": {
@@ -33,7 +34,7 @@ class ModelConfig:
         },
         "QBidirectional": {
             "activation": f"quantized_tanh({bits})",
-            "state_quantizer": f"quantized_bits({bits},{integer},{symmetric})",
+            "state_quantizer": f"quantized_bits({bits},{integer_state},{symmetric})",
             "kernel_quantizer": f"quantized_bits({bits},{integer},{symmetric})",
             "recurrent_quantizer": f"quantized_bits({bits},{integer},{symmetric})",
             "bias_quantizer": f"quantized_bits({bits},{integer},{symmetric})",

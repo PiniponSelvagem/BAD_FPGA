@@ -8,7 +8,7 @@ class ModelConfig:
     folder = "model_quantized"          # model saved location
 
     use_custom_model = True             # if False use microfaune original model, if True use customModel
-    training_dataset_percentage = 0.02   # range [0.0, 1.0]
+    training_dataset_percentage = 1.0   # range [0.0, 1.0]
 
     bits = 4
     integer = 1
@@ -17,8 +17,8 @@ class ModelConfig:
     padding = "same"
     enable_bn_folding = True    # merge Conv with BNorm
 
-    epochs = 1
-    steps_per_epoch = 1
+    epochs = 40
+    steps_per_epoch = 100
 
     
     config = { }

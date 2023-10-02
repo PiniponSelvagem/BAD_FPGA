@@ -53,12 +53,14 @@ gru_t state[GRU_MAX_STATE][GRU_STATE_SIZE];     // 0 -> current, 1 -> next
  * @brief Converts a value to quantized 4 bits.
  * @param state: Value to be quantized.
  * @return Quantized state value
+ * 
+ * @note In HLS version, this should be improved.
 */
 static inline gru_t stateQuant(gru_t state) {
 #define OFFSET_STATE    0.125   //0.0625
 #define STEP_SIZE_STATE 0.25    //0.125
 #define MIN_STATE       -1
-#define MAX_STATE       0.75
+#define MAX_STATE       1
 
     state = state + OFFSET_STATE;
     if (state <= MIN_STATE)
@@ -68,7 +70,6 @@ static inline gru_t stateQuant(gru_t state) {
     int step = int((state + 1) / STEP_SIZE_STATE);
     return (step * STEP_SIZE_STATE) - 1.0;
 }
-
 
 void gru_clearState() {
     GRU_clearstate_loop_row: for (gru_state_row_t i = 0; i < GRU_MAX_STATE; ++i) {
@@ -141,7 +142,8 @@ void gru_cell(
 #ifdef LOAD_ORIGINAL
     state[1][idx] = out;
 #else
-    state[1][idx] = stateQuant(out);
+    //state[1][idx] = stateQuant(out);
+    state[1][idx] = out;
 #endif
     *output = out;
 }

@@ -3,7 +3,7 @@
 #ifndef MY_TYPES
 #define MY_TYPES
 
-//#define TRUNCATE_BITS
+//#define TRUNCATE_BITS     //TRUNCATE_BITS TRUNCATE_BITS TRUNCATE_BITS TRUNCATE_BITS TRUNCATE_BITS
 
 /* GLOBAL TYPES */
 #ifdef __VITIS_HLS__
@@ -23,14 +23,14 @@ typedef ap_int<10> i512_t;  // requires signal because backward layer has check:
 typedef int i64_t;
 typedef int i128_t;
 typedef int i512_t;
-#define TRUNC_MAX_VALUE(bits) ((1 << (bits)) - 1)
+#define TRUNC_MAX_VALUE(bits) ((1 << (bits)))
 #define TRUNC_X(x, bits) ((int)((x) * TRUNC_MAX_VALUE(bits)) / (float)TRUNC_MAX_VALUE(bits))
 #ifndef TRUNCATE_BITS
 #define TC(x) x
 #else
 // 10 bits, seems to be the absolute minimum
 // 12 bits, safe bet
-#define TC(x) TRUNC_X(x, 12)
+#define TC(x) TRUNC_X(x, 4)
 #endif // TRUNCATE_BITS
 #endif
 
