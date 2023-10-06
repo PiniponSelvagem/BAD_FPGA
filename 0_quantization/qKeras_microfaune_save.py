@@ -52,7 +52,6 @@ layerName_split_dim0 = [
 ]
 
 
-save_merged = False
 data_type = {}
 data_type["name"] = "float"
 """
@@ -63,6 +62,7 @@ data_type["bits_int"] = 1
 
 start = time.time()
 #########################################################
+isManualQmodel = False
 
 cutils.createFolderIfNotExists(folder)
 
@@ -80,13 +80,20 @@ open(folder+"/dump_config.json", "w").write(jConfig)
 
 
 def rearange_gru_weights(data):
-    rows, cols = data.shape
-    split = 3
-    jump = cols // split  # Jump value calculated as size of the last dimension divided by 'split'
-    #
-    new_cols = jump * split
-    new_array = data[:, :new_cols].reshape(rows, split, jump).swapaxes(1, 2)
-    #
+    if isManualQmodel and len(data.shape)==1:   # it is bias of QGru
+        cols = data.shape[0]
+        split = 3
+        jump = cols // split
+        #
+        new_cols = jump * split
+        new_array = data[:new_cols].reshape(split, -1, order='F')       # fill the new shape by column, elements in the same column of the original array will be adjacent in memory
+    else:
+        rows, cols = data.shape
+        split = 3
+        jump = cols // split  # Jump value calculated as size of the last dimension divided by 'split'
+        #
+        new_cols = jump * split
+        new_array = data[:, :new_cols].reshape(rows, split, jump).swapaxes(1, 2)
     return new_array
 
 def rearange_gru_scales(data):
@@ -164,7 +171,9 @@ def processLayer(layerName, weightName, weight, isScale=False):
         if name not in weightName:
             shouldSplit = False
             break
-    if isScale:
+    if isScale or isManualQmodel:
+        # scale is only one dim always
+        # QGRU bias does not require split because there is no reccurrent bias
         shouldSplit = False
     #
     if shouldSplit:
@@ -228,6 +237,7 @@ for l in dual_model.layers:
     i+=1
 """
 if "q_conv2d_batchnorm" in dual_model.layers[1].name:
+    isManualQmodel = True
     layers_idx = {
         'q_conv2d_batchnorm': 1,
         'q_activation': 2,
@@ -282,7 +292,6 @@ def getQuantizeScale(layerName, idx):
     return np.array(qscale).flatten()
 
 
-print("save_merged == "+str(save_merged))
 """
 processLayer("conv2d", "conv2d_kernel", model_quant["conv2d"]["weights"][0])
 processLayer("conv2d", "conv2d_kernel_scale", getQuantizeScale("conv2d", 0))
@@ -294,15 +303,11 @@ for layerName in model_quant:
     #for weight in layer:
     weight = layer["weights"]
     if "conv2d" in layerName:
-        if save_merged:
-            processLayer(layerName, layerName+"_kernel", weight[0])
-            processLayer(layerName, layerName+"_bias", layer["fused_bias"])
-        else:
-            processLayer(layerName, layerName+"_kernel", weight[0])
-            processLayer(layerName, layerName+"_bias", weight[1])
-            #
-            processLayer(layerName, layerName+"_kernel_scale", getQuantizeScale(layerName, 0), isScale=True)
-            processLayer(layerName, layerName+"_bias_scale", getQuantizeScale(layerName, 1), isScale=True)
+        processLayer(layerName, layerName+"_kernel", weight[0])
+        processLayer(layerName, layerName+"_bias", weight[1])
+        #
+        processLayer(layerName, layerName+"_kernel_scale", getQuantizeScale(layerName, 0), isScale=True)
+        processLayer(layerName, layerName+"_bias_scale", getQuantizeScale(layerName, 1), isScale=True)
     if "batch_normalization" in layerName:
         processLayer(layerName, layerName+"_gamma", weight[0])
         processLayer(layerName, layerName+"_beta", weight[1])
@@ -463,3 +468,5 @@ processLayer(layerName, layerName+"_gru_backward_bias_scale", getQuantizeScale(l
 processLayer(layerName, layerName+"_gru_backward_state_scale", getQuantizeScale(layerName, 7), isScale=True)
 
 """
+
+

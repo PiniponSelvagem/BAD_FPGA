@@ -40,10 +40,6 @@ typedef float input_t;
 typedef float conv_t;
 typedef float conv_acc_t;
 
-#define BNORM_EPSILON   0.001
-typedef float bnorm_t;
-typedef float bnorm_acc_t;
-
 typedef float mpool_t;
 typedef float reducemax_t;
 
@@ -70,10 +66,6 @@ typedef ap_fixed<W,I, AP_RND, AP_SAT> input_t;
 typedef ap_fixed<W,I, AP_RND, AP_SAT> conv_t;
 typedef ap_fixed<Wacc,Iacc, AP_RND, AP_SAT> conv_acc_t;
 
-#define BNORM_EPSILON   0.125
-typedef ap_fixed<W,I, AP_RND, AP_SAT> bnorm_t;
-typedef ap_fixed<Wacc,Iacc, AP_RND, AP_SAT> bnorm_acc_t;
-
 typedef ap_fixed<W,I, AP_RND, AP_SAT> mpool_t;
 typedef ap_fixed<W,I, AP_RND, AP_SAT> reducemax_t;
 
@@ -99,10 +91,6 @@ typedef ap_fixed<W,I, AP_RND, AP_SAT> input_t;
 typedef ap_fixed<W,I, AP_RND, AP_SAT> conv_t;
 typedef ap_fixed<Wacc,Iacc, AP_RND, AP_SAT> conv_acc_t;
 
-#define BNORM_EPSILON   0.01
-typedef ap_fixed<W,I, AP_RND, AP_SAT> bnorm_t;
-typedef ap_fixed<Wacc,Iacc, AP_RND, AP_SAT> bnorm_acc_t;
-
 typedef ap_fixed<W,I, AP_RND, AP_SAT> mpool_t;
 typedef ap_fixed<W,I, AP_RND, AP_SAT> reducemax_t;
 
@@ -126,10 +114,6 @@ typedef ap_fixed<W,I, AP_RND, AP_SAT> input_t;
 typedef ap_fixed<W,I, AP_RND, AP_SAT> input_t;
 typedef ap_fixed<W,I, AP_RND, AP_SAT> conv_t;
 typedef ap_fixed<Wacc,Iacc, AP_RND, AP_SAT> conv_acc_t;
-
-#define BNORM_EPSILON   0.001
-typedef ap_fixed<W,I, AP_RND, AP_SAT> bnorm_t;
-typedef ap_fixed<Wacc,Iacc, AP_RND, AP_SAT> bnorm_acc_t;
 
 typedef ap_fixed<W,I, AP_RND, AP_SAT> mpool_t;
 typedef ap_fixed<W,I, AP_RND, AP_SAT> reducemax_t;

@@ -30,4 +30,7 @@ conv_t kernel_2[FILTERS][CHANNELS][C2D_KERNEL_LINES][C2D_KERNEL_COLS];
 conv_t bias_2[C2D_BIAS_SIZE];
 
 
+conv_t kernel_2_scale[FILTERS];
+
+
 #endif // CONV2D_2_H

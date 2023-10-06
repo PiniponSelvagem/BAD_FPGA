@@ -1,4 +1,3 @@
-#define USE_BNORM
 
 #include <stdio.h>
 
@@ -8,7 +7,6 @@
 #include "output/output.h"
 
 #include "conv2d/conv2d.h"
-#include "bnorm/bnorm.h"
 #include "mpool2d/maxpool2d.h"
 #include "reducemax/reducemax.h"
 #include "gru/gru.h"
@@ -16,29 +14,23 @@
 
 /* 0 */
 #include "conv2d/data/conv2d_0.h"
-#include "bnorm/data/bnorm_0.h"
 
 /* 1 */
 #include "conv2d/data/conv2d_1.h"
-#include "bnorm/data/bnorm_1.h"
 #include "mpool2d/data/maxpool2d_0.h"
 
 /* 2 */
 #include "conv2d/data/conv2d_2.h"
-#include "bnorm/data/bnorm_2.h"
 
 /* 3 */
 #include "conv2d/data/conv2d_3.h"
-#include "bnorm/data/bnorm_3.h"
 #include "mpool2d/data/maxpool2d_1.h"
 
 /* 4 */
 #include "conv2d/data/conv2d_4.h"
-#include "bnorm/data/bnorm_4.h"
 
 /* 5 */
 #include "conv2d/data/conv2d_5.h"
-#include "bnorm/data/bnorm_5.h"
 #include "mpool2d/data/maxpool2d_2.h"
 
 /* 6 */
@@ -121,7 +113,7 @@ void predict(
     /*************************************/
     /* 0 */
     conv2d( // CONV2D_0
-        1/*FILTERS*/,
+        C2D_0_FILTERS,
         C2D_0__IN_COLS,
         (conv_t*)inputpad,
         (conv_t*)kernel_0,
@@ -129,17 +121,6 @@ void predict(
         (conv_t*)outarray_a
     );
     DEBUG_PRINT("CONV2D_0", outarray_a, 64, 433, 42);
-#ifdef USE_BNORM
-    bnorm( // BNORM_0 + ReLu
-        BNORM_0__IN_COLS,
-        (bnorm_t*)outarray_a,
-        (bnorm_t*)gamma_0,
-        (bnorm_t*)beta_0,
-        (bnorm_t*)movingmean_0,
-        (bnorm_t*)movingvariance_0
-    );
-    DEBUG_PRINT("BNORM_0", outarray_a, 64, 433, 42);
-#endif
 
     /* 1 */
     conv2d( // CONV2D_1
@@ -151,17 +132,6 @@ void predict(
         (conv_t*)outarray_b
     );
     DEBUG_PRINT("CONV2D_1", outarray_b, 64, 433, 42);
-#ifdef USE_BNORM
-    bnorm( // BNORM_1 + ReLu
-        BNORM_1__IN_COLS,
-        (bnorm_t*)outarray_b,
-        (bnorm_t*)gamma_1,
-        (bnorm_t*)beta_1,
-        (bnorm_t*)movingmean_1,
-        (bnorm_t*)movingvariance_1
-    );
-    DEBUG_PRINT("BNORM_1", outarray_b, 64, 433, 42);
-#endif
     maxpool2d( // MPOOL2D_0
         MP2D_0__IN_COLS,
         MP2D_0__OUT_COLS,
@@ -180,17 +150,6 @@ void predict(
         (conv_t*)outarray_a
     );
     DEBUG_PRINT("CONV2D_2", outarray_a, 64, 433, 22);
-#ifdef USE_BNORM
-    bnorm( // BNORM_2 + ReLu
-        BNORM_2__IN_COLS,
-        (bnorm_t*)outarray_a,
-        (bnorm_t*)gamma_2,
-        (bnorm_t*)beta_2,
-        (bnorm_t*)movingmean_2,
-        (bnorm_t*)movingvariance_2
-    );
-    DEBUG_PRINT("BNORM_2", outarray_a, 64, 433, 22);
-#endif
 
     /* 3 */
     conv2d( // CONV2D_3
@@ -202,17 +161,6 @@ void predict(
         (conv_t*)outarray_b
     );
     DEBUG_PRINT("CONV2D_3", outarray_b, 64, 433, 22);
-#ifdef USE_BNORM
-    bnorm( // BNORM_3 + ReLu
-        BNORM_3__IN_COLS,
-        (bnorm_t*)outarray_b,
-        (bnorm_t*)gamma_3,
-        (bnorm_t*)beta_3,
-        (bnorm_t*)movingmean_3,
-        (bnorm_t*)movingvariance_3
-    );
-    DEBUG_PRINT("BNORM_3", outarray_b, 64, 433, 22);
-#endif
     maxpool2d( // MPOOL2D_1
         MP2D_1__IN_COLS,
         MP2D_1__OUT_COLS,
@@ -231,17 +179,6 @@ void predict(
         (conv_t*)outarray_a
     );
     DEBUG_PRINT("CONV2D_4", outarray_a, 64, 433, 12);
-#ifdef USE_BNORM
-    bnorm( // BNORM_4 + ReLu
-        BNORM_4__IN_COLS,
-        (bnorm_t*)outarray_a,
-        (bnorm_t*)gamma_4,
-        (bnorm_t*)beta_4,
-        (bnorm_t*)movingmean_4,
-        (bnorm_t*)movingvariance_4
-    );
-    DEBUG_PRINT("BNORM_4", outarray_a, 64, 433, 12);
-#endif
 
     /* 5 */
     conv2d( // CONV2D_5
@@ -253,17 +190,6 @@ void predict(
         (conv_t*)outarray_b
     );
     DEBUG_PRINT("CONV2D_5", outarray_b, 64, 433, 12);
-#ifdef USE_BNORM
-    bnorm( // BNORM_5 + ReLu
-        BNORM_5__IN_COLS,
-        (bnorm_t*)outarray_b,
-        (bnorm_t*)gamma_5,
-        (bnorm_t*)beta_5,
-        (bnorm_t*)movingmean_5,
-        (bnorm_t*)movingvariance_5
-    );
-    DEBUG_PRINT("BNORM_5", outarray_b, 64, 433, 12);
-#endif
     maxpool2d( // MPOOL2D_2
         MP2D_2__IN_COLS,
         MP2D_2__OUT_COLS,

@@ -73,7 +73,7 @@ void predict(
 #define INPUT_NO_BIRD_3 7   // expected: 0.11154108
 
 // SELECT INPUT
-#define SELECTED_INPUT 1
+#define SELECTED_INPUT 0
 
 #if SELECTED_INPUT == INPUT_BIRD_0
     #include "data_bird_0.h"
@@ -94,6 +94,7 @@ void predict(
 #else
     #error "Invalid INPUT definition"
 #endif
+
 
 
 

@@ -39,6 +39,27 @@ typedef int conv_p_output;
 conv_t aux[CHANNELS][CNN_LINES_PAD][CNN_COLS_PAD];
 conv_t* prev = (conv_t*)aux;
 
+/**
+ * @brief Converts a value to quantized 4 bits.
+ * @param value: Value to be quantized.
+ * @return Quantized value
+ *
+ * @note In HLS version, this should be removed / replaced using HLS.
+*/
+static inline conv_t valueQuant(conv_t value) {
+#define OFFSET_QUANT    0.0625
+#define STEP_SIZE_QUANT 0.125
+#define MIN_QUANT       0
+#define MAX_QUANT       MAX_RELU_VALUE
+    value = value + OFFSET_QUANT;
+    if (value <= MIN_QUANT)
+        return MIN_QUANT;
+    else if (value >= MAX_QUANT)
+        return MAX_QUANT;
+    int step = int((value + 1) / STEP_SIZE_QUANT);
+    return (step * STEP_SIZE_QUANT) - 1.0;
+}
+
 void conv2d(
     const i64_t filters,
     const conv_col_t inoutCols,
@@ -117,34 +138,23 @@ void conv2d(
                             conv_p_input pinput_offset_col = pinput_offset_row + kocol;
                             conv_t k = *(kernel + pkernel_offset_col); //conv_t k = kernel[f][c][krow][kcol];
                             conv_t i = *(input + pinput_offset_col);   //conv_t i = input[c][korow][kocol];
-                        #ifdef __VITIS_HLS__
-                            float kF = k.to_float();
-                            float iF = i.to_float();
-                        #endif // __VITIS_HLS__
                             acc += TC(TC(k) * TC(i));
-						#ifdef __VITIS_HLS__
-                            float accF = acc.to_float();
-                        #endif // __VITIS_HLS__
-                            float a = 0;
                         }
                     }
-
-// TODO: Uncomment after removing BatchNormalization layer
-// TODO: Might require adjustments since max value might no longer be 255
-                    #ifndef USE_BNORM
-                    if (acc < 0)
-                        acc_sat = 0;    // ReLu
-                    #endif // !USE_BNORM
-                    /*
-                    if (acc > 255)
-                        acc_sat = 255;
-                    else if (acc < 0)
-                        acc_sat = 0;    // ReLu
-                    */
-                    
                     conv_t* poutput = (output + (poutput_offset_orow + ocol));
                     //conv_t* pprev = (conv_t*)prev + (pprev_offset_orow + ocol);
-                    acc_sat = TC(TC(acc) + TC(*poutput));
+                    //acc_sat = TC(TC(acc) + TC(*poutput));
+                    acc_sat = acc + (*poutput);
+                #ifdef _MSC_VER
+                    acc_sat = valueQuant(acc_sat);  // TODO: remove in HLS
+                #endif
+
+                    /* ReLu */
+                    if (acc_sat > MAX_RELU_VALUE)
+                        acc_sat = MAX_RELU_VALUE;
+                    else if (acc_sat < 0)
+                        acc_sat = 0;
+
                     /*
                     #ifndef USE_FLOAT
                     if (acc_sat > MAX_VALUE)

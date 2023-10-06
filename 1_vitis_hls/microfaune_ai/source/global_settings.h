@@ -3,7 +3,6 @@
 #ifndef GLOBAL_SETTINGS_H
 #define GLOBAL_SETTINGS_H
 
-//#define LOAD_ORIGINAL
 
 #include "types.h"
 
@@ -16,6 +15,10 @@
 #define CNN_COLS        40
 #define CNN_LINES_PAD   (CNN_LINES+PADDING)
 #define CNN_COLS_PAD    (CNN_COLS+PADDING)
+
+
+#define MAX_RELU_VALUE  1.875
+
 
 #define RNN_LINES_GRU   431
 #define RNN_COLS_GRU    128

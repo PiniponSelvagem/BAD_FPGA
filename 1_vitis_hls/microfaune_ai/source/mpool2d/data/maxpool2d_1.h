@@ -4,10 +4,10 @@
 #define MP2D_1_H
 
 #include "../../global_settings.h"
-#include "../../bnorm/data/bnorm_3.h"
+#include "../../conv2d/data/conv2d_3.h"
 
-#define MP2D_1__RAW_IN_LINES     BNORM_3__RAW_OUT_LINES
-#define MP2D_1__RAW_IN_COLS      BNORM_3__RAW_OUT_COLS
+#define MP2D_1__RAW_IN_LINES     C2D_3__RAW_OUT_LINES
+#define MP2D_1__RAW_IN_COLS      C2D_3__RAW_OUT_COLS
 #define MP2D_1__RAW_OUT_LINES    MP2D_1__RAW_IN_LINES
 #define MP2D_1__RAW_OUT_COLS     (MP2D_1__RAW_IN_COLS/2)
 

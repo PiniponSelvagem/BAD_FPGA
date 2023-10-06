@@ -6,7 +6,7 @@
 ############################################################
 open_project microfaune_ai
 set_top conv2d
-add_files microfaune_ai/source/bnorm/bnorm.h
+add_files bnorm.h
 add_files microfaune_ai/source/conv2d/conv2d.h
 add_files microfaune_ai/source/gru/gru.h
 add_files microfaune_ai/source/load_weights.h

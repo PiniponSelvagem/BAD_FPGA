@@ -139,12 +139,8 @@ void gru_cell(
     gru_acc_t hh = TC((gru_t)TANH(TC(TC(matrix_x[2]) + (TC(r * TC(matrix_inner[2]))))));    // matrix_x[2] + (r * matrix_inner[2])
     
     gru_acc_t out = TC(TC(z * state[0][idx]) + TC((1 - z) * hh));
-#ifdef LOAD_ORIGINAL
-    state[1][idx] = out;
-#else
     //state[1][idx] = stateQuant(out);
     state[1][idx] = out;
-#endif
     *output = out;
 }
 

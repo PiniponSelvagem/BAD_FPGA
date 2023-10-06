@@ -5,10 +5,10 @@
 
 #include "../../global_settings.h"
 #include "../conv2d_settings.h"
-#include "../../bnorm/data/bnorm_2.h"
+#include "conv2d_2.h"
 
-#define C2D_3__RAW_IN_LINES     BNORM_2__RAW_OUT_LINES
-#define C2D_3__RAW_IN_COLS      BNORM_2__RAW_OUT_COLS
+#define C2D_3__RAW_IN_LINES     C2D_2__RAW_OUT_LINES
+#define C2D_3__RAW_IN_COLS      C2D_2__RAW_OUT_COLS
 #define C2D_3__RAW_OUT_LINES    C2D_3__RAW_IN_LINES
 #define C2D_3__RAW_OUT_COLS     C2D_3__RAW_IN_COLS
 
@@ -28,6 +28,9 @@ conv_t kernel_3[FILTERS][CHANNELS][C2D_KERNEL_LINES][C2D_KERNEL_COLS];
  * @brief This was taken from "model_json/dump_weights_bias.json". (Channels first)
 */
 conv_t bias_3[C2D_BIAS_SIZE];
+
+
+conv_t kernel_3_scale[FILTERS];
 
 
 #endif // CONV2D_3_H

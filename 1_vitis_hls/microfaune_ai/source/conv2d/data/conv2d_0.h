@@ -18,6 +18,7 @@
 #define C2D_0__OUT_LINES        C2D_0__IN_LINES
 #define C2D_0__OUT_COLS         C2D_0__IN_COLS
 
+#define C2D_0_FILTERS           1
 
 /**
  * @brief This was taken from "model_json/dump_weights_bias.json". (Channels first)
@@ -28,6 +29,9 @@ conv_t kernel_0[CHANNELS][C2D_KERNEL_LINES][C2D_KERNEL_COLS];
  * @brief This was taken from "model_json/dump_weights_bias.json". (Channels first)
 */
 conv_t bias_0[C2D_BIAS_SIZE];
+
+
+conv_t kernel_0_scale[CHANNELS];
 
 
 #endif // CONV2D_0_H
