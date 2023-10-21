@@ -146,14 +146,16 @@ void conv2d(
                     //acc_sat = TC(TC(acc) + TC(*poutput));
                     acc_sat = acc + (*poutput);
                 #ifdef _MSC_VER
-                    acc_sat = valueQuant(acc_sat);  // TODO: remove in HLS
+                    if (filters == 1 || c == CHANNELS - 1)
+                        acc_sat = valueQuant(acc_sat);  // TODO: remove in HLS
                 #endif
 
                     /* ReLu */
-                    if (acc_sat > MAX_RELU_VALUE)
-                        acc_sat = MAX_RELU_VALUE;
-                    else if (acc_sat < 0)
-                        acc_sat = 0;
+                    if (filters == 1 || c == CHANNELS - 1)
+                        if (acc_sat > MAX_RELU_VALUE)
+                            acc_sat = MAX_RELU_VALUE;
+                        else if (acc_sat < 0)
+                            acc_sat = 0;
 
                     /*
                     #ifndef USE_FLOAT
