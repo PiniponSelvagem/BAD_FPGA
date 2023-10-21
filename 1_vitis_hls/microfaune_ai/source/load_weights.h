@@ -50,22 +50,30 @@
 #define CONV_5_BIAS         WEIGHTS_PATH"q_conv2d_batchnorm_5_bias.bin"
 
 // gru_0_forward
-#define GRU_0_FORWARD_KERNEL            WEIGHTS_PATH"q_bidirectional_gru_forward_kernel.bin"
-#define GRU_0_FORWARD_RECURRENT_KERNEL  WEIGHTS_PATH"q_bidirectional_gru_forward_recurrent_kernel.bin"
-#define GRU_0_FORWARD_BIAS              WEIGHTS_PATH"q_bidirectional_gru_forward_bias.bin"
+#define GRU_0_FORWARD_KERNEL                    WEIGHTS_PATH"q_bidirectional_gru_forward_kernel.bin"
+#define GRU_0_FORWARD_KERNEL_SCALE              WEIGHTS_PATH"q_bidirectional_gru_forward_kernel_scale.bin"
+#define GRU_0_FORWARD_RECURRENT_KERNEL          WEIGHTS_PATH"q_bidirectional_gru_forward_recurrent_kernel.bin"
+#define GRU_0_FORWARD_RECURRENT_KERNEL_SCALE    WEIGHTS_PATH"q_bidirectional_gru_forward_recurrent_kernel_scale.bin"
+#define GRU_0_FORWARD_BIAS                      WEIGHTS_PATH"q_bidirectional_gru_forward_bias.bin"
 // gru_0_backward
-#define GRU_0_BACKWARD_KERNEL            WEIGHTS_PATH"q_bidirectional_gru_backward_kernel.bin"
-#define GRU_0_BACKWARD_RECURRENT_KERNEL  WEIGHTS_PATH"q_bidirectional_gru_backward_recurrent_kernel.bin"
-#define GRU_0_BACKWARD_BIAS              WEIGHTS_PATH"q_bidirectional_gru_backward_bias.bin"
+#define GRU_0_BACKWARD_KERNEL                   WEIGHTS_PATH"q_bidirectional_gru_backward_kernel.bin"
+#define GRU_0_BACKWARD_KERNEL_SCALE             WEIGHTS_PATH"q_bidirectional_gru_backward_kernel_scale.bin"
+#define GRU_0_BACKWARD_RECURRENT_KERNEL         WEIGHTS_PATH"q_bidirectional_gru_backward_recurrent_kernel.bin"
+#define GRU_0_BACKWARD_RECURRENT_KERNEL_SCALE   WEIGHTS_PATH"q_bidirectional_gru_backward_recurrent_kernel_scale.bin"
+#define GRU_0_BACKWARD_BIAS                     WEIGHTS_PATH"q_bidirectional_gru_backward_bias.bin"
 
 // gru_1_forward
-#define GRU_1_FORWARD_KERNEL            WEIGHTS_PATH"q_bidirectional_1_gru_forward_kernel.bin"
-#define GRU_1_FORWARD_RECURRENT_KERNEL  WEIGHTS_PATH"q_bidirectional_1_gru_forward_recurrent_kernel.bin"
-#define GRU_1_FORWARD_BIAS              WEIGHTS_PATH"q_bidirectional_1_gru_forward_bias.bin"
+#define GRU_1_FORWARD_KERNEL                    WEIGHTS_PATH"q_bidirectional_1_gru_forward_kernel.bin"
+#define GRU_1_FORWARD_KERNEL_SCALE              WEIGHTS_PATH"q_bidirectional_1_gru_forward_kernel_scale.bin"
+#define GRU_1_FORWARD_RECURRENT_KERNEL          WEIGHTS_PATH"q_bidirectional_1_gru_forward_recurrent_kernel.bin"
+#define GRU_1_FORWARD_RECURRENT_KERNEL_SCALE    WEIGHTS_PATH"q_bidirectional_1_gru_forward_recurrent_kernel_scale.bin"
+#define GRU_1_FORWARD_BIAS                      WEIGHTS_PATH"q_bidirectional_1_gru_forward_bias.bin"
 // gru_1_backward
-#define GRU_1_BACKWARD_KERNEL            WEIGHTS_PATH"q_bidirectional_1_gru_backward_kernel.bin"
-#define GRU_1_BACKWARD_RECURRENT_KERNEL  WEIGHTS_PATH"q_bidirectional_1_gru_backward_recurrent_kernel.bin"
-#define GRU_1_BACKWARD_BIAS              WEIGHTS_PATH"q_bidirectional_1_gru_backward_bias.bin"
+#define GRU_1_BACKWARD_KERNEL                   WEIGHTS_PATH"q_bidirectional_1_gru_backward_kernel.bin"
+#define GRU_1_BACKWARD_KERNEL_SCALE             WEIGHTS_PATH"q_bidirectional_1_gru_backward_kernel_scale.bin"
+#define GRU_1_BACKWARD_RECURRENT_KERNEL         WEIGHTS_PATH"q_bidirectional_1_gru_backward_recurrent_kernel.bin"
+#define GRU_1_BACKWARD_RECURRENT_KERNEL_SCALE   WEIGHTS_PATH"q_bidirectional_1_gru_backward_recurrent_kernel_scale.bin"
+#define GRU_1_BACKWARD_BIAS                     WEIGHTS_PATH"q_bidirectional_1_gru_backward_bias.bin"
 
 // timedist_0
 #define TDIST_0_KERNEL WEIGHTS_PATH"time_distributed_kernel.bin"
@@ -200,24 +208,32 @@ void loadWeights() {
     load(CONV_5_KERNEL, kernel_5, 64*64*3*3, sizeof(conv_t));
     load(CONV_5_KERNEL_SCALE, kernel_5_scale, 64, sizeof(conv_t));
     load(CONV_5_BIAS, bias_5, 64, sizeof(conv_t));
-    
+
     // gru_0_forward
-    load(GRU_0_FORWARD_KERNEL, kernel_gru0_f, 64*3*64, sizeof(gru_t));
-    load(GRU_0_FORWARD_RECURRENT_KERNEL, recurrent_kernel_gru0_f, 64*3*64, sizeof(gru_t));
-    load(GRU_0_FORWARD_BIAS, bias_gru0_f, 3*64, sizeof(gru_t));
+    load(GRU_0_FORWARD_KERNEL, kernel_gru0_f, 64*64*3, sizeof(gru_t));
+    load(GRU_0_FORWARD_KERNEL_SCALE, kernel_gru0_f_scale, 64*3, sizeof(gru_t));
+    load(GRU_0_FORWARD_RECURRENT_KERNEL, recurrent_kernel_gru0_f, 64*64*3, sizeof(gru_t));
+    load(GRU_0_FORWARD_RECURRENT_KERNEL_SCALE, recurrent_kernel_gru0_f_scale, 64*3, sizeof(gru_t));
+    load(GRU_0_FORWARD_BIAS, bias_gru0_f, 64*3, sizeof(gru_t));
     // gru_0_backward
-    load(GRU_0_BACKWARD_KERNEL, kernel_gru0_b, 64*3*64, sizeof(gru_t));
-    load(GRU_0_BACKWARD_RECURRENT_KERNEL, recurrent_kernel_gru0_b, 64*3*64, sizeof(gru_t));
-    load(GRU_0_BACKWARD_BIAS, bias_gru0_b, 3*64, sizeof(gru_t));
+    load(GRU_0_BACKWARD_KERNEL, kernel_gru0_b, 64*64*3, sizeof(gru_t));
+    load(GRU_0_BACKWARD_KERNEL_SCALE, kernel_gru0_b_scale, 64*3, sizeof(gru_t));
+    load(GRU_0_BACKWARD_RECURRENT_KERNEL, recurrent_kernel_gru0_b, 64*64*3, sizeof(gru_t));
+    load(GRU_0_BACKWARD_RECURRENT_KERNEL_SCALE, recurrent_kernel_gru0_b_scale, 64*3, sizeof(gru_t));
+    load(GRU_0_BACKWARD_BIAS, bias_gru0_b, 64*3, sizeof(gru_t));
 
     // gru_1_forward
-    load(GRU_1_FORWARD_KERNEL, kernel_gru1_f, 64*3*128, sizeof(gru_t));
-    load(GRU_1_FORWARD_RECURRENT_KERNEL, recurrent_kernel_gru1_f, 64*3*64, sizeof(gru_t));
-    load(GRU_1_FORWARD_BIAS, bias_gru1_f, 3*64, sizeof(gru_t));
+    load(GRU_1_FORWARD_KERNEL, kernel_gru1_f, 64*128*3, sizeof(gru_t));
+    load(GRU_1_FORWARD_KERNEL_SCALE, kernel_gru1_f_scale, 64*3, sizeof(gru_t));
+    load(GRU_1_FORWARD_RECURRENT_KERNEL, recurrent_kernel_gru1_f, 64*64*3, sizeof(gru_t));
+    load(GRU_1_FORWARD_RECURRENT_KERNEL_SCALE, recurrent_kernel_gru1_f_scale, 64*3, sizeof(gru_t));
+    load(GRU_1_FORWARD_BIAS, bias_gru1_f, 64*3, sizeof(gru_t));
     // gru_1_backward
-    load(GRU_1_BACKWARD_KERNEL, kernel_gru1_b, 64*3*128, sizeof(gru_t));
-    load(GRU_1_BACKWARD_RECURRENT_KERNEL, recurrent_kernel_gru1_b, 64*3*64, sizeof(gru_t));
-    load(GRU_1_BACKWARD_BIAS, bias_gru1_b, 3*64, sizeof(gru_t));
+    load(GRU_1_BACKWARD_KERNEL, kernel_gru1_b, 64*128*3, sizeof(gru_t));
+    load(GRU_1_BACKWARD_KERNEL_SCALE, kernel_gru1_b_scale, 64*3, sizeof(gru_t));
+    load(GRU_1_BACKWARD_RECURRENT_KERNEL, recurrent_kernel_gru1_b, 64*64*3, sizeof(gru_t));
+    load(GRU_1_BACKWARD_RECURRENT_KERNEL_SCALE, recurrent_kernel_gru1_b_scale, 64*3, sizeof(gru_t));
+    load(GRU_1_BACKWARD_BIAS, bias_gru1_b, 64*3, sizeof(gru_t));
 
     // timedist_0
     load(TDIST_0_KERNEL, kernel_td0, 128*64, sizeof(timedist_t));

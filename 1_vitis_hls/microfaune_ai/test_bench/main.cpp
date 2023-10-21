@@ -96,16 +96,7 @@ void predict(
 #endif
 
 
-
-
-int main() {
-    #ifdef __VITIS_HLS__
-    printf("VITIS HLS detected!\n");
-    #endif
-    #ifdef _MSC_VER
-    printf("Visual Studio detected!\n");
-    #endif
-
+void runModel() {
     loadWeights();
     output_t out_local[OUT_LINES_DEBUG][OUT_COLS_DEBUG] = { 0 };
     output_t out_global[OUT_SINGLE_DEBUG] = { 0 };
@@ -132,6 +123,52 @@ int main() {
     special_print(out, difference, exp);
 
     printTimer(elapsed_time);
+}
+
+#include "../source/gru/gru_v2.h"
+int main() {
+    #ifdef __VITIS_HLS__
+    printf("VITIS HLS detected!\n");
+    #endif
+    #ifdef _MSC_VER
+    printf("Visual Studio detected!\n");
+    #endif
+
+    runModel();
+
+    /*
+    #define SPLIT_MULT 3    // THIS IS FIXED AT 3, because of split for Z,R,H.
+    #define INPUT_SIZE 2
+    float kernel[INPUT_SIZE][GRU_UNITS * SPLIT_MULT] = {
+        { -0.875, 0.25, 0.125 },
+        { -0.125, 0.25, 0.875 }
+    };
+    float recurrent_kernel[GRU_UNITS][GRU_UNITS * SPLIT_MULT] = {
+        { -0.125, -0.25,  0.75,    0.125,  0.25, -0.75 },
+        {  0.125,  0.25, -0.75,   -0.125, -0.25,  0.75 }
+    };
+    float bias[GRU_UNITS * SPLIT_MULT] = { -0.875, -0.125, -0.5,    0.875, 0.125, 0.5 };
+
+    float input[3] = { 0.125, -0.125, 0.5 };
+    float output[3] = { 0, 0, 0 };
+
+    gru_clearState_v2();
+    gru_cell_qkeras(
+        0,
+        input,
+        *kernel,
+        bias,
+        *recurrent_kernel,
+        output
+    );
+
+    printf("%f\n", output[0]);
+    */
+
+
+
+
+
 
     /*
     #define WIDTH 8 // Specify the total number of bits

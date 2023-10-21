@@ -78,3 +78,11 @@ __pycache__/
 /0_quantization/dump_io_quantized_config0noQuantState/
 /0_quantization/model_dump_quantized/
 /0_quantization/model_quantized_weights_config_0_noQuant/
+/0_quantization/debug_small_microfaune/model_debug_dump_io_quantized/
+/0_quantization/debug_small_microfaune/model_debug_dump_quantized/
+/0_quantization/debug_small_microfaune_bgru/model_debug_dump_io_quantized/
+/0_quantization/debug_small_microfaune_bgru/model_debug_dump_quantized/
+/0_quantization/debug_small_microfaune_bgru_dual/model_debug_dump_io_quantized/
+/0_quantization/debug_small_microfaune_bgru_dual/model_debug_dump_quantized/
+/0_quantization/debug_small_microfaune_bgru/model_debug/
+/0_quantization/debug_small_microfaune_bgru_dual/model_debug/

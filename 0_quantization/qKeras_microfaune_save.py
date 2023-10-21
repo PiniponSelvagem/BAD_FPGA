@@ -80,21 +80,15 @@ open(folder+"/dump_config.json", "w").write(jConfig)
 
 
 def rearange_gru_weights(data):
-    if isManualQmodel and len(data.shape)==1:   # it is bias of QGru
-        cols = data.shape[0]
-        split = 3
-        jump = cols // split
-        #
-        new_cols = jump * split
-        new_array = data[:new_cols].reshape(split, -1, order='F')       # fill the new shape by column, elements in the same column of the original array will be adjacent in memory
+    if len(data.shape) > 1:
+        last_dim_size = data.shape[-1] // 3
+        new_data = data.reshape(data.shape[0], 3, last_dim_size)#, order='F')
     else:
-        rows, cols = data.shape
-        split = 3
-        jump = cols // split  # Jump value calculated as size of the last dimension divided by 'split'
+        num_rows = len(data) // 3
         #
-        new_cols = jump * split
-        new_array = data[:, :new_cols].reshape(rows, split, jump).swapaxes(1, 2)
-    return new_array
+        new_data = data.reshape(num_rows, -1, order='F')
+    return new_data
+
 
 def rearange_gru_scales(data):
     if data.size > 1:
@@ -164,7 +158,7 @@ def processLayer(layerName, weightName, weight, isScale=False):
         else:
             data = rearange_gru_weights(data)
             if ("kernel" in weightName): # reorder kernel for better memory access / no jumping around when access
-                data = data.transpose((1, 2, 0))
+                data = data.transpose((2, 0, 1))
     #
     shouldSplit = True
     for name in layerName_split_dim0:
@@ -468,5 +462,20 @@ processLayer(layerName, layerName+"_gru_backward_bias_scale", getQuantizeScale(l
 processLayer(layerName, layerName+"_gru_backward_state_scale", getQuantizeScale(layerName, 7), isScale=True)
 
 """
+
+
+
+
+
+
+layer  = model_quant["q_bidirectional"]
+weight = layer["weights"]
+data = weight[0]
+
+
+last_dim_size = data.shape[-1] // 3
+new_data = data.reshape(data.shape[0], 3, last_dim_size, order='F')
+
+n = new_data.transpose((2, 1, 0))
 
 

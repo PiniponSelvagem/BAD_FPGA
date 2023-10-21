@@ -1,3 +1,7 @@
+#include "out_expect.h"
+
+
+
 
 #include <stdio.h>
 
@@ -205,6 +209,36 @@ void predict(
     );
     DEBUG_PRINT("RMAX_0", outarray_a, 1, 433, 64);
 
+
+#ifdef DEBUG_CNN
+    /* CHECK output expected for data_bird_0 */
+    float* pout_a = (float*)outarray_a;
+    float* pexp_a = (float*)outexp_before_rnn;
+    int errorCount = 0;
+    for (int i = 0; i<(431*64); ++i) {
+        if (*pout_a != *pexp_a) {
+            printf("out | diff | exp  : %7.4f | %7.4f | %7.4f\n", *pout_a, *pout_a - *pexp_a, *pexp_a);
+            ++errorCount;
+        }
+        ++pout_a;
+        ++pexp_a;
+    }
+    float errorPercent = ((float)errorCount / (431 * 64)) * 100;
+    printf("ERROR COUNT = %d of %d\n", errorCount, (431*64));
+    printf("ERROR PRCNT = %f %\n", errorPercent);
+
+    /* CLEAR outarray_b */
+    /* TEMPORARY ONLY FOR DEBUG, can be safely removed */
+    for (int a = 0; a < 64; ++a) {
+        for (int b = 0; b < 433; ++b) {
+            for (int c = 0; c < 42; ++c) {
+                outarray_b[a][b][c] = 88;
+            }
+        }
+    }
+#endif
+
+
     /*************************************/
     /**************** RNN ****************/
     /*************************************/
@@ -215,7 +249,7 @@ void predict(
         GRU_0__KERNEL_COLS,
         (gru_t*)outarray_a,
         (gru_t*)kernel_gru0_f,           (gru_t*)bias_gru0_f,
-        (gru_t*)recurrent_kernel_gru0_f, (gru_t*)recurrent_bias_gru0_f,
+        (gru_t*)recurrent_kernel_gru0_f,
         (gru_t*)outarray_b
     );
     gru( // GRU_0_B
@@ -224,9 +258,45 @@ void predict(
         GRU_0__KERNEL_COLS,
         (gru_t*)outarray_a,
         (gru_t*)kernel_gru0_b,           (gru_t*)bias_gru0_b,
-        (gru_t*)recurrent_kernel_gru0_b, (gru_t*)recurrent_bias_gru0_b,
+        (gru_t*)recurrent_kernel_gru0_b,
         (gru_t*)outarray_b
     );
+
+#ifdef DEBUG_GRU0
+    /* CHECK output expected for data_bird_0 */
+    float* pout_a = (float*)outarray_b;
+    float* pexp_a = (float*)outexp_after_gru0;
+    int errorCount_different = 0;
+    int errorCount_offbyAbove0125 = 0;
+    for (int i = 0; i < (431 * 128); ++i) {
+        if (*pout_a != *pexp_a) {
+            printf("out | diff | exp  : %7.4f | %7.4f | %7.4f\n", *pout_a, *pout_a - *pexp_a, *pexp_a);
+            ++errorCount_different;
+            if (*pout_a - *pexp_a > 0.125 || *pout_a - *pexp_a < -0.125)
+                ++errorCount_offbyAbove0125;
+        }
+        ++pout_a;
+        ++pexp_a;
+    }
+    float errorPercent_different = ((float)errorCount_different / (431 * 128)) * 100;
+    printf("ERROR COUNT (different) = %d of %d\n", errorCount_different, (431 * 128));
+    printf("ERROR PRCNT (different) = %f %\n", errorPercent_different);
+
+    float errorPercent_offbyAbove0125 = ((float)errorCount_offbyAbove0125 / (431 * 128)) * 100;
+    printf("ERROR COUNT (offbyAbove0125) = %d of %d\n", errorCount_offbyAbove0125, (431 * 128));
+    printf("ERROR PRCNT (offbyAbove0125) = %f %\n", errorPercent_offbyAbove0125);
+
+    /* CLEAR outarray_b */
+    /* TEMPORARY ONLY FOR DEBUG, can be safely removed */
+    for (int a = 0; a < 64; ++a) {
+        for (int b = 0; b < 433; ++b) {
+            for (int c = 0; c < 42; ++c) {
+                outarray_a[a][b][c] = 88;
+            }
+        }
+    }
+#endif
+
 
     /*
     ///////////////////////////////////////////////////////////////////////////////////
@@ -259,7 +329,7 @@ void predict(
         GRU_1__KERNEL_COLS,
         (gru_t*)outarray_b,
         (gru_t*)kernel_gru1_f,           (gru_t*)bias_gru1_f,
-        (gru_t*)recurrent_kernel_gru1_f, (gru_t*)recurrent_bias_gru1_f,
+        (gru_t*)recurrent_kernel_gru1_f,
         (gru_t*)outarray_a
     );
     gru( // GRU_1_B
@@ -268,7 +338,7 @@ void predict(
         GRU_1__KERNEL_COLS,
         (gru_t*)outarray_b,
         (gru_t*)kernel_gru1_b,           (gru_t*)bias_gru1_b,
-        (gru_t*)recurrent_kernel_gru1_b, (gru_t*)recurrent_bias_gru1_b,
+        (gru_t*)recurrent_kernel_gru1_b,
         (gru_t*)outarray_a
     );
 
