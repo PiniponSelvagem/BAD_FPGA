@@ -68,7 +68,7 @@ input_t inputpad[CHANNELS][C2D_0__IN_LINES][C2D_0__IN_COLS] = { 0 };
 // outputLS
 // outputGS
 
-//#define DEBUG_PRINT_OUTPUT
+#define DEBUG_PRINT_OUTPUT
 #define D_C 0
 #ifdef DEBUG_PRINT_OUTPUT
 #ifdef __VITIS_HLS__
@@ -99,6 +99,16 @@ input_t inputpad[CHANNELS][C2D_0__IN_LINES][C2D_0__IN_COLS] = { 0 };
 #else
 #define DEBUG_PRINT(label, outarray, dim1, dim2, dim3) ;
 #endif
+
+
+
+
+
+
+#define DEBUG_GRU0_TO_FILE
+//#define DEBUG_CLEAR_OUTPUT_BEFORE_GRU0
+
+
 
 
 void predict(
@@ -226,7 +236,9 @@ void predict(
     float errorPercent = ((float)errorCount / (431 * 64)) * 100;
     printf("ERROR COUNT = %d of %d\n", errorCount, (431*64));
     printf("ERROR PRCNT = %f %\n", errorPercent);
+#endif
 
+#ifdef DEBUG_CLEAR_OUTPUT_BEFORE_GRU0
     /* CLEAR outarray_b */
     /* TEMPORARY ONLY FOR DEBUG, can be safely removed */
     for (int a = 0; a < 64; ++a) {
@@ -261,6 +273,16 @@ void predict(
         (gru_t*)recurrent_kernel_gru0_b,
         (gru_t*)outarray_b
     );
+
+#ifdef DEBUG_GRU0_PRINT_UNIT
+    int offset = 0;
+    float* pout_a = (float*)outarray_b;
+    pout_a += offset;
+    for (int i = 0; i < 431; ++i) {
+        printf("%3d : %f\n", i, *pout_a);
+        pout_a = pout_a + 128;
+    }
+#endif
 
 #ifdef DEBUG_GRU0
     /* CHECK output expected for data_bird_0 */
@@ -298,7 +320,7 @@ void predict(
 #endif
 
 
-    /*
+#ifdef DEBUG_GRU0_TO_FILE
     ///////////////////////////////////////////////////////////////////////////////////
     // Open the log file in write mode
     FILE* logFile = fopen("OUTPUT_C.log", "w");
@@ -308,19 +330,16 @@ void predict(
     }
 
     gru_t* ptr = (gru_t*)outarray_b;
-
-    // Loop through the array using pointer arithmetic and print each value to the log file
-    for (int i = 0; i < 128; i++) {
-        for (int j = 0; j < 431; j++) {
-            fprintf(logFile, "%f ", *(ptr + i * 431 + j));
-        }
-        fprintf(logFile, "\n"); // Newline after each row
+    for (int i = 0, idx = 0; i < 431*128; ++i) {
+        if (i % 128 == 0)
+            fprintf(logFile, "\nLINE % d\n", idx++);
+        fprintf(logFile, "%f ", *ptr++);
     }
 
     // Close the log file
     fclose(logFile);
     /////////////////////////////////////////////////////////////////////////////////
-    */
+#endif
 
     /* 8 */
     gru( // GRU_1_F

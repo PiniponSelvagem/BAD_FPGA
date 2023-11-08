@@ -80,8 +80,10 @@ void gru_clearState() {
 }
 
 void gru_syncState() {
+    ///printf("STATE:");
     GRU_syncstate_loop: for (gru_state_col_t i = 0; i < GRU_STATE_SIZE; ++i) {
         state[0][i] = state[1][i];
+        //printf("%f\n", state[0][i]);
     }
 }
 
@@ -96,7 +98,7 @@ float gru_activation_recurrent(float value) {
 #define OFFSET_AR    0.0625
 #define STEP_SIZE_AR 0.125
 #define MIN_AR       0.0
-#define MAX_AR       1.875
+#define MAX_AR       0.9375
     value = value + OFFSET_AR;
     if (value <= MIN_AR)
         return MIN_AR;
@@ -212,14 +214,8 @@ void gru_cell(
 
     h = z * state[0][idx] + (1 - z) * hh;
 
-    // this was necessary because the values got too high and too low leading to -inf and +inf, and 'h' in qkeras has its range limited
-    if (h > 0.875)
-        h = 0.875;
-    else if (h < -1)
-        h = -1;
-
-    state[1][idx] = h;    // at the time 2023-10-21, state is not quantized
-    h = gru_valueQuant(h);
+    state[1][idx] = h;
+    //h = gru_valueQuant(h);
     *output = h;
 }
 
@@ -252,7 +248,6 @@ void gru(
             gru_t* output_cell = output + (row * RNN_COLS_GRU) + (idx + offset);
             gru_cell(idx, kernelCols, input_row, kernel, bias, recKernel, output_cell);
         }
-
         // exit contidions and inc/dec iteration
         if (isForward) {
             ++row;
