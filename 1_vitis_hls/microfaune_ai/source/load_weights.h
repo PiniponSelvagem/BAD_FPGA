@@ -3,21 +3,7 @@
 
 //#define SYNTHESIS
 #ifndef SYNTHESIS
-#define W_PATH          "E:\\Rodrigo\\ISEL\\2_Mestrado\\2-ANO_1-sem\\TFM\\BAD_FPGA\\1_vitis_hls\\microfaune_ai\\test_bench\\bin_weights\\"
-#ifdef USE_FLOAT
-#define WEIGHTS_PATH    W_PATH"float\\"
-#else
-#ifdef USE_8_1
-#define WEIGHTS_PATH    W_PATH"apf_8_1\\"
-#else
-#ifdef USE_16_8
-#define WEIGHTS_PATH    W_PATH"apf_16_8\\"
-#else
-#define WEIGHTS_PATH    W_PATH"apf_32_8\\"
-#endif
-#endif
-#endif
-
+#define WEIGHTS_PATH          "E:\\Rodrigo\\ISEL\\2_Mestrado\\2-ANO_1-sem\\TFM\\BAD_FPGA\\1_vitis_hls\\microfaune_ai\\test_bench\\bin_weights\\"
 
 // conv2d_0
 #define CONV_0_KERNEL       WEIGHTS_PATH"q_conv2d_batchnorm_kernel.bin"
@@ -84,15 +70,36 @@
 #define TDIST_1_BIAS   WEIGHTS_PATH"time_distributed_1_bias.bin"
 
 
+#define DEBUG_PRINT_LOAD
+
+
+#ifdef DEBUG_PRINT_LOAD
+#define PRINT_ARRAY(label, outarray, dim1, dim2, dim3) \
+    do { \
+        conv_t(*out)[dim2][dim3] = (conv_t(*)[dim2][dim3])outarray; \
+        printf("%s:\n", label); \
+        for (int a = 0; a < dim1; ++a) { \
+            for (int b = 0; b < dim2; ++b) { \
+            	printf("  [%d][%d] > ", a, b); \
+                for (int c = 0; c < dim3; ++c) { \
+                    printf("%12.8f ", out[a][b][c].to_float()); \
+                } \
+                printf("\n"); \
+            } \
+			printf("  ---------\n"); \
+        } \
+		printf("\n"); \
+    } while (0)
+#else
+#define DEBUG_PRINT(label, outarray, dim1, dim2, dim3) ;
+#endif
+
+
 void load(const char* path, void* array, int arraysize, int typesize) {
     FILE* file = fopen(path, "rb");
 
     int idx = 0;
     if (file != NULL) {
-        #ifdef USE_FLOAT
-        fread(array, typesize, arraysize, file);
-        fclose(file);
-        #else
         // Calculate the number of bytes to read
         size_t numBytes = (W + 7) / 8 * arraysize;
 
@@ -121,7 +128,6 @@ void load(const char* path, void* array, int arraysize, int typesize) {
         }
 
         delete[] buffer;
-        #endif
         
         printf("Loaded: %s\n", path);
     }
@@ -131,64 +137,25 @@ void load(const char* path, void* array, int arraysize, int typesize) {
 }
 
 void loadWeights() {
-    /*
-    load(CONV_0_BIAS, bias_0, 9, sizeof(conv_t));
-
-    for (int i = 0; i < 9; ++i) {
-        conv_t b = bias_0[i];
-        printf(" %15.12f\n", b.to_float());
-    }
-
-    printf("##########\n");
-    ap_fixed<32,8, AP_RND, AP_SAT> v = 0.625;
-    for (int i = 0; i < 32; ++i) {
-        bool bit = v[i];
-        printf("%d", bit);
-    }
-    printf(" - %15.12f\n", v.to_float());
-    for (int i = 31; i >= 0; i--) {
-        bool bit = v[i];
-        printf("%d", bit);
-    }
-    printf(" - %15.12f\n", v.to_float());
-
-    printf("$$$$$$$$$$\n");
-    #define Aw 32
-    #define Ai 8
-    ap_fixed<Aw,Ai, AP_RND, AP_SAT> a = -0.005151249002665281;
-    //a[0] = 0;
-    //a[1] = 1;
-    //a[31-8] = 1;
-    //a[31-9] = 1;
-    //a[31-10] = 1;
-    for (int i = Aw-1; i >= 0; i--) {
-        bool bit = a[i];
-        printf("%d", bit);
-    }
-    printf(" - %15.24f\n", a.to_float());
-    */
-    
-    /*
-    for (int i = 0; i < 64; i++) {
-        printf("%2d:", i);
-        for (int j = 0; j < 3; j++) {
-            for (int k = 0; k < 3; k++) {
-            	printf(" %11.8f", kernel_0[i][j][k].to_float());
-            }
-        }
-        printf("\n");
-    }
-    */
     // conv2d_0
-	load(CONV_0_KERNEL, kernel_0, 64*3*3, sizeof(conv_t));
-    load(CONV_0_KERNEL_SCALE, kernel_0_scale, 64, sizeof(conv_t));
-    load(CONV_0_BIAS, bias_0, 64, sizeof(conv_t));
+	load(CONV_0_KERNEL, kernel_0, CHANNELS*3*3, sizeof(conv_t));
+    load(CONV_0_KERNEL_SCALE, kernel_0_scale, CHANNELS, sizeof(conv_t));
+    load(CONV_0_BIAS, bias_0, CHANNELS, sizeof(conv_t));
 
     // conv2d_1
-    load(CONV_1_KERNEL, kernel_1, 64*64*3*3, sizeof(conv_t));
-    load(CONV_1_KERNEL_SCALE, kernel_1_scale, 64, sizeof(conv_t));
-    load(CONV_1_BIAS, bias_1, 64, sizeof(conv_t));
-    
+    load(CONV_1_KERNEL, kernel_1, FILTERS*CHANNELS*3*3, sizeof(conv_t));
+    load(CONV_1_KERNEL_SCALE, kernel_1_scale, CHANNELS, sizeof(conv_t));
+    load(CONV_1_BIAS, bias_1, CHANNELS, sizeof(conv_t));
+
+    PRINT_ARRAY("kernel_0", kernel_0, CHANNELS, 3, 3);
+    PRINT_ARRAY("kernel_0_scale", kernel_0_scale, CHANNELS, 1, 1);
+    PRINT_ARRAY("bias_0", bias_0, CHANNELS, 1, 1);
+
+    PRINT_ARRAY("kernel_1", kernel_1, CHANNELS, 3, 3);
+    PRINT_ARRAY("kernel_1_scale", kernel_1_scale, CHANNELS, 1, 1);  // ONLY SHOWING 1st FILTER
+    PRINT_ARRAY("bias_1", bias_1, CHANNELS, 1, 1);
+
+    /*
     // conv2d_2
     load(CONV_2_KERNEL, kernel_2, 64*64*3*3, sizeof(conv_t));
     load(CONV_2_KERNEL_SCALE, kernel_2_scale, 64, sizeof(conv_t));
@@ -242,6 +209,7 @@ void loadWeights() {
     // timedist_1
     load(TDIST_1_KERNEL, kernel_td1, 64*1, sizeof(timedist_t));
     load(TDIST_1_BIAS, bias_td1, 1, sizeof(timedist_t));
+    */
 }
 #else
 void loadWeights() {}

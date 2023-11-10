@@ -6,8 +6,6 @@
 #include "conv2d_settings.h"
 #include "data/conv2d_0.h"
 
-#ifdef __VITIS_HLS__
-#include <ap_int.h>
 typedef ap_uint<9> conv_row_t;
 typedef ap_uint<6> conv_col_t;
 typedef ap_uint<2> conv_k_t;
@@ -19,46 +17,12 @@ typedef ap_uint<21> conv_p_input;
 typedef ap_uint<16> conv_p_kernel;
 typedef ap_uint<7>  conv_p_bias;
 typedef ap_uint<21> conv_p_output;
-#endif
-#ifdef _MSC_VER
-typedef int conv_row_t;
-typedef int conv_col_t;
-typedef int conv_k_t;
-
-typedef int conv_c_l_c;
-
-typedef int conv_p_aux;
-typedef int conv_p_input;
-typedef int conv_p_kernel;
-typedef int conv_p_bias;
-typedef int conv_p_output;
-#endif
 
 
 // aux array in filter calculations, must have the size of the max input ever provided
 conv_t aux[CHANNELS][CNN_LINES_PAD][CNN_COLS_PAD];
 conv_t* prev = (conv_t*)aux;
 
-/**
- * @brief Converts a value to quantized 4 bits.
- * @param value: Value to be quantized.
- * @return Quantized value
- *
- * @note In HLS version, this should be removed / replaced using HLS.
-*/
-static inline conv_t valueQuant(conv_t value) {
-#define OFFSET_QUANT    0.0625
-#define STEP_SIZE_QUANT 0.125
-#define MIN_QUANT       0
-#define MAX_QUANT       MAX_RELU_VALUE
-    value = value + OFFSET_QUANT;
-    if (value <= MIN_QUANT)
-        return MIN_QUANT;
-    else if (value >= MAX_QUANT)
-        return MAX_QUANT;
-    int step = int((value + 1) / STEP_SIZE_QUANT);
-    return (step * STEP_SIZE_QUANT) - 1.0;
-}
 
 void conv2d(
     const i64_t filters,
@@ -145,10 +109,6 @@ void conv2d(
                     //conv_t* pprev = (conv_t*)prev + (pprev_offset_orow + ocol);
                     //acc_sat = TC(TC(acc) + TC(*poutput));
                     acc_sat = acc + (*poutput);
-                #ifdef _MSC_VER
-                    if (filters == 1 || c == CHANNELS - 1)
-                        acc_sat = valueQuant(acc_sat);  // TODO: remove in HLS
-                #endif
 
                     /* ReLu */
                     if (filters == 1 || c == CHANNELS - 1)
@@ -163,9 +123,9 @@ void conv2d(
                         acc_sat = MAX_VALUE;
                     #endif
                     */
-					#ifdef __VITIS_HLS__
-						float acc_satF = acc_sat.to_float();
-					#endif // __VITIS_HLS__
+					
+					//float acc_satF = acc_sat.to_float();
+					
                     *poutput = acc_sat;
                     //if ((c == 0 && filters == 1) || (filters > 1))
                     //    *pprev = acc_sat;   // TODO: Memory dependency because of read for acc_sat, making pipeline not lower than ii=7

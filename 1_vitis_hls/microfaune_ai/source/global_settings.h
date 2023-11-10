@@ -6,7 +6,7 @@
 
 #include "types.h"
 
-#define CHANNELS        64
+#define CHANNELS        2   //64
 #define FILTERS         64
 
 #define PADDING         2
