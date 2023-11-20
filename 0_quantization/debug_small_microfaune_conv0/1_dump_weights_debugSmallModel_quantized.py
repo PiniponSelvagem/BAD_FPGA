@@ -2,6 +2,7 @@ import time
 from datetime import timedelta
 
 import tensorflow as tf
+import keras.backend as K
 
 gpus = tf.config.experimental.list_physical_devices('GPU')
 for gpu in gpus:
@@ -9,9 +10,16 @@ for gpu in gpus:
 
 import numpy as np
 import json
-import qkeras.utils as qutils
-import qkeras_microfaune_model as qmodel
+
 import cutils
+import qkeras.utils as qutils
+#import qkeras_microfaune_model as qmodel
+
+from smallMicrofauneModel import SmallModelMicrofauneAI
+
+models_folder = "model_debug"   #ModelConfig.folder
+model_name = "smallModel"       #ModelConfig.name
+model = SmallModelMicrofauneAI().modelQuantized()
 
 # Extend the JSONEncoder class
 class NumpyEncoder(json.JSONEncoder):
@@ -24,20 +32,10 @@ class NumpyEncoder(json.JSONEncoder):
             return float(obj)
         return json.JSONEncoder.default(self, obj)
 
-#from model_config.config_test import ModelConfig            # model_test
-#from model_config.config_0 import ModelConfig               # model_quant_411
-#from model_config.config_0_noQuantState import ModelConfig  # model_quant_411_noQuantState
-from model_config.config_0_qconvbnorm import ModelConfig    # model_quant_411_qconvbnorm
-#from model_config.config_1 import ModelConfig               # model_quant__conv-po2-81_gru-po2-81_bnorm-811
+model.load_weights(f"{models_folder}/{model_name}.h5")
 
-model_folder = ModelConfig.folder
-model_name = ModelConfig.name
-#model_original, dual_model_original = qmodel.MicrofauneAI.model()
-model, dual_model = qmodel.MicrofauneAI(ModelConfig).modelQuantized()
-dual_model.load_weights(f"{model_folder}/{model_name}__quantweights.h5")
+folder = "model_debug_dump_quantized"
 
-
-folder = "model_quantized_weights"
 
 layerName_toChannelFirst = [
     #"q_conv2d_batchnorm"
@@ -54,12 +52,12 @@ layerName_split_dim0 = [
 
 
 data_type = {}
+"""
 data_type["name"] = "float"
 """
 data_type["name"] = "ap_fixed"
-data_type["bits_total"] = 8
+data_type["bits_total"] = 4
 data_type["bits_int"] = 1
-"""
 
 start = time.time()
 #########################################################
@@ -69,27 +67,26 @@ cutils.createFolderIfNotExists(folder)
 
 # DUMP get_config
 layersConfig = []
-for layer in dual_model.layers:
+for layer in model.layers:
     layersConfig.append(layer.get_config())
 
 jLayersConfig = json.dumps(layersConfig, indent=4, cls=NumpyEncoder)
 open(folder+"/dump_layers.json", "w").write(jLayersConfig)
 
 
-jConfig = json.dumps(dual_model.get_config(), indent=4, cls=NumpyEncoder)
+jConfig = json.dumps(model.get_config(), indent=4, cls=NumpyEncoder)
 open(folder+"/dump_config.json", "w").write(jConfig)
 
 
 def rearange_gru_weights(data):
     if len(data.shape) > 1:
         last_dim_size = data.shape[-1] // 3
-        new_data = data.reshape(data.shape[0], 3, last_dim_size)#, order='F')
+        new_data = data.reshape(data.shape[0], 3, last_dim_size, order='F')
     else:
         num_rows = len(data) // 3
         #
         new_data = data.reshape(num_rows, -1, order='F')
     return new_data
-
 
 def rearange_gru_scales(data):
     if data.size > 1:
@@ -159,7 +156,7 @@ def processLayer(layerName, weightName, weight, isScale=False):
         else:
             data = rearange_gru_weights(data)
             if ("kernel" in weightName): # reorder kernel for better memory access / no jumping around when access
-                data = data.transpose((2, 0, 1))
+                data = data.transpose((2, 1, 0))
     #
     shouldSplit = True
     for name in layerName_split_dim0:
@@ -184,11 +181,11 @@ def processLayer(layerName, weightName, weight, isScale=False):
 
 
 
-model_quant = qutils.model_save_quantized_weights(dual_model)
+model_quant = qutils.model_save_quantized_weights(model)
 
 """
 import keras.backend as K
-for layer in dual_model.layers:
+for layer in model.layers:
     try:
         if layer.get_quantizers():
             q_w_pairs = zip(layer.get_quantizers(), layer.get_weights())
@@ -210,7 +207,7 @@ for layer in dual_model.layers:
 
 # save weights "scale"
 import keras.backend as K
-for layer in dual_model.layers:
+for layer in model.layers:
     try:
         if layer.get_quantizers():
             q_w_pairs = zip(layer.get_quantizers(), layer.get_weights())
@@ -227,12 +224,22 @@ for layer in dual_model.layers:
 
 """
 i = 0
-for l in dual_model.layers:
+for l in model.layers:
     print("'"+str(l.name)+"': "+str(i)+",")
     i+=1
 """
-if "q_conv2d_batchnorm" in dual_model.layers[1].name:
+if "q_conv2d_batchnorm" in model.layers[1].name:
     isManualQmodel = True
+    layers_idx = {
+        'q_conv2d_batchnorm': 1,
+        'q_activation': 2,
+        'q_conv2d_batchnorm_1': 3,
+        'q_activation_1': 4,
+        'max_pooling2d': 5,
+        'q_bidirectional': 7,
+        'q_bidirectional_1': 8
+    }
+    """ # MicrofuneQuantized
     layers_idx = {
         'q_conv2d_batchnorm': 1,
         'q_activation': 2,
@@ -252,6 +259,7 @@ if "q_conv2d_batchnorm" in dual_model.layers[1].name:
         'q_bidirectional': 17,
         'q_bidirectional_1': 18
     }
+    """
 else:
     layers_idx = {
         'conv2d': 1,
@@ -272,7 +280,7 @@ else:
 
 
 def getQuantizeScale(layerName, idx):
-    layer = dual_model.layers[layers_idx.get(layerName)]
+    layer = model.layers[layers_idx.get(layerName)]
     if layer.get_quantizers():
         quant = layer.get_quantizers()[idx]
         if quant is not None:
@@ -347,7 +355,7 @@ q = qs[7]   -> state_quantizer
 """
 
 # save non quantized layers: time_distributed and time_distributed_1
-for layer in dual_model.layers:
+for layer in model.layers:
     layerName = layer.name
     weight = layer.weights
     if "time_distributed" in layerName:
@@ -363,120 +371,4 @@ elapsed = end - start
 
 
 print('Time elapsed: ' + str(timedelta(seconds=elapsed)))
-
-
-
-
-
-
-
-
-
-
-############################################################################
-# NOTE: placing in line 82 'print(data.shape)'
-# for microfaune bidirectional gives:
-# bidirectional
-# (64, 192)
-# (64, 192)
-# (2, 192)
-# (64, 192)
-# (64, 192)
-# (2, 192)
-#
-# for qconv2dbatchnorm variant gives:
-# q_bidirectional
-# (64, 192)
-# (64, 192)
-# (192,)
-# Traceback (most recent call last):
-#   File "/mnt/e/Rodrigo/ISEL/2_Mestrado/2-ANO_1-sem/TFM/BAD_FPGA/0_quantization/qKeras_microfaune_save.py", line 319, in <module>
-#     processLayer(layerName, layerName+"_gru_forward_bias", weight[2])
-#   File "/mnt/e/Rodrigo/ISEL/2_Mestrado/2-ANO_1-sem/TFM/BAD_FPGA/0_quantization/qKeras_microfaune_save.py", line 158, in processLayer
-#     data = rearange_gru_weights(data)
-#   File "/mnt/e/Rodrigo/ISEL/2_Mestrado/2-ANO_1-sem/TFM/BAD_FPGA/0_quantization/qKeras_microfaune_save.py", line 83, in rearange_gru_weights
-#     rows, cols = data.shape
-# ValueError: not enough values to unpack (expected 2, got 1)
-#
-# 
-# This was with a super fast training
-# 
-############################################################################
-"""
-
-
-
-
-layer = model_quant["q_bidirectional"]
-
-processLayer(layerName, layerName+"_gru_forward_kernel", weight[0])
-processLayer(layerName, layerName+"_gru_forward_recurrent_kernel", weight[1])
-
-
-
-
-
-def rearange_gru_weights(data):
-    print("DATA:"+str(data))
-    rows, cols = data.shape
-    split = 3
-    jump = cols // split  # Jump value calculated as size of the last dimension divided by 'split'
-    #
-    new_cols = jump * split
-    new_array = data[:, :new_cols].reshape(rows, split, jump).swapaxes(1, 2)
-    #
-    return new_array
-
-
-w = weight[2]
-
-shape = w.shape
-sdim = len(shape)
-data = np.array(w)
-
-
-processLayer(layerName, layerName+"_gru_forward_bias", weight[2])
-
-
-
-
-
-
-
-processLayer(layerName, layerName+"_gru_backward_kernel", weight[3])
-processLayer(layerName, layerName+"_gru_backward_recurrent_kernel", weight[4])
-processLayer(layerName, layerName+"_gru_backward_bias", weight[5])
-
-
-
-
-
-
-
-processLayer(layerName, layerName+"_gru_forward_kernel_scale", getQuantizeScale(layerName, 0), isScale=True)
-processLayer(layerName, layerName+"_gru_forward_recurrent_kernel_scale", getQuantizeScale(layerName, 1), isScale=True)
-processLayer(layerName, layerName+"_gru_forward_bias_scale", getQuantizeScale(layerName, 2), isScale=True)
-processLayer(layerName, layerName+"_gru_forward_state_scale", getQuantizeScale(layerName, 3), isScale=True)
-processLayer(layerName, layerName+"_gru_backward_kernel_scale", getQuantizeScale(layerName, 4), isScale=True)
-processLayer(layerName, layerName+"_gru_backward_recurrent_kernel_scale", getQuantizeScale(layerName, 5), isScale=True)
-processLayer(layerName, layerName+"_gru_backward_bias_scale", getQuantizeScale(layerName, 6), isScale=True)
-processLayer(layerName, layerName+"_gru_backward_state_scale", getQuantizeScale(layerName, 7), isScale=True)
-
-"""
-
-
-
-
-
-
-layer  = model_quant["q_bidirectional"]
-weight = layer["weights"]
-data = weight[0]
-
-
-last_dim_size = data.shape[-1] // 3
-new_data = data.reshape(data.shape[0], 3, last_dim_size, order='F')
-
-n = new_data.transpose((2, 1, 0))
-
 

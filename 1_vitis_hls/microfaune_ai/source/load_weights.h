@@ -1,9 +1,12 @@
 #ifndef LOAD_WEIGHTS_H
 #define LOAD_WEIGHTS_H
 
-//#define SYNTHESIS
-#ifndef SYNTHESIS
-#define WEIGHTS_PATH          "E:\\Rodrigo\\ISEL\\2_Mestrado\\2-ANO_1-sem\\TFM\\BAD_FPGA\\1_vitis_hls\\microfaune_ai\\test_bench\\bin_weights\\"
+#include <stdio.h>
+
+#include "types.h"
+#include "size_conv3D.h"
+
+#define WEIGHTS_PATH          "E:\\Rodrigo\\ISEL\\2_Mestrado\\2-ANO_1-sem\\TFM\\BAD_FPGA\\1_vitis_hls\\microfaune_ai\\source\\weights\\"
 
 // conv2d_0
 #define CONV_0_KERNEL       WEIGHTS_PATH"q_conv2d_batchnorm_kernel.bin"
@@ -15,6 +18,7 @@
 #define CONV_1_KERNEL_SCALE WEIGHTS_PATH"q_conv2d_batchnorm_1_kernel_scale.bin"
 #define CONV_1_BIAS         WEIGHTS_PATH"q_conv2d_batchnorm_1_bias.bin"
 
+/*
 // conv2d_2
 #define CONV_2_KERNEL       WEIGHTS_PATH"q_conv2d_batchnorm_2_kernel.bin"
 #define CONV_2_KERNEL_SCALE WEIGHTS_PATH"q_conv2d_batchnorm_2_kernel_scale.bin"
@@ -68,15 +72,15 @@
 // timedist_1
 #define TDIST_1_KERNEL WEIGHTS_PATH"time_distributed_1_kernel.bin"
 #define TDIST_1_BIAS   WEIGHTS_PATH"time_distributed_1_bias.bin"
-
+*/
 
 #define DEBUG_PRINT_LOAD
 
 
 #ifdef DEBUG_PRINT_LOAD
-#define PRINT_ARRAY(label, outarray, dim1, dim2, dim3) \
+#define PRINT_ARRAY_3D(label, outarray, dim1, dim2, dim3) \
     do { \
-        conv_t(*out)[dim2][dim3] = (conv_t(*)[dim2][dim3])outarray; \
+        quant_t(*out)[dim2][dim3] = (quant_t(*)[dim2][dim3])outarray; \
         printf("%s:\n", label); \
         for (int a = 0; a < dim1; ++a) { \
             for (int b = 0; b < dim2; ++b) { \
@@ -90,9 +94,29 @@
         } \
 		printf("\n"); \
     } while (0)
+#define PRINT_ARRAY_4D(label, outarray, dim1, dim2, dim3, dim4) \
+    do { \
+        quant_t(*out)[dim2][dim3][dim4] = (quant_t(*)[dim2][dim3][dim4])outarray; \
+        printf("%s:\n", label); \
+        for (int a = 0; a < dim1; ++a) { \
+            for (int b = 0; b < dim2; ++b) { \
+                for (int c = 0; c < dim3; ++c) { \
+                    printf("  [%d][%d][%d] > ", a, b, c); \
+                    for (int d = 0; d < dim4; ++d) { \
+                        printf("%12.8f ", out[a][b][c][d].to_float()); \
+                    } \
+                    printf("\n"); \
+                } \
+            } \
+			printf("  ---------\n"); \
+        } \
+		printf("\n"); \
+    } while (0)
 #else
-#define DEBUG_PRINT(label, outarray, dim1, dim2, dim3) ;
+#define PRINT_ARRAY_3D(label, outarray, dim1, dim2, dim3) ;
+#define PRINT_ARRAY_4D(label, outarray, dim1, dim2, dim3, dim4) ;
 #endif
+
 
 
 void load(const char* path, void* array, int arraysize, int typesize) {
@@ -100,6 +124,7 @@ void load(const char* path, void* array, int arraysize, int typesize) {
 
     int idx = 0;
     if (file != NULL) {
+        #ifdef READ_APFIXED
         // Calculate the number of bytes to read
         size_t numBytes = (W + 7) / 8 * arraysize;
 
@@ -108,13 +133,13 @@ void load(const char* path, void* array, int arraysize, int typesize) {
         fread(buffer, sizeof(char), numBytes, file);
         fclose(file);
 
-        ap_fixed<W,I, AP_RND, AP_SAT>* p_array = (ap_fixed<W,I, AP_RND, AP_SAT>*)array;
+        quant_t* p_array = (quant_t*)array;
 
         // Copy the binary data from the temporary buffer to the array
         size_t offset = 0;
         for (size_t i = 0; i < arraysize; ++i) {
             //printf("%4d > ", idx++);
-            ap_fixed<W,I, AP_RND, AP_SAT> value = 0;
+            quant_t value = 0;
             for (size_t j = 0; j < W; ++j) {
                 // Read the bits from the buffer
                 bool bit = (buffer[offset / 8] >> (7 - (offset % 8))) & 1;
@@ -126,8 +151,16 @@ void load(const char* path, void* array, int arraysize, int typesize) {
             //printf(" - %f\n", value.to_float());
             p_array[i] = value;
         }
-
         delete[] buffer;
+        #else
+        // Calculate the number of bytes to read
+        size_t numBytes = (W_BIT_WIDTH + 7) / 8 * arraysize;
+
+        // Read the binary data into the array
+        char* buffer = (char*)array;
+        fread(buffer, sizeof(char), numBytes, file);
+        fclose(file);
+        #endif
         
         printf("Loaded: %s\n", path);
     }
@@ -136,26 +169,30 @@ void load(const char* path, void* array, int arraysize, int typesize) {
     }
 }
 
-void loadWeights() {
+void loadWeights(weigth_t* kernel_1) {
+    /*
     // conv2d_0
-	load(CONV_0_KERNEL, kernel_0, CHANNELS*3*3, sizeof(conv_t));
-    load(CONV_0_KERNEL_SCALE, kernel_0_scale, CHANNELS, sizeof(conv_t));
-    load(CONV_0_BIAS, bias_0, CHANNELS, sizeof(conv_t));
+	load(CONV_0_KERNEL, kernel_0, CHANNELS*K_SIZE*K_SIZE, sizeof(quant_t));
+    load(CONV_0_KERNEL_SCALE, kernel_0_scale, CHANNELS, sizeof(quant_t));
+    load(CONV_0_BIAS, bias_0, CHANNELS, sizeof(quant_t));
+    */
 
     // conv2d_1
-    load(CONV_1_KERNEL, kernel_1, FILTERS*CHANNELS*3*3, sizeof(conv_t));
-    load(CONV_1_KERNEL_SCALE, kernel_1_scale, CHANNELS, sizeof(conv_t));
-    load(CONV_1_BIAS, bias_1, CHANNELS, sizeof(conv_t));
+    load(CONV_1_KERNEL, kernel_1, FILTERS*CHANNELS*K_SIZE*K_SIZE, sizeof(weigth_t));
+    /*
+    load(CONV_1_KERNEL_SCALE, kernel_1_scale, CHANNELS, sizeof(quant_t));
+    load(CONV_1_BIAS, bias_1, CHANNELS, sizeof(quant_t));
 
-    PRINT_ARRAY("kernel_0", kernel_0, CHANNELS, 3, 3);
+    PRINT_ARRAY("kernel_0", kernel_0, CHANNELS, K_SIZE, K_SIZE);
     PRINT_ARRAY("kernel_0_scale", kernel_0_scale, CHANNELS, 1, 1);
     PRINT_ARRAY("bias_0", bias_0, CHANNELS, 1, 1);
+    */
 
-    PRINT_ARRAY("kernel_1", kernel_1, CHANNELS, 3, 3);
+    //PRINT_ARRAY_4D("kernel_1", kernel_1, K_SIZE, K_SIZE, CHANNELS, FILTERS);
+    /*
     PRINT_ARRAY("kernel_1_scale", kernel_1_scale, CHANNELS, 1, 1);  // ONLY SHOWING 1st FILTER
     PRINT_ARRAY("bias_1", bias_1, CHANNELS, 1, 1);
 
-    /*
     // conv2d_2
     load(CONV_2_KERNEL, kernel_2, 64*64*3*3, sizeof(conv_t));
     load(CONV_2_KERNEL_SCALE, kernel_2_scale, 64, sizeof(conv_t));
@@ -211,8 +248,5 @@ void loadWeights() {
     load(TDIST_1_BIAS, bias_td1, 1, sizeof(timedist_t));
     */
 }
-#else
-void loadWeights() {}
-#endif // SYNTHESIS
 
 #endif // LOAD_WEIGHTS_H
