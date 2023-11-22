@@ -72,10 +72,25 @@ void conv2D(hls::stream<in_pkt> &strm_in, hls::stream<out_pkt> &strm_out, unsign
                                 //printf("weights[%d] = 0x%0x 0x%0x\n", w_index, (int)weights[w_index].range(63,32), (int)weights[w_index].range(31,0));
                                 //printf("img_in[%d] = 0x%0x 0x%0x\n", i_index, (int)img_in[i_index].range(63,32), (int)img_in[i_index].range(31,0));
 
-                                acc += weights[w_index].range(15,0)  * img_in[i_index].range(15,0);
-                                acc += weights[w_index].range(31,16) * img_in[i_index].range(31,16);
-                                acc += weights[w_index].range(47,32) * img_in[i_index].range(47,32);
-                                acc += weights[w_index].range(63,48) * img_in[i_index].range(63,48);
+                                acc += weights[w_index].range(3,0)   * img_in[i_index].range(3,0);
+                                acc += weights[w_index].range(7,4)   * img_in[i_index].range(7,4);
+                                acc += weights[w_index].range(11,8)  * img_in[i_index].range(11,8);
+                                acc += weights[w_index].range(15,12) * img_in[i_index].range(15,12);
+
+                                acc += weights[w_index].range(19,16) * img_in[i_index].range(19,16);
+                                acc += weights[w_index].range(23,20) * img_in[i_index].range(23,20);
+                                acc += weights[w_index].range(27,24) * img_in[i_index].range(27,24);
+                                acc += weights[w_index].range(31,28) * img_in[i_index].range(31,28);
+
+                                acc += weights[w_index].range(35,32) * img_in[i_index].range(35,32);
+                                acc += weights[w_index].range(39,36) * img_in[i_index].range(39,36);
+                                acc += weights[w_index].range(43,40) * img_in[i_index].range(43,40);
+                                acc += weights[w_index].range(47,44) * img_in[i_index].range(47,44);
+
+                                acc += weights[w_index].range(51,48) * img_in[i_index].range(51,48);
+                                acc += weights[w_index].range(55,52) * img_in[i_index].range(55,52);
+                                acc += weights[w_index].range(59,56) * img_in[i_index].range(59,56);
+                                acc += weights[w_index].range(63,60) * img_in[i_index].range(63,60);
                                 //printf("accin %d, %d, %d, %d\n", (int)i_index, (int)acc, (int)img_in[i_index].range(15,0), (int)img_in[i_index].range(31,16));
                             }
                             w_index += 1;
@@ -89,14 +104,39 @@ void conv2D(hls::stream<in_pkt> &strm_in, hls::stream<out_pkt> &strm_out, unsign
 
 
                 if (pool == 1){
-                    if (i%4 == 0)
-                        tmpo.data.range(15,0) = acc_sat.range(15,0);
-                    if (i%4 == 1)
-                        tmpo.data.range(31,16) = acc_sat1.range(15,0);
-                    if (i%4 == 2)
-                        tmpo.data.range(47,32) = acc_sat.range(15,0);
-                    if (i%4 == 3){
-                        tmpo.data.range(63,48) = acc_sat1.range(15,0);
+                	//printf("i=%d | i%16=%d\n", i, i%16);
+                    if (i%16 == 0)
+                    	tmpo.data.range(3,0)   = acc_sat.range(3,0);
+                    if (i%16 == 1)
+                    	tmpo.data.range(7,4)   = acc_sat1.range(3,0);
+                    if (i%16 == 2)
+                    	tmpo.data.range(11,8)  = acc_sat.range(3,0);
+                    if (i%16 == 3)
+                    	tmpo.data.range(15,12) = acc_sat1.range(3,0);
+                    if (i%16 == 4)
+                    	tmpo.data.range(19,16) = acc_sat.range(3,0);
+                    if (i%16 == 5)
+                    	tmpo.data.range(23,20) = acc_sat1.range(3,0);
+                    if (i%16 == 6)
+                    	tmpo.data.range(27,24) = acc_sat.range(3,0);
+                    if (i%16 == 7)
+                    	tmpo.data.range(31,28) = acc_sat1.range(3,0);
+                    if (i%16 == 8)
+                    	tmpo.data.range(35,32) = acc_sat.range(3,0);
+                    if (i%16 == 9)
+                    	tmpo.data.range(39,36) = acc_sat1.range(3,0);
+                    if (i%16 == 10)
+                    	tmpo.data.range(43,40) = acc_sat.range(3,0);
+                    if (i%16 == 11)
+                    	tmpo.data.range(47,44) = acc_sat1.range(3,0);
+                    if (i%16 == 12)
+                    	tmpo.data.range(51,48) = acc_sat.range(3,0);
+                    if (i%16 == 13)
+                    	tmpo.data.range(55,52) = acc_sat1.range(3,0);
+                    if (i%16 == 14)
+                    	tmpo.data.range(59,56) = acc_sat.range(3,0);
+                    if (i%16 == 15){
+                        tmpo.data.range(63,60) = acc_sat1.range(3,0);
                         tmpo.strb = 0xF;
                         tmpo.keep = 0xF;
                         if (orow == OHEIGHT-1 && ocol == OWIDTH-1) tmpo.last = 1;
@@ -110,14 +150,38 @@ void conv2D(hls::stream<in_pkt> &strm_in, hls::stream<out_pkt> &strm_out, unsign
                     if (cp == pool){
                         if (acc_sat > accArray[i])
                             accArray[i] = acc_sat;
-                        if (i%4 == 0)
-                            tmpo.data.range(15,0) = accArray[i].range(15,0);
-                        if (i%4 == 1)
-                            tmpo.data.range(31,16) = accArray[i].range(15,0);
-                        if (i%4 == 2)
-                            tmpo.data.range(47,32) = accArray[i].range(15,0);
-                        if (i%4 == 3){
-                            tmpo.data.range(63,48) = accArray[i].range(15,0);
+                        if (i%16 == 0)
+                        	tmpo.data.range(3,0)   = accArray[i].range(3,0);
+                        if (i%16 == 1)
+                        	tmpo.data.range(7,4)   = accArray[i].range(3,0);
+                        if (i%16 == 2)
+                        	tmpo.data.range(11,8)  = accArray[i].range(3,0);
+                        if (i%16 == 3)
+                        	tmpo.data.range(15,12) = accArray[i].range(3,0);
+                        if (i%16 == 4)
+                        	tmpo.data.range(19,16) = accArray[i].range(3,0);
+                        if (i%16 == 5)
+                        	tmpo.data.range(23,20) = accArray[i].range(3,0);
+                        if (i%16 == 6)
+                        	tmpo.data.range(27,24) = accArray[i].range(3,0);
+                        if (i%16 == 7)
+                        	tmpo.data.range(31,28) = accArray[i].range(3,0);
+                        if (i%16 == 8)
+                        	tmpo.data.range(35,32) = accArray[i].range(3,0);
+                        if (i%16 == 9)
+                        	tmpo.data.range(39,36) = accArray[i].range(3,0);
+                        if (i%16 == 10)
+                        	tmpo.data.range(43,40) = accArray[i].range(3,0);
+                        if (i%16 == 11)
+                        	tmpo.data.range(47,44) = accArray[i].range(3,0);
+                        if (i%16 == 12)
+                        	tmpo.data.range(51,48) = accArray[i].range(3,0);
+                        if (i%16 == 13)
+                        	tmpo.data.range(55,52) = accArray[i].range(3,0);
+                        if (i%16 == 14)
+                        	tmpo.data.range(59,56) = accArray[i].range(3,0);
+                        if (i%16 == 15){
+                            tmpo.data.range(63,60) = accArray[i].range(3,0);
                             tmpo.strb = 0xF;
                             tmpo.keep = 0xF;
                             if (orow == OHEIGHT-1 && ocol == OWIDTH-1) tmpo.last = 1;

@@ -47,9 +47,19 @@
 			<location>E:/Rodrigo/ISEL/2_Mestrado/2-ANO_1-sem/TFM/BAD_FPGA/1_vitis_hls/microfaune_ai/source/axis_conv3D.cpp</location>
 		</link>
 		<link>
+			<name>source/global_settings.h</name>
+			<type>1</type>
+			<location>E:/Rodrigo/ISEL/2_Mestrado/2-ANO_1-sem/TFM/BAD_FPGA/1_vitis_hls/microfaune_ai/source/global_settings.h</location>
+		</link>
+		<link>
 			<name>source/size_conv3D.h</name>
 			<type>1</type>
 			<location>E:/Rodrigo/ISEL/2_Mestrado/2-ANO_1-sem/TFM/BAD_FPGA/1_vitis_hls/microfaune_ai/source/size_conv3D.h</location>
+		</link>
+		<link>
+			<name>source/types.h</name>
+			<type>1</type>
+			<location>E:/Rodrigo/ISEL/2_Mestrado/2-ANO_1-sem/TFM/BAD_FPGA/1_vitis_hls/microfaune_ai/source/types.h</location>
 		</link>
 		<link>
 			<name>testbench/load_weights.h</name>

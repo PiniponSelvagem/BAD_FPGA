@@ -6,7 +6,13 @@
 #include "types.h"
 #include "size_conv3D.h"
 
+#define INPUTS_PATH           "E:\\Rodrigo\\ISEL\\2_Mestrado\\2-ANO_1-sem\\TFM\\BAD_FPGA\\1_vitis_hls\\microfaune_ai\\source\\inputs\\"
 #define WEIGHTS_PATH          "E:\\Rodrigo\\ISEL\\2_Mestrado\\2-ANO_1-sem\\TFM\\BAD_FPGA\\1_vitis_hls\\microfaune_ai\\source\\weights\\"
+
+
+// DEBUG with INPUT
+#define INPUT_2             INPUTS_PATH"2__q_activation.bin"
+
 
 // conv2d_0
 #define CONV_0_KERNEL       WEIGHTS_PATH"q_conv2d_batchnorm_kernel.bin"
@@ -118,6 +124,7 @@
 #endif
 
 
+#define FILE_READ_BYTE_MULT sizeof(char)/(sizeof(weigth_t)/PACKET)
 
 void load(const char* path, void* array, int arraysize, int typesize) {
     FILE* file = fopen(path, "rb");
@@ -155,6 +162,7 @@ void load(const char* path, void* array, int arraysize, int typesize) {
         #else
         // Calculate the number of bytes to read
         size_t numBytes = (W_BIT_WIDTH + 7) / 8 * arraysize;
+        //numBytes = numBytes / FILE_READ_BYTE_MULT;	// 2023-11-21 - im not aware of the problem to why i only read half of the file, but this seems to fix it
 
         // Read the binary data into the array
         char* buffer = (char*)array;
@@ -169,7 +177,10 @@ void load(const char* path, void* array, int arraysize, int typesize) {
     }
 }
 
-void loadWeights(weigth_t* kernel_1) {
+void loadWeights(weigth_t* input_2, weigth_t* kernel_1, weigth_t* kernel_1_scale) {
+    // debug: input
+    load(INPUT_2, input_2, FILTERS*IHEIGHT*IWIDTH, sizeof(weigth_t));
+
     /*
     // conv2d_0
 	load(CONV_0_KERNEL, kernel_0, CHANNELS*K_SIZE*K_SIZE, sizeof(quant_t));
@@ -179,8 +190,8 @@ void loadWeights(weigth_t* kernel_1) {
 
     // conv2d_1
     load(CONV_1_KERNEL, kernel_1, FILTERS*CHANNELS*K_SIZE*K_SIZE, sizeof(weigth_t));
+    load(CONV_1_KERNEL_SCALE, kernel_1_scale, CHANNELS, sizeof(weigth_t));
     /*
-    load(CONV_1_KERNEL_SCALE, kernel_1_scale, CHANNELS, sizeof(quant_t));
     load(CONV_1_BIAS, bias_1, CHANNELS, sizeof(quant_t));
 
     PRINT_ARRAY("kernel_0", kernel_0, CHANNELS, K_SIZE, K_SIZE);

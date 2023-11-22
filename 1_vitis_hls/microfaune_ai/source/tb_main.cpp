@@ -24,12 +24,23 @@ int pf = 1; //10;
 
 void conv2D(hls::stream<in_pkt> &strm_in, hls::stream<out_pkt> &strm_out, unsigned char scale, int pool);
 
-
+weigth_t input_2[FILTERS*IHEIGHT*IWIDTH/PACKET];
 weigth_t kernel_1[FILTERS*CHANNELS*K_SIZE*K_SIZE/PACKET];
+weigth_t kernel_1_scale[CHANNELS/PACKET];
 
 
 int main() {
-    loadWeights(kernel_1);
+    loadWeights(input_2, kernel_1, kernel_1_scale);
+
+    printf("\ninput_2:\n");
+    for (int idx=0; idx<FILTERS*IHEIGHT*IWIDTH/PACKET; idx++) {
+    	printf("idx=%d | 0x%016llx\n", idx, input_2[idx]);
+    }
+    printf("\nkernel_1_scale:\n");
+    for (int idx=0; idx<CHANNELS/PACKET; idx++) {
+    	printf("idx=%d | 0x%016llx\n", idx, kernel_1_scale[idx]);
+    }
+    printf("\n");
 
     int i, j, err_cnt = 0;
 
@@ -39,10 +50,10 @@ int main() {
     for (i=0; i<(FILTERS*K_SIZE*K_SIZE*IDEPTH/PACKET); i++) {
         //printf("%d\n", i);
         /*
-        if (i == 4)
+    	if (i == 4)
             tmp.data = (weigth_t)0x0001000100010001;
         else
-            tmp.data = (weigth_t)0x0000000000000000;
+            tmp.data = (weigth_t)0x0002000200020002;
         */
         tmp.data = kernel_1[i];
         //tmp.data = (weigth_t)0x0001000100010001;
@@ -52,13 +63,20 @@ int main() {
     }
 
     for (i=0; i<IHEIGHT*IWIDTH*IDEPTH/PACKET; i++) {
-        if (i==0) { // || i==1 || i==2 || i==3) {
-            tmp.data = (imap_t)0x0004000300020001;
+    	//printf("input[%d]\n", i);
+        tmp.data = input_2[i];
+    	/*
+    	if (i==0) { // || i==1 || i==2 || i==3) {
             //tmp.data = (imap_t)0x0004000300020001;
+            tmp.data = (imap_t)0x0FEDCBA987654321;
+        }
+        else if (i==5) {
+            tmp.data = (imap_t)0x123456789ABCDEF0;
         }
         else {
-            tmp.data = (imap_t)0x0005000500050005;
+            tmp.data = (imap_t)0x0101010101010101;
         }
+        */
         /*
         if (i/(IDEPTH/PACKET)%2 == 0)
             tmp.data = (imap_t)0x0002000200020002;
@@ -72,13 +90,21 @@ int main() {
     }
 
 #if HW_IP
-conv2D(str_in, str_out, 0, pf);
+    conv2D(str_in, str_out, 0, pf);
 #endif
 
     for (i=0; i<OWIDTH*OHEIGHT*FILTERS/PACKET/pf; i++) {
         tmpo = str_out.read();
+        /*
         printf("%02d - result %d, %d, %d, %d\n", i, (int)tmpo.data.range(15,0), (int)tmpo.data.range(31,16),
                 (int)tmpo.data.range(47,32), (int)tmpo.data.range(63,48));
+        */
+        printf("%02d - result %d, %d, %d, %d,   %d, %d, %d, %d,   %d, %d, %d, %d,   %d, %d, %d, %d,\n", i,
+        		(int)tmpo.data.range(3,0),   (int)tmpo.data.range(7,4),   (int)tmpo.data.range(11,8),  (int)tmpo.data.range(15,12),
+				(int)tmpo.data.range(19,16), (int)tmpo.data.range(23,20), (int)tmpo.data.range(27,24), (int)tmpo.data.range(31,28),
+				(int)tmpo.data.range(35,32), (int)tmpo.data.range(39,36), (int)tmpo.data.range(43,40), (int)tmpo.data.range(47,44),
+				(int)tmpo.data.range(51,48), (int)tmpo.data.range(55,52), (int)tmpo.data.range(59,56), (int)tmpo.data.range(63,60)
+		);
     }
 
 

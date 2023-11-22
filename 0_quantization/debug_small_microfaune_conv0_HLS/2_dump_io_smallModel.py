@@ -13,9 +13,19 @@ import numpy as np
 import json
 
 from smallMicrofauneModel import SmallModelMicrofauneAI
+import cutils
+
+data_type = {}
+"""
+data_type["name"] = "float"
+"""
+data_type["name"] = "ap_fixed"
+data_type["bits_total"] = 4
+data_type["bits_int"] = 1
 
 # use old rearange
 shouldRearrange = False
+
 
 
 # Extend the JSONEncoder class
@@ -120,6 +130,10 @@ for layer_name in layers_names:
         out.dtype.name,
         out.numpy().tolist()
     )
+    #
+    # 20231120 - hotfix to create binary outputs of every layer
+    cutils.saveArray(folder, str(i)+"__"+layer.name, out, str(i)+"__"+layer.name, data_type)
+    #
     layersIO.append(layer)
     jLayer = json.dumps(layer, indent=4, default=lambda o: o.encode())
     open(filepath+"__"+str(i)+"__"+layer_name.replace(".", "_")+ext, "w").write(jLayer)

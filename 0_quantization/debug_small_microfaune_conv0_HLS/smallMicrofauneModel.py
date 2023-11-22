@@ -3,7 +3,7 @@ from qkeras.utils import model_quantize
 
 
 class ModelConfig:
-    bits = 16
+    bits = 4
     integer = 1
     integer_gru_recact = 0
     symmetric = 1
@@ -22,7 +22,7 @@ class ModelConfig:
         from tensorflow.keras import layers
         from qkeras import QConv2DBatchnorm, QActivation
         ### model start ###
-        n_filter = 4
+        n_filter = 16
         conv_reg = keras.regularizers.l2(1e-3)
         #
         spec = keras.Input(shape=[3, 2, 1], dtype=np.float32)

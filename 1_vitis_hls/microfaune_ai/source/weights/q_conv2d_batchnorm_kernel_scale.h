@@ -1,6 +1,18 @@
-const float q_conv2d_batchnorm_kernel_scale[4] = {
+const float q_conv2d_batchnorm_kernel_scale[16] = {
     0.5,
     0.5,
     0.5,
     0.5,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    2.0,
+    2.0,
+    2.0,
+    2.0,
+    2.0,
+    2.0,
+    2.0,
+    2.0,
 };
