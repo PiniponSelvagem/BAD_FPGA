@@ -37,8 +37,6 @@ model.load_weights(f"{models_folder}/{model_name}.h5")
 folder = "model_debug_dump_quantized"
 
 
-shouldRearrangeConv2D = False    # True to use old weights arrangement
-
 layerName_toChannelFirst = [
     #"q_conv2d_batchnorm"
     "conv2d",
@@ -133,33 +131,37 @@ class Layer:
 
 
 
-def processLayer(layerName, weightName, weight, isScale=False, shouldRearrange=True):
+def processLayer(layerName, weightName, weight, isScale=False):
     shape = weight.shape
     sdim = len(shape)
     data = np.array(weight)
-    if shouldRearrange:
-        if any(layerName_c1 in layerName for layerName_c1 in layerName_toChannelFirst):
-            # change to channel first
-            if sdim == 4:
-                [shape[i] for i in (3, 2, 0, 1)]
-                data = data.transpose((3, 2, 0, 1)) #fc
-            elif sdim == 3:
-                [shape[i] for i in (0, 2, 1)]
-                data = data.transpose((0, 2, 1))
-            elif sdim == 2:
-                [shape[i] for i in (1, 0)]
-                data = data.transpose((1, 0))
-        #
-        if layerName_to3d in weightName:
-            if isScale:
-                data = rearange_gru_scales(data)
-                # TODO: check if the code below is actually required for scales
-                #if ("kernel" in weightName): # reorder kernel for better memory access / no jumping around when access
-                #    data = data.transpose((0, 1))
-            else:
-                data = rearange_gru_weights(data)
-                if ("kernel" in weightName): # reorder kernel for better memory access / no jumping around when access
-                    data = data.transpose((2, 1, 0))
+    if any(layerName_c1 in layerName for layerName_c1 in layerName_toChannelFirst):
+        # change to channel first
+        if sdim == 4:
+            """
+            OLD METHOD
+            [shape[i] for i in (3, 2, 0, 1)]
+            data = data.transpose((3, 2, 0, 1)) #fc
+            """
+            [shape[i] for i in (3, 0, 1, 2)]
+            data = data.transpose((3, 0, 1, 2))
+        elif sdim == 3:
+            [shape[i] for i in (0, 2, 1)]
+            data = data.transpose((0, 2, 1))
+        elif sdim == 2:
+            [shape[i] for i in (1, 0)]
+            data = data.transpose((1, 0))
+    #
+    if layerName_to3d in weightName:
+        if isScale:
+            data = rearange_gru_scales(data)
+            # TODO: check if the code below is actually required for scales
+            #if ("kernel" in weightName): # reorder kernel for better memory access / no jumping around when access
+            #    data = data.transpose((0, 1))
+        else:
+            data = rearange_gru_weights(data)
+            if ("kernel" in weightName): # reorder kernel for better memory access / no jumping around when access
+                data = data.transpose((2, 1, 0))
     #
     shouldSplit = True
     for name in layerName_split_dim0:
@@ -298,6 +300,18 @@ def getQuantizeScale(layerName, idx):
     return np.array(qscale).flatten()
 
 
+def mergeKernelScale(kernel, scale):
+    # Ensure that the dimensions match for broadcasting
+    assert scale.shape == (kernel.shape[-1],)
+    #
+    # Reshape scale to have the appropriate dimensions for broadcasting
+    scale_reshaped = scale.reshape((1,) * (kernel.ndim - 1) + (-1,))
+    #
+    # Perform the scaling and update the kernel, handling division by zero
+    updated_kernel = np.where(scale_reshaped != 0, (kernel / scale_reshaped) * 4, 0)
+    #
+    return updated_kernel
+
 """
 processLayer("conv2d", "conv2d_kernel", model_quant["conv2d"]["weights"][0])
 processLayer("conv2d", "conv2d_kernel_scale", getQuantizeScale("conv2d", 0))
@@ -309,11 +323,15 @@ for layerName in model_quant:
     #for weight in layer:
     weight = layer["weights"]
     if "conv2d" in layerName:
-        processLayer(layerName, layerName+"_kernel", weight[0], shouldRearrange=shouldRearrangeConv2D)
-        processLayer(layerName, layerName+"_bias", weight[1], shouldRearrange=shouldRearrangeConv2D)
+        processLayer(layerName, layerName+"_kernel", weight[0])
+        processLayer(layerName, layerName+"_bias", weight[1])
         #
-        processLayer(layerName, layerName+"_kernel_scale", getQuantizeScale(layerName, 0), isScale=True)
+        kernel_scale = getQuantizeScale(layerName, 0)
+        processLayer(layerName, layerName+"_kernel_scale", kernel_scale, isScale=True)
         processLayer(layerName, layerName+"_bias_scale", getQuantizeScale(layerName, 1), isScale=True)
+        #
+        kernelWscale = mergeKernelScale(weight[0], kernel_scale)
+        processLayer(layerName, layerName+"_kernel_merged_scale", kernelWscale)
     if "batch_normalization" in layerName:
         processLayer(layerName, layerName+"_gamma", weight[0])
         processLayer(layerName, layerName+"_beta", weight[1])
@@ -374,4 +392,5 @@ elapsed = end - start
 
 
 print('Time elapsed: ' + str(timedelta(seconds=elapsed)))
+
 

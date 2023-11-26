@@ -24,8 +24,9 @@ wav_file = "audio_samples/bird_50124.wav" # data_bird_0     # 0.98303944 | 0.986
 
 #from model_config.config_test import ModelConfig            # model_test
 #from model_config.config_0 import ModelConfig               # model_quant_411
-from model_config.config_0_noQuantState import ModelConfig  # model_quant_411_noQuantState
+#from model_config.config_0_noQuantState import ModelConfig  # model_quant_411_noQuantState
 #from model_config.config_0_qconvbnorm import ModelConfig    # model_quant_411_qconvbnorm
+from model_config.config_0_qconvbnorm__input_relu import ModelConfig    # model_quant_411_qconvbnorm__input_relu
 #from model_config.config_1 import ModelConfig               # model_quant__conv-po2-81_gru-po2-81_bnorm-811
 
 model_folder = ModelConfig.folder
@@ -36,6 +37,8 @@ model = model_original
 dual_model = dual_model_original
 """
 
+# Print all array data, do not truncate prints
+np.set_printoptions(threshold=np.inf)
 
 
 from scipy.io import wavfile

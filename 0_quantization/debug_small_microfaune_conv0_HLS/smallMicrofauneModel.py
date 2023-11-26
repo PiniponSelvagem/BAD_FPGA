@@ -5,6 +5,7 @@ from qkeras.utils import model_quantize
 class ModelConfig:
     bits = 4
     integer = 1
+    integer_relu = 0
     integer_gru_recact = 0
     symmetric = 1
     padding = "same"
@@ -15,6 +16,7 @@ class ModelConfig:
     def customModel():
         bits = ModelConfig.bits
         integer = ModelConfig.integer
+        integer_relu = ModelConfig.integer_relu
         symmetric = ModelConfig.symmetric
         #
         import numpy as np
@@ -33,7 +35,7 @@ class ModelConfig:
             bias_quantizer = f"quantized_bits({bits},{integer},{symmetric})",
             momentum=0.95
         )(spec)
-        x = QActivation(f"quantized_relu({bits},{integer})")(x)
+        x = QActivation(f"quantized_relu({bits},{integer_relu})")(x)
         #
         x = QConv2DBatchnorm(
             n_filter, (3, 3), padding=ModelConfig.padding, kernel_regularizer=conv_reg, activation=None,
@@ -41,7 +43,7 @@ class ModelConfig:
             bias_quantizer = f"quantized_bits({bits},{integer},{symmetric})",
             momentum=0.95
         )(x)
-        x = QActivation(f"quantized_relu({bits},{integer})")(x)
+        x = QActivation(f"quantized_relu({bits},{integer_relu})")(x)
         #
         x = layers.MaxPool2D((1, 2))(x)
         #

@@ -1,4 +1,3 @@
-import numpy as np
 import os
 import struct
 from bitarray import bitarray
@@ -82,6 +81,13 @@ def packRow(packed_bits, array, dataType):
         min_value = -(1 << (bits_total - 1)) / (2 ** bits_dec)
         #
         #print(array)
+        #
+        #
+        # NOTE: The isOddElement check was only tested with 4 total bits, and it is hardcoded to only work in those situations.
+        #       It is used to save the bytes in litle-endian, making sure the lower part is placed in the lower part of the byte.
+        #       It should not be necessary to use this technique in 8, 16, 32, etc bits.
+        isOddElement = False
+        prevBinary = ""
         for value in array:
             #print(value)
             # Check for overflow and underflow
@@ -101,7 +107,18 @@ def packRow(packed_bits, array, dataType):
                 complement = (1 << bits_total) + scaled_value
                 binary = bin(complement)[2:].zfill(bits_total)
             #
-            packed_bits.extend(binary)
+            if bits_total == 4:
+                if isOddElement:
+                    packed_bits.extend(binary)
+                    packed_bits.extend(prevBinary)
+                    isOddElement = False
+                else:
+                    prevBinary = binary
+                    isOddElement = True
+            else:
+                packed_bits.extend(binary)
+        if isOddElement & bits_total == 4:
+            packed_bits.extend(prevBinary)
         #
     else:
         # float
@@ -120,6 +137,7 @@ def packBits(packed_bits, row, dataType):
 def saveArray_dim1_bin(folder, fileName, array, dataType):
     file_path = os.path.join(folder, '{}.bin'.format(fileName))
     packed_bits = bitarray()
+    packed_data = packed_bits.tobytes()
     packed_bits = packBits(packed_bits, array, dataType)
     saveFileBin(file_path, packed_bits, dataType)
 

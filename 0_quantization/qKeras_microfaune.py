@@ -38,9 +38,10 @@ import qkeras_microfaune_model as qmodel
 #from model_config.config_test import ModelConfig            # model_test
 #from model_config.config_0 import ModelConfig               # model_quant_411
 #from model_config.config_0_noQuantState import ModelConfig  # model_quant_411_noQuantState
-from model_config.config_0_quantState_401 import ModelConfig  # model_quant_411_quantState_401
+#from model_config.config_0_quantState_401 import ModelConfig  # model_quant_411_quantState_401
 #from model_config.config_0_quantState_801 import ModelConfig  # model_quant_411_quantState_801
 #from model_config.config_0_qconvbnorm import ModelConfig    # model_quant_411_qconvbnorm
+from model_config.config_0_qconvbnorm__input_relu import ModelConfig    # model_quant_411_qconvbnorm__input_relu
 #from model_config.config_1 import ModelConfig               # model_quant__conv-po2-81_gru-po2-81_bnorm-811
 
 datasets_dir = '../../datasets'
