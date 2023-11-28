@@ -5,7 +5,7 @@
 
 /* GLOBAL TYPES */
 typedef ap_int<W_BIT_WIDTH*PACKET> weigth_t;
-typedef ap_int<I_BIT_WIDTH*PACKET> imap_t;
+typedef ap_uint<I_BIT_WIDTH*PACKET> imap_t;		// 2023-11-24 before was ap_int
 typedef ap_uint<I_BIT_WIDTH*PACKET> omap_t;
 
 /* LAYER TYPES */

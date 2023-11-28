@@ -1,4 +1,4 @@
-const float q_conv2d_batchnorm_1_kernel[16][3][3][16] = {
+const float q_conv2d_batchnorm_1_kernel_merged_scale[16][3][3][16] = {
     {
         {
             {
@@ -76,9 +76,9 @@ const float q_conv2d_batchnorm_1_kernel[16][3][3][16] = {
                 0.0,
             },
             {
-                0.875,
-                0.75,
-                0.875,
+                7.0,
+                6.0,
+                7.0,
                 0.0,
                 0.0,
                 0.0,
@@ -586,9 +586,9 @@ const float q_conv2d_batchnorm_1_kernel[16][3][3][16] = {
                 0.0,
             },
             {
-                1.75,
-                1.75,
-                1.75,
+                7.0,
+                7.0,
+                7.0,
                 0.0,
                 0.0,
                 0.0,

@@ -15,16 +15,17 @@
 
 
 // conv2d_0
-#define CONV_0_KERNEL       WEIGHTS_PATH"q_conv2d_batchnorm_kernel.bin"
+#define CONV_0_KERNEL       WEIGHTS_PATH"q_conv2d_batchnorm_kernel_merged_scale.bin"
 #define CONV_0_KERNEL_SCALE WEIGHTS_PATH"q_conv2d_batchnorm_kernel_scale.bin"
 #define CONV_0_BIAS         WEIGHTS_PATH"q_conv2d_batchnorm_bias.bin"
 
 // conv2d_1
-#define CONV_1_KERNEL       WEIGHTS_PATH"q_conv2d_batchnorm_1_kernel.bin"
+#define CONV_1_KERNEL       WEIGHTS_PATH"q_conv2d_batchnorm_1_kernel_merged_scale.bin"
 #define CONV_1_KERNEL_SCALE WEIGHTS_PATH"q_conv2d_batchnorm_1_kernel_scale.bin"
 #define CONV_1_BIAS         WEIGHTS_PATH"q_conv2d_batchnorm_1_bias.bin"
 
 /*
+_kernel_merged_scale
 // conv2d_2
 #define CONV_2_KERNEL       WEIGHTS_PATH"q_conv2d_batchnorm_2_kernel.bin"
 #define CONV_2_KERNEL_SCALE WEIGHTS_PATH"q_conv2d_batchnorm_2_kernel_scale.bin"
@@ -177,7 +178,10 @@ void load(const char* path, void* array, int arraysize, int typesize) {
     }
 }
 
-void loadWeights(weigth_t* input_2, weigth_t* kernel_1, weigth_t* kernel_1_scale) {
+void loadWeights(
+    weigth_t* input_2,
+    weigth_t* kernel_1, weigth_t* kernel_1_scale, weigth_t* bias_1
+) {
     // debug: input
     load(INPUT_2, input_2, FILTERS*IHEIGHT*IWIDTH, sizeof(weigth_t));
 
@@ -191,9 +195,9 @@ void loadWeights(weigth_t* input_2, weigth_t* kernel_1, weigth_t* kernel_1_scale
     // conv2d_1
     load(CONV_1_KERNEL, kernel_1, FILTERS*CHANNELS*K_SIZE*K_SIZE, sizeof(weigth_t));
     load(CONV_1_KERNEL_SCALE, kernel_1_scale, CHANNELS, sizeof(weigth_t));
-    /*
-    load(CONV_1_BIAS, bias_1, CHANNELS, sizeof(quant_t));
+    load(CONV_1_BIAS, bias_1, CHANNELS, sizeof(weigth_t));
 
+    /*
     PRINT_ARRAY("kernel_0", kernel_0, CHANNELS, K_SIZE, K_SIZE);
     PRINT_ARRAY("kernel_0_scale", kernel_0_scale, CHANNELS, 1, 1);
     PRINT_ARRAY("bias_0", bias_0, CHANNELS, 1, 1);

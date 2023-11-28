@@ -132,7 +132,7 @@ for layer_name in layers_names:
     )
     #
     # 20231120 - hotfix to create binary outputs of every layer
-    cutils.saveArray(folder, str(i)+"__"+layer.name, out, str(i)+"__"+layer.name, data_type)
+    cutils.saveArray(folder, str(i)+"__"+layer.name, np.array(out), str(i)+"__"+layer.name, data_type)
     #
     layersIO.append(layer)
     jLayer = json.dumps(layer, indent=4, default=lambda o: o.encode())

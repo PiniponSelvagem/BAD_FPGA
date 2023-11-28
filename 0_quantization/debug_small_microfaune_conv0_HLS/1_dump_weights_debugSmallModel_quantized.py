@@ -131,7 +131,7 @@ class Layer:
 
 
 
-def processLayer(layerName, weightName, weight, isScale=False):
+def processLayer(layerName, weightName, weight, isScale=False, isKernelMergedScale=False):
     shape = weight.shape
     sdim = len(shape)
     data = np.array(weight)
@@ -179,10 +179,10 @@ def processLayer(layerName, weightName, weight, isScale=False):
         rbias = np.squeeze(rbias)
         biasName = weightName
         rbiasBias = weightName+"_recurrent"
-        cutils.saveArray(folder, biasName, bias, biasName, data_type)
-        cutils.saveArray(folder, rbiasBias, rbias, rbiasBias, data_type)
+        cutils.saveArray(folder, biasName, bias, biasName, data_type, saveBinAsInteger=isKernelMergedScale)
+        cutils.saveArray(folder, rbiasBias, rbias, rbiasBias, data_type, saveBinAsInteger=isKernelMergedScale)
     else:
-        cutils.saveArray(folder, weightName, data, weightName, data_type)
+        cutils.saveArray(folder, weightName, data, weightName, data_type, saveBinAsInteger=isKernelMergedScale)
 
 
 
@@ -311,6 +311,24 @@ def mergeKernelScale(kernel, scale):
     updated_kernel = np.where(scale_reshaped != 0, (kernel / scale_reshaped) * 4, 0)
     #
     return updated_kernel
+
+
+"""
+print("------ KERNEL ------")
+layer = model_quant["q_conv2d_batchnorm"]
+weight = layer["weights"]
+layerName = "q_conv2d_batchnorm"
+processLayer(layerName, layerName+"_kernel", weight[0])
+
+print("------ KERNEL + SCALE ------")
+layer = model_quant["q_conv2d_batchnorm"]
+weight = layer["weights"]
+layerName = "q_conv2d_batchnorm"
+kernel_scale = getQuantizeScale(layerName, 0)
+kernelWscale = mergeKernelScale(weight[0], kernel_scale)
+processLayer(layerName, layerName+"_kernel_merged_scale", kernelWscale, isKernelMergedScale=True)
+"""
+
 
 """
 processLayer("conv2d", "conv2d_kernel", model_quant["conv2d"]["weights"][0])

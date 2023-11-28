@@ -68,36 +68,46 @@ def saveArray_dim4(folder, fileName, array, arrayName, dataType):
 
 
 
-def packRow(packed_bits, array, dataType):
+def packData(packed_bits, array, dataType, saveBinAsInteger):
+    # saveBinAsInteger should be True when Kernel is merged with its Scale making the values of the resulted kernel Integers.
+    #       knowing that, the values should be saved without the fracction pre-processing
+    #
     if dataType["name"] == "ap_fixed":
         bits_total = dataType["bits_total"]
         bits_int = dataType["bits_int"]
         bits_dec = bits_total - bits_int
         #
-        max_bits = bitarray('0' + '1' * (bits_total - 1))  # All bits except sign bit set to 1
-        #
-        # Convert the binary back to a float for max and min values
-        max_value = int(max_bits.to01(), 2) / (2 ** bits_dec)
-        min_value = -(1 << (bits_total - 1)) / (2 ** bits_dec)
-        #
-        #print(array)
+        if saveBinAsInteger:
+            max_bits = bitarray('0' + '1' * (bits_total - 1))  # All bits except sign bit set to 1
+            #
+            # Convert the binary back to a float for max and min values
+            max_value = int(max_bits.to01(), 2)
+            min_value = -(1 << (bits_total - 1))
+        else:
+            max_bits = bitarray('0' + '1' * (bits_total - 1))  # All bits except sign bit set to 1
+            #
+            # Convert the binary back to a float for max and min values
+            max_value = int(max_bits.to01(), 2) / (2 ** bits_dec)
+            min_value = -(1 << (bits_total - 1)) / (2 ** bits_dec)
         #
         #
         # NOTE: The isOddElement check was only tested with 4 total bits, and it is hardcoded to only work in those situations.
         #       It is used to save the bytes in litle-endian, making sure the lower part is placed in the lower part of the byte.
         #       It should not be necessary to use this technique in 8, 16, 32, etc bits.
         isOddElement = False
-        prevBinary = ""
+        prevBinary = "0000"
         for value in array:
-            #print(value)
             # Check for overflow and underflow
             if value > max_value:
                 value = max_value
             elif value < min_value:
                 value = min_value
             #
-            # Scale the value to fit within the specified decimal_bits
-            scaled_value = round(value * (2 ** bits_dec))
+            if saveBinAsInteger:
+                scaled_value = int(value)
+            else:
+                # Scale the value to fit within the specified decimal_bits
+                scaled_value = round(value * (2 ** bits_dec))
             #
             # Convert to one's complement binary
             if scaled_value >= 0:
@@ -106,6 +116,7 @@ def packRow(packed_bits, array, dataType):
                 # For negative values, calculate the one's complement
                 complement = (1 << bits_total) + scaled_value
                 binary = bin(complement)[2:].zfill(bits_total)
+            #
             #
             if bits_total == 4:
                 if isOddElement:
@@ -117,9 +128,16 @@ def packRow(packed_bits, array, dataType):
                     isOddElement = True
             else:
                 packed_bits.extend(binary)
-        if isOddElement & bits_total == 4:
-            packed_bits.extend(prevBinary)
-        #
+        if bits_total == 4: # closing in the case of 4 bits_total
+            if isOddElement:
+                packed_bits.extend(prevBinary)
+                """
+            else:
+                # This is wrong, do not use it.
+                # Was trying to make a case for situations that the array was not even.
+                packed_bits.extend(binary)
+                packed_bits.extend("1110")  # close the leftover byte
+                """
     else:
         # float
         binary_representation = struct.pack('f' * len(array), *array)
@@ -128,41 +146,16 @@ def packRow(packed_bits, array, dataType):
         packed_bits.extend(bits)
     return packed_bits
 
-def packBits(packed_bits, row, dataType):
-    row_data = [float(element) for element in row]
-    packed_bits = packRow(packed_bits, row_data, dataType)
+def packBits(packed_bits, array, dataType, saveBinAsInteger):
+    data = array.flatten()
+    packed_bits = packData(packed_bits, data, dataType, saveBinAsInteger)
     return packed_bits
 
 
-def saveArray_dim1_bin(folder, fileName, array, dataType):
+def saveArray_bin(folder, fileName, array, dataType, saveBinAsInteger):
     file_path = os.path.join(folder, '{}.bin'.format(fileName))
     packed_bits = bitarray()
-    packed_data = packed_bits.tobytes()
-    packed_bits = packBits(packed_bits, array, dataType)
-    saveFileBin(file_path, packed_bits, dataType)
-
-def saveArray_dim2_bin(folder, fileName, array, dataType):
-    file_path = os.path.join(folder, '{}.bin'.format(fileName))
-    packed_bits = bitarray()
-    for row in array:
-        packed_bits = packBits(packed_bits, row, dataType)
-    saveFileBin(file_path, packed_bits, dataType)
-
-def saveArray_dim3_bin(folder, fileName, array, dataType):
-    file_path = os.path.join(folder, '{}.bin'.format(fileName))
-    packed_bits = bitarray()
-    for matrix in array:
-        for row in matrix:
-            packed_bits = packBits(packed_bits, row, dataType)
-    saveFileBin(file_path, packed_bits, dataType)
-
-def saveArray_dim4_bin(folder, fileName, array, dataType):
-    file_path = os.path.join(folder, '{}.bin'.format(fileName))
-    packed_bits = bitarray()
-    for dim1 in array:
-        for dim2 in dim1:
-            for row in dim2:
-                packed_bits = packBits(packed_bits, row, dataType)
+    packed_bits = packBits(packed_bits, array, dataType, saveBinAsInteger)
     saveFileBin(file_path, packed_bits, dataType)
 
 
@@ -183,20 +176,20 @@ def saveFileBin(file_path, packed_bits, dataType):
 
 
 
-def saveArray(folder, fileName, array, arrayName, dataType):
+def saveArray(folder, fileName, array, arrayName, dataType, saveBinAsInteger=False):
     size = len(array.shape)
     if size == 1:
         saveArray_dim1(folder, fileName, array, arrayName, "float")
-        saveArray_dim1_bin(folder, fileName, array, dataType)
+        saveArray_bin(folder, fileName, array, dataType, saveBinAsInteger)
     elif size == 2:
         saveArray_dim2(folder, fileName, array, arrayName, "float")
-        saveArray_dim2_bin(folder, fileName, array, dataType)
+        saveArray_bin(folder, fileName, array, dataType, saveBinAsInteger)
     elif size == 3:
         saveArray_dim3(folder, fileName, array, arrayName, "float")
-        saveArray_dim3_bin(folder, fileName, array, dataType)
+        saveArray_bin(folder, fileName, array, dataType, saveBinAsInteger)
     elif size == 4:
         saveArray_dim4(folder, fileName, array, arrayName, "float")
-        saveArray_dim4_bin(folder, fileName, array, dataType)
+        saveArray_bin(folder, fileName, array, dataType, saveBinAsInteger)
     else:
         print("ERROR saving array {}, with total dimensions {}.".format(arrayName, size))
 

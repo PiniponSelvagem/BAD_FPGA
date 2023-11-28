@@ -24,14 +24,17 @@ int pf = 1; //10;
 
 void conv2D(hls::stream<in_pkt> &strm_in, hls::stream<out_pkt> &strm_out, unsigned char scale, int pool);
 
+
 weigth_t input_2[FILTERS*IHEIGHT*IWIDTH/PACKET];
+
 weigth_t kernel_1[FILTERS*CHANNELS*K_SIZE*K_SIZE/PACKET];
 weigth_t kernel_1_scale[CHANNELS/PACKET];
+weigth_t bias_1[CHANNELS/PACKET];
 
 
 int main() {
-    loadWeights(input_2, kernel_1, kernel_1_scale);
-
+    loadWeights(input_2, kernel_1, kernel_1_scale, bias_1);
+    /*
     printf("\ninput_2:\n");
     for (int idx=0; idx<FILTERS*IHEIGHT*IWIDTH/PACKET; idx++) {
     	printf("idx=%d | 0x%016llx\n", idx, input_2[idx]);
@@ -40,23 +43,36 @@ int main() {
     for (int idx=0; idx<CHANNELS/PACKET; idx++) {
     	printf("idx=%d | 0x%016llx\n", idx, kernel_1_scale[idx]);
     }
+    printf("\nbias:\n");
+    for (int idx=0; idx<CHANNELS/PACKET; idx++) {
+    	printf("idx=%d | 0x%016llx\n", idx, bias_1[idx]);
+    }
     printf("\n");
+	*/
 
     int i, j, err_cnt = 0;
 
     in_pkt tmp;
     out_pkt tmpo;
 
+    for (i=0; i<(CHANNELS/PACKET); i++) {
+        tmp.data = bias_1[i];
+    	//tmp.data = (weigth_t)0x1111111111111111;
+        str_in.write(tmp);
+    }
+    for (i=0; i<(CHANNELS/PACKET); i++) {
+        tmp.data = kernel_1_scale[i];
+        str_in.write(tmp);
+    }
     for (i=0; i<(FILTERS*K_SIZE*K_SIZE*IDEPTH/PACKET); i++) {
         //printf("%d\n", i);
-        /*
-    	if (i == 4)
-            tmp.data = (weigth_t)0x0001000100010001;
+    	/*
+    	if ((i+5) % 9 == 0)
+            tmp.data = (weigth_t)0x1111111111111111;
         else
-            tmp.data = (weigth_t)0x0002000200020002;
-        */
+            tmp.data = (weigth_t)0x0000000000000000;
+    	*/
         tmp.data = kernel_1[i];
-        //tmp.data = (weigth_t)0x0001000100010001;
         if (i==(FILTERS*K_SIZE*K_SIZE*IDEPTH/PACKET-1)) tmp.last = (ap_int<1>)1;
         else tmp.last = (ap_int<1>)0;
         str_in.write(tmp);
@@ -64,7 +80,8 @@ int main() {
 
     for (i=0; i<IHEIGHT*IWIDTH*IDEPTH/PACKET; i++) {
     	//printf("input[%d]\n", i);
-        tmp.data = input_2[i];
+    	//tmp.data = (imap_t)0x1110000000000000;
+    	tmp.data = input_2[i];
     	/*
     	if (i==0) { // || i==1 || i==2 || i==3) {
             //tmp.data = (imap_t)0x0004000300020001;
@@ -88,6 +105,8 @@ int main() {
         str_in.write(tmp);
         //printf("%d\n", (int)tmp.data.range(15,0));
     }
+
+    printf("--- END OF SEND ---\n\n");
 
 #if HW_IP
     conv2D(str_in, str_out, 0, pf);
