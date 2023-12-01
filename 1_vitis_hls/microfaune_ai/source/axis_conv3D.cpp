@@ -123,7 +123,7 @@ void conv2D(hls::stream<in_pkt> &strm_in, hls::stream<out_pkt> &strm_out, unsign
                 ,3frac   *   ,4frac   =   ,7frac
                  */
 
-                //printf("acc %d, %d\n", (int)acc, (int)cp);
+                printf("acc %d, %d\n", (int)acc, (int)cp);
                 if (acc <= 0) acc_sat = 0;
                 else acc_sat = (acc >> scale);	//load scale here, saber quantos fraccionarios tenho, saber onde esta a virgula
                 // verificar se esta a saturar, numeros a esquerda do fraccionario se e maior

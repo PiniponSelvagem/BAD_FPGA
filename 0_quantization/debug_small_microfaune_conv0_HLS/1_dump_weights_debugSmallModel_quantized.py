@@ -233,16 +233,17 @@ for l in model.layers:
     print("'"+str(l.name)+"': "+str(i)+",")
     i+=1
 """
-if "q_conv2d_batchnorm" in model.layers[1].name:
+if "q_conv2d_batchnorm" in model.layers[2].name:    # WARNING: THIS CHECK MIGHT FAIL IF MODEL LAYERS ARE CHANGED
     isManualQmodel = True
     layers_idx = {
-        'q_conv2d_batchnorm': 1,
-        'q_activation': 2,
-        'q_conv2d_batchnorm_1': 3,
-        'q_activation_1': 4,
-        'max_pooling2d': 5,
-        'q_bidirectional': 7,
-        'q_bidirectional_1': 8
+        'q_activation': 1,
+        'q_conv2d_batchnorm': 2,
+        'q_activation_1': 3,
+        'q_conv2d_batchnorm_1': 4,
+        'q_activation_2': 5,
+        'max_pooling2d': 6,
+        'q_bidirectional': 8,
+        'q_bidirectional_1': 9
     }
     """ # MicrofuneQuantized
     layers_idx = {
@@ -318,16 +319,38 @@ print("------ KERNEL ------")
 layer = model_quant["q_conv2d_batchnorm"]
 weight = layer["weights"]
 layerName = "q_conv2d_batchnorm"
+print("- processing kernel")
 processLayer(layerName, layerName+"_kernel", weight[0])
 
-print("------ KERNEL + SCALE ------")
-layer = model_quant["q_conv2d_batchnorm"]
-weight = layer["weights"]
-layerName = "q_conv2d_batchnorm"
+print("------ SCALE ------")
 kernel_scale = getQuantizeScale(layerName, 0)
+processLayer(layerName, layerName+"_kernel_scale", kernel_scale, isScale=True)
+#
+print("------ KERNEL + SCALE ------")
 kernelWscale = mergeKernelScale(weight[0], kernel_scale)
+print("- processing kernel_merged_scale")
 processLayer(layerName, layerName+"_kernel_merged_scale", kernelWscale, isKernelMergedScale=True)
 """
+
+"""
+print("------ KERNEL ------")
+layer = model_quant["q_conv2d_batchnorm_1"]
+weight = layer["weights"]
+layerName = "q_conv2d_batchnorm_1"
+print("- processing kernel")
+processLayer(layerName, layerName+"_kernel", weight[0])
+
+print("------ SCALE ------")
+kernel_scale = getQuantizeScale(layerName, 0)
+processLayer(layerName, layerName+"_kernel_scale", kernel_scale, isScale=True)
+#
+print("------ KERNEL + SCALE ------")
+kernelWscale = mergeKernelScale(weight[0], kernel_scale)
+print("- processing kernel_merged_scale")
+processLayer(layerName, layerName+"_kernel_merged_scale", kernelWscale, isKernelMergedScale=True)
+"""
+
+
 
 
 """
@@ -335,21 +358,29 @@ processLayer("conv2d", "conv2d_kernel", model_quant["conv2d"]["weights"][0])
 processLayer("conv2d", "conv2d_kernel_scale", getQuantizeScale("conv2d", 0))
 processLayer("conv2d", "conv2d_bias_scale", getQuantizeScale("conv2d", 1), isScale=True)
 """
+
+"""
+"""
 for layerName in model_quant:
     print(layerName)
     layer = model_quant[layerName]
     #for weight in layer:
     weight = layer["weights"]
     if "conv2d" in layerName:
+        print("- processing kernel")
         processLayer(layerName, layerName+"_kernel", weight[0])
+        print("- processing bias")
         processLayer(layerName, layerName+"_bias", weight[1])
         #
         kernel_scale = getQuantizeScale(layerName, 0)
+        print("- processing kernel_scale")
         processLayer(layerName, layerName+"_kernel_scale", kernel_scale, isScale=True)
+        print("- processing bias_scale")
         processLayer(layerName, layerName+"_bias_scale", getQuantizeScale(layerName, 1), isScale=True)
         #
         kernelWscale = mergeKernelScale(weight[0], kernel_scale)
-        processLayer(layerName, layerName+"_kernel_merged_scale", kernelWscale)
+        print("- processing kernel_merged_scale")
+        processLayer(layerName, layerName+"_kernel_merged_scale", kernelWscale, isKernelMergedScale=True)
     if "batch_normalization" in layerName:
         processLayer(layerName, layerName+"_gamma", weight[0])
         processLayer(layerName, layerName+"_beta", weight[1])

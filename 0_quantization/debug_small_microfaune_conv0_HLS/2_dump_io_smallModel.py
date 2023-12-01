@@ -21,7 +21,7 @@ data_type["name"] = "float"
 """
 data_type["name"] = "ap_fixed"
 data_type["bits_total"] = 4
-data_type["bits_int"] = 1
+data_type["bits_int"] = 0
 
 # use old rearange
 shouldRearrange = False

@@ -117,6 +117,8 @@ def packData(packed_bits, array, dataType, saveBinAsInteger):
                 complement = (1 << bits_total) + scaled_value
                 binary = bin(complement)[2:].zfill(bits_total)
             #
+            #if True: #value != 0:
+            #    print(value, ",", scaled_value, " --- ", binary)
             #
             if bits_total == 4:
                 if isOddElement:
@@ -156,6 +158,7 @@ def saveArray_bin(folder, fileName, array, dataType, saveBinAsInteger):
     file_path = os.path.join(folder, '{}.bin'.format(fileName))
     packed_bits = bitarray()
     packed_bits = packBits(packed_bits, array, dataType, saveBinAsInteger)
+    #print(packed_bits)
     saveFileBin(file_path, packed_bits, dataType)
 
 

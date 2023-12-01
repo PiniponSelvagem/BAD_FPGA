@@ -109,7 +109,7 @@ int main() {
     printf("--- END OF SEND ---\n\n");
 
 #if HW_IP
-    conv2D(str_in, str_out, 0, pf);
+    conv2D(str_in, str_out, 3, pf);
 #endif
 
     for (i=0; i<OWIDTH*OHEIGHT*FILTERS/PACKET/pf; i++) {

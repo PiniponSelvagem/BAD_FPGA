@@ -11,7 +11,7 @@
 
 
 // DEBUG with INPUT
-#define INPUT_2             INPUTS_PATH"2__q_activation.bin"
+#define INPUT_2             INPUTS_PATH"3__q_activation_1.bin"
 
 
 // conv2d_0
