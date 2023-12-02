@@ -22,7 +22,7 @@ static weigth_t kernel[FILTERS][K_SIZE][K_SIZE][IDEPTH/PACKET];
 
 int pf = 1; //10;
 
-void conv2D(hls::stream<in_pkt> &strm_in, hls::stream<out_pkt> &strm_out, unsigned char scale, int pool);
+void conv2D(hls::stream<in_pkt> &strm_in, hls::stream<out_pkt> &strm_out, int pool);
 
 
 weigth_t input_2[FILTERS*IHEIGHT*IWIDTH/PACKET];
@@ -62,6 +62,11 @@ int main() {
     }
     for (i=0; i<(CHANNELS/PACKET); i++) {
         tmp.data = kernel_1_scale[i];
+    	/*
+        if (i=0) tmp.data = (weigth_t)0xFEDCBA0987654321;
+    	else if (i=1) tmp.data = (weigth_t)0x9785643210ABCDEF;
+    	else tmp.data = (weigth_t)0x1010101010101010;
+    	*/
         str_in.write(tmp);
     }
     for (i=0; i<(FILTERS*K_SIZE*K_SIZE*IDEPTH/PACKET); i++) {
@@ -109,7 +114,7 @@ int main() {
     printf("--- END OF SEND ---\n\n");
 
 #if HW_IP
-    conv2D(str_in, str_out, 3, pf);
+    conv2D(str_in, str_out, pf);
 #endif
 
     for (i=0; i<OWIDTH*OHEIGHT*FILTERS/PACKET/pf; i++) {

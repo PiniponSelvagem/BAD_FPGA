@@ -28,13 +28,14 @@ class ModelConfig:
         conv_reg = keras.regularizers.l2(1e-3)
         #
         spec = keras.Input(shape=[3, 2, 1], dtype=np.float32)
+        x = QActivation(f"quantized_relu({bits},{integer_relu})")(spec)
         #
         x = QConv2DBatchnorm(
             n_filter, (3, 3), padding=ModelConfig.padding, kernel_regularizer=conv_reg, activation=None,
             kernel_quantizer = f"quantized_bits({bits},{integer},{symmetric})",
             bias_quantizer = f"quantized_bits({bits},{integer},{symmetric})",
             momentum=0.95
-        )(spec)
+        )(x)
         x = QActivation(f"quantized_relu({bits},{integer_relu})")(x)
         #
         x = QConv2DBatchnorm(

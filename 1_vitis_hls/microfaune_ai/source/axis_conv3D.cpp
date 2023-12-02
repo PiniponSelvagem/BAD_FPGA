@@ -1,4 +1,5 @@
 #include <ap_int.h>
+#include <ap_fixed.h>
 #include <ap_axi_sdata.h>
 #include "hls_stream.h"
 
@@ -7,20 +8,21 @@
 
 typedef ap_int<16> bias_t;
 typedef ap_int<13> count_t;
-typedef ap_int<40> accum_t;  // I_BIT_WIDTH+W_BIT_WIDTH + 4
+typedef ap_int<18> accum_t;  //TODO: was 40 // I_BIT_WIDTH+W_BIT_WIDTH + 4
+typedef ap_int<4>  scale_t;
 
 typedef ap_axis<64, 0, 0, 0> in_pkt;
 typedef ap_axis<64, 0, 0, 0> out_pkt;
 
 // The top-level function
-void conv2D(hls::stream<in_pkt> &strm_in, hls::stream<out_pkt> &strm_out, unsigned char scale, int pool) {
+void conv2D(hls::stream<in_pkt> &strm_in, hls::stream<out_pkt> &strm_out, int pool) {
 #pragma HLS INTERFACE ap_ctrl_none port=return
 #pragma HLS interface axis port=strm_in
 #pragma HLS INTERFACE axis port=strm_out
 
     imap_t img_in[(K_SIZE+1)*IWIDTH*IDEPTH/PACKET];
     weigth_t weights[FILTERS*K_SIZE*K_SIZE*IDEPTH/PACKET];
-    weigth_t weights_scale[CHANNELS/PACKET];
+    weigth_t scales[CHANNELS/PACKET];
     weigth_t bias[CHANNELS/PACKET];
 #pragma HLS ARRAY_PARTITION variable=weights type=cyclic factor=2
 #pragma HLS ARRAY_PARTITION variable=img_in type=cyclic factor=2
@@ -31,27 +33,28 @@ void conv2D(hls::stream<in_pkt> &strm_in, hls::stream<out_pkt> &strm_out, unsign
     READ_BIAS: for (int i = 0; i < CHANNELS/PACKET; i++){
         tmp = strm_in.read();
         bias[i] = tmp.data.range(63, 0);
-        printf("bias[%d] = 0x%08x 0x%08x\n", i, (int)bias[i].range(63,32), (int)bias[i].range(31,0));
+//        printf("bias[%d] = 0x%08x 0x%08x\n", i, (int)bias[i].range(63,32), (int)bias[i].range(31,0));
     }
-    READ_WEIGHTS_SCALE: for (int i = 0; i < CHANNELS/PACKET; i++){
+    READ_SCALES: for (int i = 0; i < CHANNELS/PACKET; i++){
         tmp = strm_in.read();
-        weights_scale[i] = tmp.data.range(63, 0);
-        printf("weights_scale[%d] = 0x%08x 0x%08x\n", i, (int)weights_scale[i].range(63,32), (int)weights_scale[i].range(31,0));
+        scales[i] = tmp.data.range(63, 0);
+        printf("scale[%d] = 0x%08x 0x%08x\n", i, (int)scales[i].range(63,32), (int)scales[i].range(31,0));
     }
     READ_WEIGHTS: for (int i = 0; i < FILTERS*K_SIZE*K_SIZE*IDEPTH/PACKET; i++){    //FILTERS*(K_SIZE*K_SIZE*IDEPTH/PACKET+1
         tmp = strm_in.read();
         weights[i] = tmp.data.range(63, 0);
-        printf("weights[%d] = 0x%08x 0x%08x\n", i, (int)weights[i].range(63,32), (int)weights[i].range(31,0));
+//        printf("weights[%d] = 0x%08x 0x%08x\n", i, (int)weights[i].range(63,32), (int)weights[i].range(31,0));
     }
 
     READ_INIT_MAP: for (int i = 0; i < (K_SIZE-1)*IWIDTH*IDEPTH/PACKET; i++){
         tmp = strm_in.read();
         img_in[i] = tmp.data.range(63, 0);
-        printf("img_in[%d] = 0x%08x 0x%08x\n", i, (int)img_in[i].range(63,32), (int)img_in[i].range(31,0));
+//        printf("img_in[%d] = 0x%08x 0x%08x\n", i, (int)img_in[i].range(63,32), (int)img_in[i].range(31,0));
     }
 
     int kk, xx, w_index, i_index, i_index1, rd_index, cp;
     int b_index, b0, b1;
+    ap_ufixed<4,0> accF;
     omap_t acc_sat;
     accum_t acc;
     accum_t accArray[64];
@@ -123,10 +126,27 @@ void conv2D(hls::stream<in_pkt> &strm_in, hls::stream<out_pkt> &strm_out, unsign
                 ,3frac   *   ,4frac   =   ,7frac
                  */
 
-                printf("acc %d, %d\n", (int)acc, (int)cp);
+                //printf("acc %d, %d\n", (int)acc, (int)cp);
+
+                ap_uint<6> scaleStart = (i % PACKET) * 4;
+                ap_uint<6> scaleEnd   = scaleStart + 3;
+                scale_t scale = scales[i/PACKET].range(scaleEnd,scaleStart);
+                //printf("%d - %d,%d\n", i, scaleStart, scaleEnd);
+
                 if (acc <= 0) acc_sat = 0;
-                else acc_sat = (acc >> scale);	//load scale here, saber quantos fraccionarios tenho, saber onde esta a virgula
-                // verificar se esta a saturar, numeros a esquerda do fraccionario se e maior
+                else acc_sat = (acc >> scale);
+
+                if (acc_sat[0] == 1){
+                	acc_sat = acc_sat + 2;
+                }
+
+                acc_sat = acc_sat.range(4,1);
+                if (acc_sat > 15)
+                	acc_sat = 15;
+
+                accF.range(3,0) = acc_sat.range(3,0);
+				printf("acc %f\n", (float)accF);
+
 
                 if (pool == 1){
                 	//printf("i=%d | i%16=%d\n", i, i%16);

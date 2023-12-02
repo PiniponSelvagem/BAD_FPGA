@@ -131,7 +131,7 @@ class Layer:
 
 
 
-def processLayer(layerName, weightName, weight, isScale=False, isKernelMergedScale=False):
+def processLayer(layerName, weightName, weight, isScale=False, saveBinAsInteger=False):
     shape = weight.shape
     sdim = len(shape)
     data = np.array(weight)
@@ -179,10 +179,10 @@ def processLayer(layerName, weightName, weight, isScale=False, isKernelMergedSca
         rbias = np.squeeze(rbias)
         biasName = weightName
         rbiasBias = weightName+"_recurrent"
-        cutils.saveArray(folder, biasName, bias, biasName, data_type, saveBinAsInteger=isKernelMergedScale)
-        cutils.saveArray(folder, rbiasBias, rbias, rbiasBias, data_type, saveBinAsInteger=isKernelMergedScale)
+        cutils.saveArray(folder, biasName, bias, biasName, data_type, saveBinAsInteger=saveBinAsInteger)
+        cutils.saveArray(folder, rbiasBias, rbias, rbiasBias, data_type, saveBinAsInteger=saveBinAsInteger)
     else:
-        cutils.saveArray(folder, weightName, data, weightName, data_type, saveBinAsInteger=isKernelMergedScale)
+        cutils.saveArray(folder, weightName, data, weightName, data_type, saveBinAsInteger=saveBinAsInteger)
 
 
 
@@ -318,14 +318,14 @@ def createScaleHLS(kernel_scale):
     nNeg = data_type["bits_total"]
     nPos = nNeg-1
     #
-    scaleHLS = (1 / kernel_scale) * 4
-    scaleHLS = np.floor(np.log2(np.abs(scaleHLS)))
+    scaleHLSprocessing = (1 / kernel_scale) * 4
+    scaleHLS = np.floor(np.log2(np.abs(scaleHLSprocessing)))
     #
     # If value is below 1, then it is a fractional value, get the value of n in 2^(-n)
     # Find indices where values are below 1
-    indices_below_1 = scaleHLS < 1
-    filtered_values = scaleHLS[indices_below_1]
-    filtered_values[filtered_values > 0] = -np.log2(filtered_values[filtered_values > 0])
+    indices_below_1 = scaleHLSprocessing < 1
+    filtered_values = scaleHLSprocessing[indices_below_1]
+    filtered_values[filtered_values > 0] = -(-np.log2(filtered_values[filtered_values > 0]))
     scaleHLS[indices_below_1] = filtered_values
     #
     # Check for values that cannot be represented in total_bits
@@ -350,7 +350,7 @@ processLayer(layerName, layerName+"_kernel_scale", kernel_scale, isScale=True)
 print("------ KERNEL + SCALE ------")
 kernelWscale = mergeKernelScale(weight[0], kernel_scale)
 print("- processing kernel_merged_scale")
-processLayer(layerName, layerName+"_kernel_merged_scale", kernelWscale, isKernelMergedScale=True)
+processLayer(layerName, layerName+"_kernel_merged_scale", kernelWscale, saveBinAsInteger=True)
 """
 
 """
@@ -368,16 +368,24 @@ processLayer(layerName, layerName+"_kernel_scale", kernel_scale, isScale=True)
 print("------ KERNEL + SCALE ------")
 kernelWscale = mergeKernelScale(weight[0], kernel_scale)
 print("- processing kernel_merged_scale")
-processLayer(layerName, layerName+"_kernel_merged_scale", kernelWscale, isKernelMergedScale=True)
+processLayer(layerName, layerName+"_kernel_merged_scale", kernelWscale, saveBinAsInteger=True)
 """
-
-
-
 
 """
 processLayer("conv2d", "conv2d_kernel", model_quant["conv2d"]["weights"][0])
 processLayer("conv2d", "conv2d_kernel_scale", getQuantizeScale("conv2d", 0))
 processLayer("conv2d", "conv2d_bias_scale", getQuantizeScale("conv2d", 1), isScale=True)
+"""
+
+"""
+scaleTest = np.array([0.03125, 0.0625, 0.125, 0.25, 0.5, 1, 2, 4, 8, 16, 32, 64, 128, 256, 512])
+scaleExpected = np.array([7, 6, 5, 4, 3, 2, 1, 0, -1, -2, -3, -4, -5, -6, -7])
+scaleTestHLS = createScaleHLS(scaleTest)
+
+# Zip the arrays together and iterate over them
+for st, se, sthls in zip(scaleTest, scaleExpected, scaleTestHLS):
+    print(f'{st}\t\t{se}\t\t{sthls}')
+#processLayer("test_scaleHLS", "test_scaleHLS"+"_kernel_scale_hls", scaleTestHLS, isScale=True, saveBinAsInteger=True)
 """
 
 """
@@ -401,11 +409,11 @@ for layerName in model_quant:
         #
         print("- processing kernel_merged_scale")
         kernelWscale = mergeKernelScale(weight[0], kernel_scale)
-        processLayer(layerName, layerName+"_kernel_merged_scale", kernelWscale, isKernelMergedScale=True)   # TODO: This might be the same for GRU
+        processLayer(layerName, layerName+"_kernel_merged_scale", kernelWscale, saveBinAsInteger=True)   # TODO: This might be the same for GRU
         #
         print("- processing kernel_scale for HLS")
         scaleHLS = createScaleHLS(kernel_scale)
-        processLayer(layerName, layerName+"_kernel_scale_hls", scaleHLS, isScale=True)
+        processLayer(layerName, layerName+"_kernel_scale_hls", scaleHLS, isScale=True, saveBinAsInteger=True)
     if "batch_normalization" in layerName:
         processLayer(layerName, layerName+"_gamma", weight[0])
         processLayer(layerName, layerName+"_beta", weight[1])

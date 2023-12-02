@@ -16,12 +16,12 @@
 
 // conv2d_0
 #define CONV_0_KERNEL       WEIGHTS_PATH"q_conv2d_batchnorm_kernel_merged_scale.bin"
-#define CONV_0_KERNEL_SCALE WEIGHTS_PATH"q_conv2d_batchnorm_kernel_scale.bin"
+#define CONV_0_KERNEL_SCALE WEIGHTS_PATH"q_conv2d_batchnorm_kernel_scale_hls.bin"
 #define CONV_0_BIAS         WEIGHTS_PATH"q_conv2d_batchnorm_bias.bin"
 
 // conv2d_1
 #define CONV_1_KERNEL       WEIGHTS_PATH"q_conv2d_batchnorm_1_kernel_merged_scale.bin"
-#define CONV_1_KERNEL_SCALE WEIGHTS_PATH"q_conv2d_batchnorm_1_kernel_scale.bin"
+#define CONV_1_KERNEL_SCALE WEIGHTS_PATH"q_conv2d_batchnorm_1_kernel_scale_hls.bin"
 #define CONV_1_BIAS         WEIGHTS_PATH"q_conv2d_batchnorm_1_bias.bin"
 
 /*
