@@ -11,6 +11,7 @@
 
 
 // DEBUG with INPUT
+#define INPUT_1             INPUTS_PATH"1__q_activation.bin"
 #define INPUT_2             INPUTS_PATH"3__q_activation_1.bin"
 
 
@@ -179,18 +180,18 @@ void load(const char* path, void* array, int arraysize, int typesize) {
 }
 
 void loadWeights(
-    weigth_t* input_2,
-    weigth_t* kernel_1, weigth_t* kernel_1_scale, weigth_t* bias_1
+	weigth_t* input_1, weigth_t* input_2,
+	weigth_t* kernel_0, weigth_t* kernel_0_scale, weigth_t* bias_0,
+	weigth_t* kernel_1, weigth_t* kernel_1_scale, weigth_t* bias_1
 ) {
     // debug: input
+	load(INPUT_1, input_1, IHEIGHT*IWIDTH, sizeof(weigth_t));
     load(INPUT_2, input_2, FILTERS*IHEIGHT*IWIDTH, sizeof(weigth_t));
 
-    /*
     // conv2d_0
-	load(CONV_0_KERNEL, kernel_0, CHANNELS*K_SIZE*K_SIZE, sizeof(quant_t));
-    load(CONV_0_KERNEL_SCALE, kernel_0_scale, CHANNELS, sizeof(quant_t));
-    load(CONV_0_BIAS, bias_0, CHANNELS, sizeof(quant_t));
-    */
+	load(CONV_0_KERNEL, kernel_0, FILTERS*CHANNELS*K_SIZE*K_SIZE, sizeof(weigth_t));
+    load(CONV_0_KERNEL_SCALE, kernel_0_scale, CHANNELS, sizeof(weigth_t));
+    load(CONV_0_BIAS, bias_0, CHANNELS, sizeof(weigth_t));
 
     // conv2d_1
     load(CONV_1_KERNEL, kernel_1, FILTERS*CHANNELS*K_SIZE*K_SIZE, sizeof(weigth_t));

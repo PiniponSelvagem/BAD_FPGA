@@ -10,6 +10,7 @@ typedef ap_int<16> bias_t;
 typedef ap_int<13> count_t;
 typedef ap_int<18> accum_t;  //TODO: was 40 // I_BIT_WIDTH+W_BIT_WIDTH + 4
 typedef ap_int<4>  scale_t;
+typedef ap_uint<6> range_t;	 // range calculations results: 0-63
 
 typedef ap_axis<64, 0, 0, 0> in_pkt;
 typedef ap_axis<64, 0, 0, 0> out_pkt;
@@ -38,7 +39,7 @@ void conv2D(hls::stream<in_pkt> &strm_in, hls::stream<out_pkt> &strm_out, int po
     READ_SCALES: for (int i = 0; i < CHANNELS/PACKET; i++){
         tmp = strm_in.read();
         scales[i] = tmp.data.range(63, 0);
-        printf("scale[%d] = 0x%08x 0x%08x\n", i, (int)scales[i].range(63,32), (int)scales[i].range(31,0));
+//        printf("scale[%d] = 0x%08x 0x%08x\n", i, (int)scales[i].range(63,32), (int)scales[i].range(31,0));
     }
     READ_WEIGHTS: for (int i = 0; i < FILTERS*K_SIZE*K_SIZE*IDEPTH/PACKET; i++){    //FILTERS*(K_SIZE*K_SIZE*IDEPTH/PACKET+1
         tmp = strm_in.read();
@@ -49,7 +50,7 @@ void conv2D(hls::stream<in_pkt> &strm_in, hls::stream<out_pkt> &strm_out, int po
     READ_INIT_MAP: for (int i = 0; i < (K_SIZE-1)*IWIDTH*IDEPTH/PACKET; i++){
         tmp = strm_in.read();
         img_in[i] = tmp.data.range(63, 0);
-//        printf("img_in[%d] = 0x%08x 0x%08x\n", i, (int)img_in[i].range(63,32), (int)img_in[i].range(31,0));
+        printf("img_in[%d] = 0x%08x 0x%08x\n", i, (int)img_in[i].range(63,32), (int)img_in[i].range(31,0));
     }
 
     int kk, xx, w_index, i_index, i_index1, rd_index, cp;
@@ -128,8 +129,8 @@ void conv2D(hls::stream<in_pkt> &strm_in, hls::stream<out_pkt> &strm_out, int po
 
                 //printf("acc %d, %d\n", (int)acc, (int)cp);
 
-                ap_uint<6> scaleStart = (i % PACKET) * 4;
-                ap_uint<6> scaleEnd   = scaleStart + 3;
+                range_t scaleStart = (i % PACKET) * 4;
+                range_t scaleEnd   = scaleStart + 3;
                 scale_t scale = scales[i/PACKET].range(scaleEnd,scaleStart);
                 //printf("%d - %d,%d\n", i, scaleStart, scaleEnd);
 

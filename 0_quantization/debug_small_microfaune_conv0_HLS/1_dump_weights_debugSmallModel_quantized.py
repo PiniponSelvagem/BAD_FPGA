@@ -131,10 +131,12 @@ class Layer:
 
 
 
-def processLayer(layerName, weightName, weight, isScale=False, saveBinAsInteger=False):
+def processLayer(layerName, weightName, weight, isScale=False, saveBinAsInteger=False, isConv0=False):
     shape = weight.shape
     sdim = len(shape)
     data = np.array(weight)
+    if isConv0:
+        data = kernelPaddingHLS(kernel)
     if any(layerName_c1 in layerName for layerName_c1 in layerName_toChannelFirst):
         # change to channel first
         if sdim == 4:
@@ -335,6 +337,22 @@ def createScaleHLS(kernel_scale):
     #
     return scaleHLS
 
+def kernelPaddingHLS(kernel):
+    # reshape the 1st kernel for easy load in HLS, so padding during runtime is not necessary
+    # by padding the 3rd dimension
+    new_kernel_shape = (kernel.shape[0], kernel.shape[1], kernel.shape[3], kernel.shape[3])
+    new_kernel = np.zeros(new_kernel_shape)
+    pad_width = [(0, 0)] * (len(new_kernel_shape) - len(kernel.shape))
+    for i in range(len(kernel.shape)):
+        pad_width.append((0, new_kernel_shape[i] - kernel.shape[i]))
+
+    # Perform zero-padding
+    new_kernel = np.pad(kernel, pad_width, mode='constant', constant_values=0)
+
+    print(new_kernel.shape)
+    return new_kernel
+
+
 """
 print("------ KERNEL ------")
 layer = model_quant["q_conv2d_batchnorm"]
@@ -390,6 +408,7 @@ for st, se, sthls in zip(scaleTest, scaleExpected, scaleTestHLS):
 
 """
 """
+isConv0 = True
 for layerName in model_quant:
     print(layerName)
     layer = model_quant[layerName]
@@ -397,7 +416,8 @@ for layerName in model_quant:
     weight = layer["weights"]
     if "conv2d" in layerName:
         print("- processing kernel")
-        processLayer(layerName, layerName+"_kernel", weight[0])
+        kernel = weight[0]
+        processLayer(layerName, layerName+"_kernel", kernel, isConv0=isConv0)
         print("- processing bias")
         processLayer(layerName, layerName+"_bias", weight[1])
         #
@@ -408,12 +428,13 @@ for layerName in model_quant:
         processLayer(layerName, layerName+"_bias_scale", getQuantizeScale(layerName, 1), isScale=True)
         #
         print("- processing kernel_merged_scale")
-        kernelWscale = mergeKernelScale(weight[0], kernel_scale)
-        processLayer(layerName, layerName+"_kernel_merged_scale", kernelWscale, saveBinAsInteger=True)   # TODO: This might be the same for GRU
+        kernelWscale = mergeKernelScale(kernel, kernel_scale)
+        processLayer(layerName, layerName+"_kernel_merged_scale", kernelWscale, saveBinAsInteger=True, isConv0=isConv0)   # TODO: This might be the same for GRU
         #
         print("- processing kernel_scale for HLS")
         scaleHLS = createScaleHLS(kernel_scale)
         processLayer(layerName, layerName+"_kernel_scale_hls", scaleHLS, isScale=True, saveBinAsInteger=True)
+        isConv0 = False
     if "batch_normalization" in layerName:
         processLayer(layerName, layerName+"_gamma", weight[0])
         processLayer(layerName, layerName+"_beta", weight[1])

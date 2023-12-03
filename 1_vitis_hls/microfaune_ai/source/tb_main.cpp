@@ -24,8 +24,13 @@ int pf = 1; //10;
 
 void conv2D(hls::stream<in_pkt> &strm_in, hls::stream<out_pkt> &strm_out, int pool);
 
-
+weigth_t input_1[IHEIGHT*IWIDTH/PACKET];
 weigth_t input_2[FILTERS*IHEIGHT*IWIDTH/PACKET];
+
+
+weigth_t kernel_0[FILTERS*CHANNELS*K_SIZE*K_SIZE/PACKET];
+weigth_t kernel_0_scale[CHANNELS/PACKET];
+weigth_t bias_0[CHANNELS/PACKET];
 
 weigth_t kernel_1[FILTERS*CHANNELS*K_SIZE*K_SIZE/PACKET];
 weigth_t kernel_1_scale[CHANNELS/PACKET];
@@ -33,7 +38,11 @@ weigth_t bias_1[CHANNELS/PACKET];
 
 
 int main() {
-    loadWeights(input_2, kernel_1, kernel_1_scale, bias_1);
+    loadWeights(
+		input_1, input_2,
+		kernel_0, kernel_0_scale, bias_0,
+		kernel_1, kernel_1_scale, bias_1
+	);
     /*
     printf("\ninput_2:\n");
     for (int idx=0; idx<FILTERS*IHEIGHT*IWIDTH/PACKET; idx++) {
@@ -55,6 +64,63 @@ int main() {
     in_pkt tmp;
     out_pkt tmpo;
 
+    for (i=0; i<(CHANNELS/PACKET); i++) {
+        tmp.data = bias_0[i];
+        str_in.write(tmp);
+    }
+    for (i=0; i<(CHANNELS/PACKET); i++) {
+        tmp.data = kernel_0_scale[i];
+        str_in.write(tmp);
+    }
+    for (i=0; i<(FILTERS*K_SIZE*K_SIZE*IDEPTH/PACKET); i++) {
+        tmp.data = kernel_0[i];
+        if (i==(FILTERS*K_SIZE*K_SIZE*IDEPTH/PACKET-1)) tmp.last = (ap_int<1>)1;
+        else tmp.last = (ap_int<1>)0;
+        str_in.write(tmp);
+    }
+
+    for (i=0, j=0; i<IHEIGHT*IWIDTH*CHANNELS/PACKET; i++) {
+    	//printf("i %d\n", (int)i);
+    	//if (i % CHANNELS==0) {
+    		// TODO: IF condition is not correct, when changing CHANNELS to 64, this will fail and give wrong results
+            ap_uint<6> rangeStart = (j % PACKET) * 4;
+            ap_uint<6> rangeEnd   = rangeStart + 3;
+            printf("i %d, j %d, rs %d, re %d\n", i, j, (int)rangeStart, (int)rangeEnd);
+            tmp.data = input_1[j/PACKET].range(rangeEnd,rangeStart);
+            ++j;
+    	//}
+    	//else {
+    	//	tmp.data = (imap_t)0x0000000000000000;
+    	//}
+
+        if (i == (IHEIGHT*IWIDTH*IDEPTH/PACKET-1)) tmp.last = (ap_int<1>)1;
+        else tmp.last = (ap_int<1>)0;
+        str_in.write(tmp);
+        //printf("%d\n", (int)tmp.data.range(15,0));
+    }
+
+    printf("--- END OF SEND ---\n\n");
+
+#if HW_IP
+    conv2D(str_in, str_out, pf);
+#endif
+
+    for (i=0; i<OWIDTH*OHEIGHT*FILTERS/PACKET/pf; i++) {
+        tmpo = str_out.read();
+        /*
+        printf("%02d - result %d, %d, %d, %d\n", i, (int)tmpo.data.range(15,0), (int)tmpo.data.range(31,16),
+                (int)tmpo.data.range(47,32), (int)tmpo.data.range(63,48));
+        */
+        printf("%02d - result %d, %d, %d, %d,   %d, %d, %d, %d,   %d, %d, %d, %d,   %d, %d, %d, %d,\n", i,
+        		(int)tmpo.data.range(3,0),   (int)tmpo.data.range(7,4),   (int)tmpo.data.range(11,8),  (int)tmpo.data.range(15,12),
+				(int)tmpo.data.range(19,16), (int)tmpo.data.range(23,20), (int)tmpo.data.range(27,24), (int)tmpo.data.range(31,28),
+				(int)tmpo.data.range(35,32), (int)tmpo.data.range(39,36), (int)tmpo.data.range(43,40), (int)tmpo.data.range(47,44),
+				(int)tmpo.data.range(51,48), (int)tmpo.data.range(55,52), (int)tmpo.data.range(59,56), (int)tmpo.data.range(63,60)
+		);
+    }
+
+
+#ifdef CONV1
     for (i=0; i<(CHANNELS/PACKET); i++) {
         tmp.data = bias_1[i];
     	//tmp.data = (weigth_t)0x1111111111111111;
@@ -130,6 +196,8 @@ int main() {
 				(int)tmpo.data.range(51,48), (int)tmpo.data.range(55,52), (int)tmpo.data.range(59,56), (int)tmpo.data.range(63,60)
 		);
     }
+#endif
+
 
 
     return 0;
