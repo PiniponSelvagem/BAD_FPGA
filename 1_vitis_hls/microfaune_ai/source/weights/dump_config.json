@@ -1,0 +1,1446 @@
+{
+    "name": "model",
+    "trainable": true,
+    "layers": [
+        {
+            "class_name": "InputLayer",
+            "config": {
+                "batch_input_shape": [
+                    null,
+                    431,
+                    40,
+                    1
+                ],
+                "dtype": "float32",
+                "sparse": false,
+                "ragged": false,
+                "name": "input_1"
+            },
+            "name": "input_1",
+            "inbound_nodes": []
+        },
+        {
+            "class_name": "QActivation",
+            "config": {
+                "name": "q_activation",
+                "trainable": true,
+                "dtype": "float32",
+                "activation": "quantized_relu(4,0)"
+            },
+            "name": "q_activation",
+            "inbound_nodes": [
+                [
+                    [
+                        "input_1",
+                        0,
+                        0,
+                        {}
+                    ]
+                ]
+            ]
+        },
+        {
+            "class_name": "QConv2DBatchnorm",
+            "config": {
+                "name": "q_conv2d_batchnorm",
+                "trainable": true,
+                "dtype": "float32",
+                "filters": 64,
+                "kernel_size": [
+                    3,
+                    3
+                ],
+                "strides": [
+                    1,
+                    1
+                ],
+                "padding": "same",
+                "data_format": "channels_last",
+                "dilation_rate": [
+                    1,
+                    1
+                ],
+                "groups": 1,
+                "activation": "linear",
+                "use_bias": true,
+                "kernel_initializer": {
+                    "class_name": "HeNormal",
+                    "config": {
+                        "seed": null
+                    }
+                },
+                "bias_initializer": {
+                    "class_name": "Zeros",
+                    "config": {}
+                },
+                "kernel_regularizer": {
+                    "class_name": "L2",
+                    "config": {
+                        "l2": 0.0010000000474974513
+                    },
+                    "shared_object_id": 6
+                },
+                "bias_regularizer": null,
+                "activity_regularizer": null,
+                "kernel_constraint": {
+                    "class_name": "Clip",
+                    "config": {
+                        "min_value": -2.0,
+                        "max_value": 2.0
+                    }
+                },
+                "bias_constraint": {
+                    "class_name": "Clip",
+                    "config": {
+                        "min_value": -2.0,
+                        "max_value": 2.0
+                    }
+                },
+                "kernel_quantizer": {
+                    "class_name": "quantized_bits",
+                    "config": {
+                        "bits": 4,
+                        "integer": 1,
+                        "symmetric": true,
+                        "alpha": "auto_po2",
+                        "keep_negative": true,
+                        "use_stochastic_rounding": false,
+                        "qnoise_factor": 1.0
+                    }
+                },
+                "bias_quantizer": {
+                    "class_name": "quantized_bits",
+                    "config": {
+                        "bits": 4,
+                        "integer": 1,
+                        "symmetric": 1,
+                        "alpha": null,
+                        "keep_negative": true,
+                        "use_stochastic_rounding": false,
+                        "qnoise_factor": 1.0
+                    }
+                },
+                "kernel_range": null,
+                "bias_range": null,
+                "axis": [
+                    3
+                ],
+                "momentum": 0.95,
+                "epsilon": 0.001,
+                "center": true,
+                "scale": true,
+                "beta_initializer": {
+                    "class_name": "Zeros",
+                    "config": {}
+                },
+                "gamma_initializer": {
+                    "class_name": "Ones",
+                    "config": {}
+                },
+                "moving_mean_initializer": {
+                    "class_name": "Zeros",
+                    "config": {}
+                },
+                "moving_variance_initializer": {
+                    "class_name": "Ones",
+                    "config": {}
+                },
+                "beta_regularizer": null,
+                "gamma_regularizer": null,
+                "beta_constraint": null,
+                "gamma_constraint": null,
+                "ema_freeze_delay": null,
+                "folding_mode": "ema_stats_folding"
+            },
+            "name": "q_conv2d_batchnorm",
+            "inbound_nodes": [
+                [
+                    [
+                        "q_activation",
+                        0,
+                        0,
+                        {}
+                    ]
+                ]
+            ]
+        },
+        {
+            "class_name": "QActivation",
+            "config": {
+                "name": "q_activation_1",
+                "trainable": true,
+                "dtype": "float32",
+                "activation": "quantized_relu(4,0)"
+            },
+            "name": "q_activation_1",
+            "inbound_nodes": [
+                [
+                    [
+                        "q_conv2d_batchnorm",
+                        0,
+                        0,
+                        {}
+                    ]
+                ]
+            ]
+        },
+        {
+            "class_name": "QConv2DBatchnorm",
+            "config": {
+                "name": "q_conv2d_batchnorm_1",
+                "trainable": true,
+                "dtype": "float32",
+                "filters": 64,
+                "kernel_size": [
+                    3,
+                    3
+                ],
+                "strides": [
+                    1,
+                    1
+                ],
+                "padding": "same",
+                "data_format": "channels_last",
+                "dilation_rate": [
+                    1,
+                    1
+                ],
+                "groups": 1,
+                "activation": "linear",
+                "use_bias": true,
+                "kernel_initializer": {
+                    "class_name": "HeNormal",
+                    "config": {
+                        "seed": null
+                    }
+                },
+                "bias_initializer": {
+                    "class_name": "Zeros",
+                    "config": {}
+                },
+                "kernel_regularizer": {
+                    "class_name": "L2",
+                    "config": {
+                        "l2": 0.0010000000474974513
+                    },
+                    "shared_object_id": 6
+                },
+                "bias_regularizer": null,
+                "activity_regularizer": null,
+                "kernel_constraint": {
+                    "class_name": "Clip",
+                    "config": {
+                        "min_value": -2.0,
+                        "max_value": 2.0
+                    }
+                },
+                "bias_constraint": {
+                    "class_name": "Clip",
+                    "config": {
+                        "min_value": -2.0,
+                        "max_value": 2.0
+                    }
+                },
+                "kernel_quantizer": {
+                    "class_name": "quantized_bits",
+                    "config": {
+                        "bits": 4,
+                        "integer": 1,
+                        "symmetric": true,
+                        "alpha": "auto_po2",
+                        "keep_negative": true,
+                        "use_stochastic_rounding": false,
+                        "qnoise_factor": 1.0
+                    }
+                },
+                "bias_quantizer": {
+                    "class_name": "quantized_bits",
+                    "config": {
+                        "bits": 4,
+                        "integer": 1,
+                        "symmetric": 1,
+                        "alpha": null,
+                        "keep_negative": true,
+                        "use_stochastic_rounding": false,
+                        "qnoise_factor": 1.0
+                    }
+                },
+                "kernel_range": null,
+                "bias_range": null,
+                "axis": [
+                    3
+                ],
+                "momentum": 0.95,
+                "epsilon": 0.001,
+                "center": true,
+                "scale": true,
+                "beta_initializer": {
+                    "class_name": "Zeros",
+                    "config": {}
+                },
+                "gamma_initializer": {
+                    "class_name": "Ones",
+                    "config": {}
+                },
+                "moving_mean_initializer": {
+                    "class_name": "Zeros",
+                    "config": {}
+                },
+                "moving_variance_initializer": {
+                    "class_name": "Ones",
+                    "config": {}
+                },
+                "beta_regularizer": null,
+                "gamma_regularizer": null,
+                "beta_constraint": null,
+                "gamma_constraint": null,
+                "ema_freeze_delay": null,
+                "folding_mode": "ema_stats_folding"
+            },
+            "name": "q_conv2d_batchnorm_1",
+            "inbound_nodes": [
+                [
+                    [
+                        "q_activation_1",
+                        0,
+                        0,
+                        {}
+                    ]
+                ]
+            ]
+        },
+        {
+            "class_name": "QActivation",
+            "config": {
+                "name": "q_activation_2",
+                "trainable": true,
+                "dtype": "float32",
+                "activation": "quantized_relu(4,0)"
+            },
+            "name": "q_activation_2",
+            "inbound_nodes": [
+                [
+                    [
+                        "q_conv2d_batchnorm_1",
+                        0,
+                        0,
+                        {}
+                    ]
+                ]
+            ]
+        },
+        {
+            "class_name": "MaxPooling2D",
+            "config": {
+                "name": "max_pooling2d",
+                "trainable": true,
+                "dtype": "float32",
+                "pool_size": [
+                    1,
+                    2
+                ],
+                "padding": "valid",
+                "strides": [
+                    1,
+                    2
+                ],
+                "data_format": "channels_last"
+            },
+            "name": "max_pooling2d",
+            "inbound_nodes": [
+                [
+                    [
+                        "q_activation_2",
+                        0,
+                        0,
+                        {}
+                    ]
+                ]
+            ]
+        },
+        {
+            "class_name": "QConv2DBatchnorm",
+            "config": {
+                "name": "q_conv2d_batchnorm_2",
+                "trainable": true,
+                "dtype": "float32",
+                "filters": 64,
+                "kernel_size": [
+                    3,
+                    3
+                ],
+                "strides": [
+                    1,
+                    1
+                ],
+                "padding": "same",
+                "data_format": "channels_last",
+                "dilation_rate": [
+                    1,
+                    1
+                ],
+                "groups": 1,
+                "activation": "linear",
+                "use_bias": true,
+                "kernel_initializer": {
+                    "class_name": "HeNormal",
+                    "config": {
+                        "seed": null
+                    }
+                },
+                "bias_initializer": {
+                    "class_name": "Zeros",
+                    "config": {}
+                },
+                "kernel_regularizer": {
+                    "class_name": "L2",
+                    "config": {
+                        "l2": 0.0010000000474974513
+                    },
+                    "shared_object_id": 6
+                },
+                "bias_regularizer": null,
+                "activity_regularizer": null,
+                "kernel_constraint": {
+                    "class_name": "Clip",
+                    "config": {
+                        "min_value": -2.0,
+                        "max_value": 2.0
+                    }
+                },
+                "bias_constraint": {
+                    "class_name": "Clip",
+                    "config": {
+                        "min_value": -2.0,
+                        "max_value": 2.0
+                    }
+                },
+                "kernel_quantizer": {
+                    "class_name": "quantized_bits",
+                    "config": {
+                        "bits": 4,
+                        "integer": 1,
+                        "symmetric": true,
+                        "alpha": "auto_po2",
+                        "keep_negative": true,
+                        "use_stochastic_rounding": false,
+                        "qnoise_factor": 1.0
+                    }
+                },
+                "bias_quantizer": {
+                    "class_name": "quantized_bits",
+                    "config": {
+                        "bits": 4,
+                        "integer": 1,
+                        "symmetric": 1,
+                        "alpha": null,
+                        "keep_negative": true,
+                        "use_stochastic_rounding": false,
+                        "qnoise_factor": 1.0
+                    }
+                },
+                "kernel_range": null,
+                "bias_range": null,
+                "axis": [
+                    3
+                ],
+                "momentum": 0.95,
+                "epsilon": 0.001,
+                "center": true,
+                "scale": true,
+                "beta_initializer": {
+                    "class_name": "Zeros",
+                    "config": {}
+                },
+                "gamma_initializer": {
+                    "class_name": "Ones",
+                    "config": {}
+                },
+                "moving_mean_initializer": {
+                    "class_name": "Zeros",
+                    "config": {}
+                },
+                "moving_variance_initializer": {
+                    "class_name": "Ones",
+                    "config": {}
+                },
+                "beta_regularizer": null,
+                "gamma_regularizer": null,
+                "beta_constraint": null,
+                "gamma_constraint": null,
+                "ema_freeze_delay": null,
+                "folding_mode": "ema_stats_folding"
+            },
+            "name": "q_conv2d_batchnorm_2",
+            "inbound_nodes": [
+                [
+                    [
+                        "max_pooling2d",
+                        0,
+                        0,
+                        {}
+                    ]
+                ]
+            ]
+        },
+        {
+            "class_name": "QActivation",
+            "config": {
+                "name": "q_activation_3",
+                "trainable": true,
+                "dtype": "float32",
+                "activation": "quantized_relu(4,0)"
+            },
+            "name": "q_activation_3",
+            "inbound_nodes": [
+                [
+                    [
+                        "q_conv2d_batchnorm_2",
+                        0,
+                        0,
+                        {}
+                    ]
+                ]
+            ]
+        },
+        {
+            "class_name": "QConv2DBatchnorm",
+            "config": {
+                "name": "q_conv2d_batchnorm_3",
+                "trainable": true,
+                "dtype": "float32",
+                "filters": 64,
+                "kernel_size": [
+                    3,
+                    3
+                ],
+                "strides": [
+                    1,
+                    1
+                ],
+                "padding": "same",
+                "data_format": "channels_last",
+                "dilation_rate": [
+                    1,
+                    1
+                ],
+                "groups": 1,
+                "activation": "linear",
+                "use_bias": true,
+                "kernel_initializer": {
+                    "class_name": "HeNormal",
+                    "config": {
+                        "seed": null
+                    }
+                },
+                "bias_initializer": {
+                    "class_name": "Zeros",
+                    "config": {}
+                },
+                "kernel_regularizer": {
+                    "class_name": "L2",
+                    "config": {
+                        "l2": 0.0010000000474974513
+                    },
+                    "shared_object_id": 6
+                },
+                "bias_regularizer": null,
+                "activity_regularizer": null,
+                "kernel_constraint": {
+                    "class_name": "Clip",
+                    "config": {
+                        "min_value": -2.0,
+                        "max_value": 2.0
+                    }
+                },
+                "bias_constraint": {
+                    "class_name": "Clip",
+                    "config": {
+                        "min_value": -2.0,
+                        "max_value": 2.0
+                    }
+                },
+                "kernel_quantizer": {
+                    "class_name": "quantized_bits",
+                    "config": {
+                        "bits": 4,
+                        "integer": 1,
+                        "symmetric": true,
+                        "alpha": "auto_po2",
+                        "keep_negative": true,
+                        "use_stochastic_rounding": false,
+                        "qnoise_factor": 1.0
+                    }
+                },
+                "bias_quantizer": {
+                    "class_name": "quantized_bits",
+                    "config": {
+                        "bits": 4,
+                        "integer": 1,
+                        "symmetric": 1,
+                        "alpha": null,
+                        "keep_negative": true,
+                        "use_stochastic_rounding": false,
+                        "qnoise_factor": 1.0
+                    }
+                },
+                "kernel_range": null,
+                "bias_range": null,
+                "axis": [
+                    3
+                ],
+                "momentum": 0.95,
+                "epsilon": 0.001,
+                "center": true,
+                "scale": true,
+                "beta_initializer": {
+                    "class_name": "Zeros",
+                    "config": {}
+                },
+                "gamma_initializer": {
+                    "class_name": "Ones",
+                    "config": {}
+                },
+                "moving_mean_initializer": {
+                    "class_name": "Zeros",
+                    "config": {}
+                },
+                "moving_variance_initializer": {
+                    "class_name": "Ones",
+                    "config": {}
+                },
+                "beta_regularizer": null,
+                "gamma_regularizer": null,
+                "beta_constraint": null,
+                "gamma_constraint": null,
+                "ema_freeze_delay": null,
+                "folding_mode": "ema_stats_folding"
+            },
+            "name": "q_conv2d_batchnorm_3",
+            "inbound_nodes": [
+                [
+                    [
+                        "q_activation_3",
+                        0,
+                        0,
+                        {}
+                    ]
+                ]
+            ]
+        },
+        {
+            "class_name": "QActivation",
+            "config": {
+                "name": "q_activation_4",
+                "trainable": true,
+                "dtype": "float32",
+                "activation": "quantized_relu(4,0)"
+            },
+            "name": "q_activation_4",
+            "inbound_nodes": [
+                [
+                    [
+                        "q_conv2d_batchnorm_3",
+                        0,
+                        0,
+                        {}
+                    ]
+                ]
+            ]
+        },
+        {
+            "class_name": "MaxPooling2D",
+            "config": {
+                "name": "max_pooling2d_1",
+                "trainable": true,
+                "dtype": "float32",
+                "pool_size": [
+                    1,
+                    2
+                ],
+                "padding": "valid",
+                "strides": [
+                    1,
+                    2
+                ],
+                "data_format": "channels_last"
+            },
+            "name": "max_pooling2d_1",
+            "inbound_nodes": [
+                [
+                    [
+                        "q_activation_4",
+                        0,
+                        0,
+                        {}
+                    ]
+                ]
+            ]
+        },
+        {
+            "class_name": "QConv2DBatchnorm",
+            "config": {
+                "name": "q_conv2d_batchnorm_4",
+                "trainable": true,
+                "dtype": "float32",
+                "filters": 64,
+                "kernel_size": [
+                    3,
+                    3
+                ],
+                "strides": [
+                    1,
+                    1
+                ],
+                "padding": "same",
+                "data_format": "channels_last",
+                "dilation_rate": [
+                    1,
+                    1
+                ],
+                "groups": 1,
+                "activation": "linear",
+                "use_bias": true,
+                "kernel_initializer": {
+                    "class_name": "HeNormal",
+                    "config": {
+                        "seed": null
+                    }
+                },
+                "bias_initializer": {
+                    "class_name": "Zeros",
+                    "config": {}
+                },
+                "kernel_regularizer": {
+                    "class_name": "L2",
+                    "config": {
+                        "l2": 0.0010000000474974513
+                    },
+                    "shared_object_id": 6
+                },
+                "bias_regularizer": null,
+                "activity_regularizer": null,
+                "kernel_constraint": {
+                    "class_name": "Clip",
+                    "config": {
+                        "min_value": -2.0,
+                        "max_value": 2.0
+                    }
+                },
+                "bias_constraint": {
+                    "class_name": "Clip",
+                    "config": {
+                        "min_value": -2.0,
+                        "max_value": 2.0
+                    }
+                },
+                "kernel_quantizer": {
+                    "class_name": "quantized_bits",
+                    "config": {
+                        "bits": 4,
+                        "integer": 1,
+                        "symmetric": true,
+                        "alpha": "auto_po2",
+                        "keep_negative": true,
+                        "use_stochastic_rounding": false,
+                        "qnoise_factor": 1.0
+                    }
+                },
+                "bias_quantizer": {
+                    "class_name": "quantized_bits",
+                    "config": {
+                        "bits": 4,
+                        "integer": 1,
+                        "symmetric": 1,
+                        "alpha": null,
+                        "keep_negative": true,
+                        "use_stochastic_rounding": false,
+                        "qnoise_factor": 1.0
+                    }
+                },
+                "kernel_range": null,
+                "bias_range": null,
+                "axis": [
+                    3
+                ],
+                "momentum": 0.95,
+                "epsilon": 0.001,
+                "center": true,
+                "scale": true,
+                "beta_initializer": {
+                    "class_name": "Zeros",
+                    "config": {}
+                },
+                "gamma_initializer": {
+                    "class_name": "Ones",
+                    "config": {}
+                },
+                "moving_mean_initializer": {
+                    "class_name": "Zeros",
+                    "config": {}
+                },
+                "moving_variance_initializer": {
+                    "class_name": "Ones",
+                    "config": {}
+                },
+                "beta_regularizer": null,
+                "gamma_regularizer": null,
+                "beta_constraint": null,
+                "gamma_constraint": null,
+                "ema_freeze_delay": null,
+                "folding_mode": "ema_stats_folding"
+            },
+            "name": "q_conv2d_batchnorm_4",
+            "inbound_nodes": [
+                [
+                    [
+                        "max_pooling2d_1",
+                        0,
+                        0,
+                        {}
+                    ]
+                ]
+            ]
+        },
+        {
+            "class_name": "QActivation",
+            "config": {
+                "name": "q_activation_5",
+                "trainable": true,
+                "dtype": "float32",
+                "activation": "quantized_relu(4,0)"
+            },
+            "name": "q_activation_5",
+            "inbound_nodes": [
+                [
+                    [
+                        "q_conv2d_batchnorm_4",
+                        0,
+                        0,
+                        {}
+                    ]
+                ]
+            ]
+        },
+        {
+            "class_name": "QConv2DBatchnorm",
+            "config": {
+                "name": "q_conv2d_batchnorm_5",
+                "trainable": true,
+                "dtype": "float32",
+                "filters": 64,
+                "kernel_size": [
+                    3,
+                    3
+                ],
+                "strides": [
+                    1,
+                    1
+                ],
+                "padding": "same",
+                "data_format": "channels_last",
+                "dilation_rate": [
+                    1,
+                    1
+                ],
+                "groups": 1,
+                "activation": "linear",
+                "use_bias": true,
+                "kernel_initializer": {
+                    "class_name": "HeNormal",
+                    "config": {
+                        "seed": null
+                    }
+                },
+                "bias_initializer": {
+                    "class_name": "Zeros",
+                    "config": {}
+                },
+                "kernel_regularizer": {
+                    "class_name": "L2",
+                    "config": {
+                        "l2": 0.0010000000474974513
+                    },
+                    "shared_object_id": 6
+                },
+                "bias_regularizer": null,
+                "activity_regularizer": null,
+                "kernel_constraint": {
+                    "class_name": "Clip",
+                    "config": {
+                        "min_value": -2.0,
+                        "max_value": 2.0
+                    }
+                },
+                "bias_constraint": {
+                    "class_name": "Clip",
+                    "config": {
+                        "min_value": -2.0,
+                        "max_value": 2.0
+                    }
+                },
+                "kernel_quantizer": {
+                    "class_name": "quantized_bits",
+                    "config": {
+                        "bits": 4,
+                        "integer": 1,
+                        "symmetric": true,
+                        "alpha": "auto_po2",
+                        "keep_negative": true,
+                        "use_stochastic_rounding": false,
+                        "qnoise_factor": 1.0
+                    }
+                },
+                "bias_quantizer": {
+                    "class_name": "quantized_bits",
+                    "config": {
+                        "bits": 4,
+                        "integer": 1,
+                        "symmetric": 1,
+                        "alpha": null,
+                        "keep_negative": true,
+                        "use_stochastic_rounding": false,
+                        "qnoise_factor": 1.0
+                    }
+                },
+                "kernel_range": null,
+                "bias_range": null,
+                "axis": [
+                    3
+                ],
+                "momentum": 0.95,
+                "epsilon": 0.001,
+                "center": true,
+                "scale": true,
+                "beta_initializer": {
+                    "class_name": "Zeros",
+                    "config": {}
+                },
+                "gamma_initializer": {
+                    "class_name": "Ones",
+                    "config": {}
+                },
+                "moving_mean_initializer": {
+                    "class_name": "Zeros",
+                    "config": {}
+                },
+                "moving_variance_initializer": {
+                    "class_name": "Ones",
+                    "config": {}
+                },
+                "beta_regularizer": null,
+                "gamma_regularizer": null,
+                "beta_constraint": null,
+                "gamma_constraint": null,
+                "ema_freeze_delay": null,
+                "folding_mode": "ema_stats_folding"
+            },
+            "name": "q_conv2d_batchnorm_5",
+            "inbound_nodes": [
+                [
+                    [
+                        "q_activation_5",
+                        0,
+                        0,
+                        {}
+                    ]
+                ]
+            ]
+        },
+        {
+            "class_name": "QActivation",
+            "config": {
+                "name": "q_activation_6",
+                "trainable": true,
+                "dtype": "float32",
+                "activation": "quantized_relu(4,0)"
+            },
+            "name": "q_activation_6",
+            "inbound_nodes": [
+                [
+                    [
+                        "q_conv2d_batchnorm_5",
+                        0,
+                        0,
+                        {}
+                    ]
+                ]
+            ]
+        },
+        {
+            "class_name": "MaxPooling2D",
+            "config": {
+                "name": "max_pooling2d_2",
+                "trainable": true,
+                "dtype": "float32",
+                "pool_size": [
+                    1,
+                    2
+                ],
+                "padding": "valid",
+                "strides": [
+                    1,
+                    2
+                ],
+                "data_format": "channels_last"
+            },
+            "name": "max_pooling2d_2",
+            "inbound_nodes": [
+                [
+                    [
+                        "q_activation_6",
+                        0,
+                        0,
+                        {}
+                    ]
+                ]
+            ]
+        },
+        {
+            "class_name": "TFOpLambda",
+            "config": {
+                "name": "tf.math.reduce_max",
+                "trainable": true,
+                "dtype": "float32",
+                "function": "math.reduce_max"
+            },
+            "name": "tf.math.reduce_max",
+            "inbound_nodes": [
+                [
+                    "max_pooling2d_2",
+                    0,
+                    0,
+                    {
+                        "axis": -2
+                    }
+                ]
+            ]
+        },
+        {
+            "class_name": "QBidirectional",
+            "config": {
+                "name": "q_bidirectional",
+                "trainable": true,
+                "dtype": "float32",
+                "layer": {
+                    "class_name": "QGRU",
+                    "config": {
+                        "name": "qgru",
+                        "trainable": true,
+                        "dtype": "float32",
+                        "return_sequences": true,
+                        "return_state": false,
+                        "go_backwards": false,
+                        "stateful": false,
+                        "unroll": false,
+                        "time_major": false,
+                        "units": 64,
+                        "activation": {
+                            "class_name": "quantized_tanh",
+                            "config": {
+                                "bits": 4,
+                                "symmetric": false,
+                                "use_stochastic_rounding": false,
+                                "use_real_tanh": false
+                            },
+                            "shared_object_id": 79
+                        },
+                        "recurrent_activation": {
+                            "class_name": "quantized_relu",
+                            "config": {
+                                "bits": 4,
+                                "integer": 0,
+                                "use_sigmoid": 1,
+                                "negative_slope": 0.0,
+                                "use_stochastic_rounding": false,
+                                "relu_upper_bound": null,
+                                "qnoise_factor": 1.0
+                            },
+                            "shared_object_id": 80
+                        },
+                        "use_bias": true,
+                        "kernel_initializer": {
+                            "class_name": "GlorotUniform",
+                            "config": {
+                                "seed": null
+                            },
+                            "shared_object_id": 81
+                        },
+                        "recurrent_initializer": {
+                            "class_name": "Orthogonal",
+                            "config": {
+                                "gain": 1.0,
+                                "seed": null
+                            },
+                            "shared_object_id": 82
+                        },
+                        "bias_initializer": {
+                            "class_name": "Zeros",
+                            "config": {},
+                            "shared_object_id": 83
+                        },
+                        "kernel_regularizer": null,
+                        "recurrent_regularizer": null,
+                        "bias_regularizer": null,
+                        "activity_regularizer": null,
+                        "kernel_constraint": {
+                            "class_name": "Clip",
+                            "config": {
+                                "min_value": -2.0,
+                                "max_value": 2.0
+                            },
+                            "shared_object_id": 84
+                        },
+                        "recurrent_constraint": {
+                            "class_name": "Clip",
+                            "config": {
+                                "min_value": -2.0,
+                                "max_value": 2.0
+                            },
+                            "shared_object_id": 85
+                        },
+                        "bias_constraint": {
+                            "class_name": "Clip",
+                            "config": {
+                                "min_value": -2.0,
+                                "max_value": 2.0
+                            },
+                            "shared_object_id": 86
+                        },
+                        "kernel_quantizer": {
+                            "class_name": "quantized_bits",
+                            "config": {
+                                "bits": 4,
+                                "integer": 1,
+                                "symmetric": true,
+                                "alpha": "auto_po2",
+                                "keep_negative": true,
+                                "use_stochastic_rounding": false,
+                                "qnoise_factor": 1.0
+                            },
+                            "shared_object_id": 87
+                        },
+                        "recurrent_quantizer": {
+                            "class_name": "quantized_bits",
+                            "config": {
+                                "bits": 4,
+                                "integer": 1,
+                                "symmetric": true,
+                                "alpha": "auto_po2",
+                                "keep_negative": true,
+                                "use_stochastic_rounding": false,
+                                "qnoise_factor": 1.0
+                            },
+                            "shared_object_id": 88
+                        },
+                        "bias_quantizer": {
+                            "class_name": "quantized_bits",
+                            "config": {
+                                "bits": 4,
+                                "integer": 1,
+                                "symmetric": 1,
+                                "alpha": null,
+                                "keep_negative": true,
+                                "use_stochastic_rounding": false,
+                                "qnoise_factor": 1.0
+                            },
+                            "shared_object_id": 89
+                        },
+                        "state_quantizer": null,
+                        "dropout": 0.0,
+                        "recurrent_dropout": 0.0,
+                        "implementation": 1,
+                        "reset_after": false
+                    }
+                },
+                "merge_mode": "concat"
+            },
+            "name": "q_bidirectional",
+            "inbound_nodes": [
+                [
+                    [
+                        "tf.math.reduce_max",
+                        0,
+                        0,
+                        {}
+                    ]
+                ]
+            ]
+        },
+        {
+            "class_name": "QBidirectional",
+            "config": {
+                "name": "q_bidirectional_1",
+                "trainable": true,
+                "dtype": "float32",
+                "layer": {
+                    "class_name": "QGRU",
+                    "config": {
+                        "name": "qgru_1",
+                        "trainable": true,
+                        "dtype": "float32",
+                        "return_sequences": true,
+                        "return_state": false,
+                        "go_backwards": false,
+                        "stateful": false,
+                        "unroll": false,
+                        "time_major": false,
+                        "units": 64,
+                        "activation": {
+                            "class_name": "quantized_tanh",
+                            "config": {
+                                "bits": 4,
+                                "symmetric": false,
+                                "use_stochastic_rounding": false,
+                                "use_real_tanh": false
+                            },
+                            "shared_object_id": 93
+                        },
+                        "recurrent_activation": {
+                            "class_name": "quantized_relu",
+                            "config": {
+                                "bits": 4,
+                                "integer": 0,
+                                "use_sigmoid": 1,
+                                "negative_slope": 0.0,
+                                "use_stochastic_rounding": false,
+                                "relu_upper_bound": null,
+                                "qnoise_factor": 1.0
+                            },
+                            "shared_object_id": 94
+                        },
+                        "use_bias": true,
+                        "kernel_initializer": {
+                            "class_name": "GlorotUniform",
+                            "config": {
+                                "seed": null
+                            },
+                            "shared_object_id": 95
+                        },
+                        "recurrent_initializer": {
+                            "class_name": "Orthogonal",
+                            "config": {
+                                "gain": 1.0,
+                                "seed": null
+                            },
+                            "shared_object_id": 96
+                        },
+                        "bias_initializer": {
+                            "class_name": "Zeros",
+                            "config": {},
+                            "shared_object_id": 97
+                        },
+                        "kernel_regularizer": null,
+                        "recurrent_regularizer": null,
+                        "bias_regularizer": null,
+                        "activity_regularizer": null,
+                        "kernel_constraint": {
+                            "class_name": "Clip",
+                            "config": {
+                                "min_value": -2.0,
+                                "max_value": 2.0
+                            },
+                            "shared_object_id": 98
+                        },
+                        "recurrent_constraint": {
+                            "class_name": "Clip",
+                            "config": {
+                                "min_value": -2.0,
+                                "max_value": 2.0
+                            },
+                            "shared_object_id": 99
+                        },
+                        "bias_constraint": {
+                            "class_name": "Clip",
+                            "config": {
+                                "min_value": -2.0,
+                                "max_value": 2.0
+                            },
+                            "shared_object_id": 100
+                        },
+                        "kernel_quantizer": {
+                            "class_name": "quantized_bits",
+                            "config": {
+                                "bits": 4,
+                                "integer": 1,
+                                "symmetric": true,
+                                "alpha": "auto_po2",
+                                "keep_negative": true,
+                                "use_stochastic_rounding": false,
+                                "qnoise_factor": 1.0
+                            },
+                            "shared_object_id": 101
+                        },
+                        "recurrent_quantizer": {
+                            "class_name": "quantized_bits",
+                            "config": {
+                                "bits": 4,
+                                "integer": 1,
+                                "symmetric": true,
+                                "alpha": "auto_po2",
+                                "keep_negative": true,
+                                "use_stochastic_rounding": false,
+                                "qnoise_factor": 1.0
+                            },
+                            "shared_object_id": 102
+                        },
+                        "bias_quantizer": {
+                            "class_name": "quantized_bits",
+                            "config": {
+                                "bits": 4,
+                                "integer": 1,
+                                "symmetric": 1,
+                                "alpha": null,
+                                "keep_negative": true,
+                                "use_stochastic_rounding": false,
+                                "qnoise_factor": 1.0
+                            },
+                            "shared_object_id": 103
+                        },
+                        "state_quantizer": null,
+                        "dropout": 0.0,
+                        "recurrent_dropout": 0.0,
+                        "implementation": 1,
+                        "reset_after": false
+                    }
+                },
+                "merge_mode": "concat"
+            },
+            "name": "q_bidirectional_1",
+            "inbound_nodes": [
+                [
+                    [
+                        "q_bidirectional",
+                        0,
+                        0,
+                        {}
+                    ]
+                ]
+            ]
+        },
+        {
+            "class_name": "TimeDistributed",
+            "config": {
+                "name": "time_distributed",
+                "trainable": true,
+                "dtype": "float32",
+                "layer": {
+                    "class_name": "Dense",
+                    "config": {
+                        "name": "dense",
+                        "trainable": true,
+                        "dtype": "float32",
+                        "units": 64,
+                        "activation": "sigmoid",
+                        "use_bias": true,
+                        "kernel_initializer": {
+                            "class_name": "GlorotUniform",
+                            "config": {
+                                "seed": null
+                            }
+                        },
+                        "bias_initializer": {
+                            "class_name": "Zeros",
+                            "config": {}
+                        },
+                        "kernel_regularizer": null,
+                        "bias_regularizer": null,
+                        "activity_regularizer": null,
+                        "kernel_constraint": null,
+                        "bias_constraint": null
+                    }
+                }
+            },
+            "name": "time_distributed",
+            "inbound_nodes": [
+                [
+                    [
+                        "q_bidirectional_1",
+                        0,
+                        0,
+                        {}
+                    ]
+                ]
+            ]
+        },
+        {
+            "class_name": "TimeDistributed",
+            "config": {
+                "name": "time_distributed_1",
+                "trainable": true,
+                "dtype": "float32",
+                "layer": {
+                    "class_name": "Dense",
+                    "config": {
+                        "name": "dense_1",
+                        "trainable": true,
+                        "dtype": "float32",
+                        "units": 1,
+                        "activation": "sigmoid",
+                        "use_bias": true,
+                        "kernel_initializer": {
+                            "class_name": "GlorotUniform",
+                            "config": {
+                                "seed": null
+                            }
+                        },
+                        "bias_initializer": {
+                            "class_name": "Zeros",
+                            "config": {}
+                        },
+                        "kernel_regularizer": null,
+                        "bias_regularizer": null,
+                        "activity_regularizer": null,
+                        "kernel_constraint": null,
+                        "bias_constraint": null
+                    }
+                }
+            },
+            "name": "time_distributed_1",
+            "inbound_nodes": [
+                [
+                    [
+                        "time_distributed",
+                        0,
+                        0,
+                        {}
+                    ]
+                ]
+            ]
+        },
+        {
+            "class_name": "TFOpLambda",
+            "config": {
+                "name": "tf.math.reduce_max_1",
+                "trainable": true,
+                "dtype": "float32",
+                "function": "math.reduce_max"
+            },
+            "name": "tf.math.reduce_max_1",
+            "inbound_nodes": [
+                [
+                    "time_distributed_1",
+                    0,
+                    0,
+                    {
+                        "axis": -2
+                    }
+                ]
+            ]
+        }
+    ],
+    "input_layers": [
+        [
+            "input_1",
+            0,
+            0
+        ]
+    ],
+    "output_layers": [
+        [
+            "tf.math.reduce_max_1",
+            0,
+            0
+        ]
+    ]
+}

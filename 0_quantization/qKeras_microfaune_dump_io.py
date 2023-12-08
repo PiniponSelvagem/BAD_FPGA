@@ -17,6 +17,21 @@ import qkeras
 import qkeras_microfaune_model as qmodel
 import keras as K
 
+import cutils
+
+data_type = {}
+"""
+data_type["name"] = "float"
+"""
+data_type["name"] = "ap_fixed"
+data_type["bits_total"] = 4
+data_type["bits_int"] = 0
+
+# use old rearange
+shouldRearrange = False
+
+
+
 # Extend the JSONEncoder class
 class NumpyEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -128,13 +143,14 @@ for layer_name in layers_names:
     print(layer_name)
     out = getOutputOfLayer(layer_name)
     sdim = len(out.shape)
-    # rearrange for channel first, ex: [1, 40, 10, 64] -> [1, 64, 40, 10]
-    if sdim == 4:
-        out = tf.transpose(out, perm=[0, 3, 1, 2])
-    elif sdim == 3:
-        out = tf.transpose(out, perm=[0, 2, 1])
-    #elif sdim == 2:
-    #    out = tf.transpose(out, perm=[1, 0])
+    if shouldRearrange:
+        # rearrange for channel first, ex: [1, 40, 10, 64] -> [1, 64, 40, 10]
+        if sdim == 4:
+            out = tf.transpose(out, perm=[0, 3, 1, 2])
+        elif sdim == 3:
+            out = tf.transpose(out, perm=[0, 2, 1])
+        #elif sdim == 2:
+        #    out = tf.transpose(out, perm=[1, 0])
     #
     layer = Layer(
         str(layer_name),
@@ -142,6 +158,10 @@ for layer_name in layers_names:
         out.dtype.name,
         out.numpy().tolist()
     )
+    #
+    # 20231120 - hotfix to create binary outputs of every layer
+    cutils.saveArray(folder, str(i)+"__"+layer.name, np.array(out), str(i)+"__"+layer.name, data_type, binPositiveOnly=True)
+    #
     layersIO.append(layer)
     jLayer = json.dumps(layer, indent=4, default=lambda o: o.encode())
     open(filepath+"__"+str(i)+"__"+layer_name.replace(".", "_")+ext, "w").write(jLayer)

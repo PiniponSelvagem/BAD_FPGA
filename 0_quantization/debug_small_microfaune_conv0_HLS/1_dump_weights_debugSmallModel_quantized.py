@@ -136,7 +136,7 @@ def processLayer(layerName, weightName, weight, isScale=False, saveBinAsInteger=
     sdim = len(shape)
     data = np.array(weight)
     if isConv0:
-        data = kernelPaddingHLS(kernel)
+        data = kernelPaddingHLS(data)
     if any(layerName_c1 in layerName for layerName_c1 in layerName_toChannelFirst):
         # change to channel first
         if sdim == 4:
@@ -304,14 +304,17 @@ def getQuantizeScale(layerName, idx):
 
 
 def mergeKernelScale(kernel, scale):
-    # Ensure that the dimensions match for broadcasting
+    # Ensure that the dimensions match
     assert scale.shape == (kernel.shape[-1],)
     #
-    # Reshape scale to have the appropriate dimensions for broadcasting
+    # Reshape scale to have the appropriate dimensions
     scale_reshaped = scale.reshape((1,) * (kernel.ndim - 1) + (-1,))
     #
     # Perform the scaling and update the kernel, handling division by zero
     updated_kernel = np.where(scale_reshaped != 0, (kernel / scale_reshaped) * 4, 0)
+    print(kernel)
+    print(scale_reshaped)
+    print(updated_kernel)
     #
     return updated_kernel
 

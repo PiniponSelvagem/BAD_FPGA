@@ -68,27 +68,32 @@ def saveArray_dim4(folder, fileName, array, arrayName, dataType):
 
 
 
-def packData(packed_bits, array, dataType, saveBinAsInteger):
+def packData(packed_bits, array, dataType, saveBinAsInteger=False, binPositiveOnly=False):
     # saveBinAsInteger should be True when Kernel is merged with its Scale making the values of the resulted kernel Integers.
     #       knowing that, the values should be saved without the fracction pre-processing
-    #
+    # binPositiveOnly is only evaluated if saveBinAsInteger is set to False
     if dataType["name"] == "ap_fixed":
         bits_total = dataType["bits_total"]
         bits_int = dataType["bits_int"]
         bits_dec = bits_total - bits_int
         #
         if saveBinAsInteger:
-            max_bits = bitarray('0' + '1' * (bits_total - 1))  # All bits except sign bit set to 1
+            max_bits = bitarray('0' + '1' * (bits_total - 1))
             #
-            # Convert the binary back to a float for max and min values
             max_value = int(max_bits.to01(), 2)
             min_value = -(1 << (bits_total - 1))
         else:
-            max_bits = bitarray('0' + '1' * (bits_total - 1))  # All bits except sign bit set to 1
-            #
-            # Convert the binary back to a float for max and min values
-            max_value = int(max_bits.to01(), 2) / (2 ** bits_dec)
-            min_value = -(1 << (bits_total - 1)) / (2 ** bits_dec)
+            if binPositiveOnly:
+                max_bits = bitarray('1' * (bits_total))
+                #
+                max_value = int(max_bits.to01(), 2)
+                min_value = 0
+            else:
+                max_bits = bitarray('0' + '1' * (bits_total - 1))  # All bits except sign bit set to 1
+                #
+                # Convert the binary back to a float for max and min values
+                max_value = int(max_bits.to01(), 2) / (2 ** bits_dec)
+                min_value = -(1 << (bits_total - 1)) / (2 ** bits_dec)
         #
         #
         # NOTE: The isOddElement check was only tested with 4 total bits, and it is hardcoded to only work in those situations.
@@ -148,16 +153,16 @@ def packData(packed_bits, array, dataType, saveBinAsInteger):
         packed_bits.extend(bits)
     return packed_bits
 
-def packBits(packed_bits, array, dataType, saveBinAsInteger):
+def packBits(packed_bits, array, dataType, saveBinAsInteger, binPositiveOnly):
     data = array.flatten()
-    packed_bits = packData(packed_bits, data, dataType, saveBinAsInteger)
+    packed_bits = packData(packed_bits, data, dataType, saveBinAsInteger, binPositiveOnly)
     return packed_bits
 
 
-def saveArray_bin(folder, fileName, array, dataType, saveBinAsInteger):
+def saveArray_bin(folder, fileName, array, dataType, saveBinAsInteger, binPositiveOnly):
     file_path = os.path.join(folder, '{}.bin'.format(fileName))
     packed_bits = bitarray()
-    packed_bits = packBits(packed_bits, array, dataType, saveBinAsInteger)
+    packed_bits = packBits(packed_bits, array, dataType, saveBinAsInteger, binPositiveOnly)
     #print(packed_bits)
     saveFileBin(file_path, packed_bits, dataType)
 
@@ -179,20 +184,20 @@ def saveFileBin(file_path, packed_bits, dataType):
 
 
 
-def saveArray(folder, fileName, array, arrayName, dataType, saveBinAsInteger=False):
+def saveArray(folder, fileName, array, arrayName, dataType, saveBinAsInteger=False, binPositiveOnly=False):
     size = len(array.shape)
     if size == 1:
         saveArray_dim1(folder, fileName, array, arrayName, "float")
-        saveArray_bin(folder, fileName, array, dataType, saveBinAsInteger)
+        saveArray_bin(folder, fileName, array, dataType, saveBinAsInteger, binPositiveOnly)
     elif size == 2:
         saveArray_dim2(folder, fileName, array, arrayName, "float")
-        saveArray_bin(folder, fileName, array, dataType, saveBinAsInteger)
+        saveArray_bin(folder, fileName, array, dataType, saveBinAsInteger, binPositiveOnly)
     elif size == 3:
         saveArray_dim3(folder, fileName, array, arrayName, "float")
-        saveArray_bin(folder, fileName, array, dataType, saveBinAsInteger)
+        saveArray_bin(folder, fileName, array, dataType, saveBinAsInteger, binPositiveOnly)
     elif size == 4:
         saveArray_dim4(folder, fileName, array, arrayName, "float")
-        saveArray_bin(folder, fileName, array, dataType, saveBinAsInteger)
+        saveArray_bin(folder, fileName, array, dataType, saveBinAsInteger, binPositiveOnly)
     else:
         print("ERROR saving array {}, with total dimensions {}.".format(arrayName, size))
 

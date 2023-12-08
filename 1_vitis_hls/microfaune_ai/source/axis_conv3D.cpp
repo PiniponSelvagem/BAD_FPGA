@@ -16,13 +16,13 @@ typedef ap_axis<64, 0, 0, 0> in_pkt;
 typedef ap_axis<64, 0, 0, 0> out_pkt;
 
 // The top-level function
-void conv2D(hls::stream<in_pkt> &strm_in, hls::stream<out_pkt> &strm_out, int pool) {
+void conv2D(hls::stream<in_pkt> &strm_in, hls::stream<out_pkt> &strm_out, int pool, int maxWidth) {
 #pragma HLS INTERFACE ap_ctrl_none port=return
 #pragma HLS interface axis port=strm_in
 #pragma HLS INTERFACE axis port=strm_out
 
-    imap_t img_in[(K_SIZE+1)*IWIDTH*IDEPTH/PACKET];
-    weigth_t weights[FILTERS*K_SIZE*K_SIZE*IDEPTH/PACKET];
+    imap_t img_in[(K_SIZE+1)*IWIDTH*CHANNELS/PACKET];
+    weigth_t weights[FILTERS*K_SIZE*K_SIZE*CHANNELS/PACKET];
     weigth_t scales[CHANNELS/PACKET];
     weigth_t bias[CHANNELS/PACKET];
 #pragma HLS ARRAY_PARTITION variable=weights type=cyclic factor=2
@@ -34,20 +34,20 @@ void conv2D(hls::stream<in_pkt> &strm_in, hls::stream<out_pkt> &strm_out, int po
     READ_BIAS: for (int i = 0; i < CHANNELS/PACKET; i++){
         tmp = strm_in.read();
         bias[i] = tmp.data.range(63, 0);
-//        printf("bias[%d] = 0x%08x 0x%08x\n", i, (int)bias[i].range(63,32), (int)bias[i].range(31,0));
+        printf("bias[%d] = 0x%08x 0x%08x\n", i, (int)bias[i].range(63,32), (int)bias[i].range(31,0));
     }
     READ_SCALES: for (int i = 0; i < CHANNELS/PACKET; i++){
         tmp = strm_in.read();
         scales[i] = tmp.data.range(63, 0);
-//        printf("scale[%d] = 0x%08x 0x%08x\n", i, (int)scales[i].range(63,32), (int)scales[i].range(31,0));
+        printf("scale[%d] = 0x%08x 0x%08x\n", i, (int)scales[i].range(63,32), (int)scales[i].range(31,0));
     }
-    READ_WEIGHTS: for (int i = 0; i < FILTERS*K_SIZE*K_SIZE*IDEPTH/PACKET; i++){    //FILTERS*(K_SIZE*K_SIZE*IDEPTH/PACKET+1
+    READ_WEIGHTS: for (int i = 0; i < FILTERS*K_SIZE*K_SIZE*CHANNELS/PACKET; i++){
         tmp = strm_in.read();
         weights[i] = tmp.data.range(63, 0);
-//        printf("weights[%d] = 0x%08x 0x%08x\n", i, (int)weights[i].range(63,32), (int)weights[i].range(31,0));
+        printf("weights[%d] = 0x%08x 0x%08x\n", i, (int)weights[i].range(63,32), (int)weights[i].range(31,0));
     }
 
-    READ_INIT_MAP: for (int i = 0; i < (K_SIZE-1)*IWIDTH*IDEPTH/PACKET; i++){
+    READ_INIT_MAP: for (int i = 0; i < (K_SIZE-1)*maxWidth*CHANNELS/PACKET; i++){
         tmp = strm_in.read();
         img_in[i] = tmp.data.range(63, 0);
         printf("img_in[%d] = 0x%08x 0x%08x\n", i, (int)img_in[i].range(63,32), (int)img_in[i].range(31,0));
@@ -74,20 +74,20 @@ void conv2D(hls::stream<in_pkt> &strm_in, hls::stream<out_pkt> &strm_out, int po
                 accum_t acc = bias[b_index].range(b1, b0);
                 //printf("b_index %d, acc %d, range(%d,%d)\n", b_index, acc, b1, b0);
 
-                w_index = i * K_SIZE * K_SIZE * IDEPTH/PACKET;
-                if (rd_index < IWIDTH * IDEPTH/PACKET && orow < OHEIGHT - 3){
+                w_index = i * K_SIZE * K_SIZE * CHANNELS/PACKET;
+                if (rd_index < maxWidth * CHANNELS/PACKET && orow < OHEIGHT - 3){
                     tmp = strm_in.read();
-                    img_in[(orow+3)%4 * IWIDTH*IDEPTH/PACKET + rd_index] = tmp.data.range(63, 0);
+                    img_in[(orow+3)%4 * maxWidth*CHANNELS/PACKET + rd_index] = tmp.data.range(63, 0);
                 }
                 rd_index += 1;
                 for (int j = 0; j < K_SIZE; j++){
                     for (int k = 0; k < K_SIZE; k++){
-                        for (int l = 0; l < IDEPTH/PACKET; l++){
+                        for (int l = 0; l < CHANNELS/PACKET; l++){
 #pragma HLS UNROLL factor = 4
-                            i_index = ((orow+j)%4) * IWIDTH*IDEPTH/PACKET + (ocol+k) * IDEPTH/PACKET + l;
+                            i_index = ((orow+j)%4) * maxWidth*CHANNELS/PACKET + (ocol+k) * CHANNELS/PACKET + l;
                             //printf("bi = %d\n", (int)i_index);
                             //printf("orow= %d | ocol= %d | i (filter)= %d | j= %d | k= %d | l= %d\n", (int)orow, (int)ocol, (int)i, (int)j, (int)k, (int)l);
-                            if (!(orow+j == -1 || ocol+k == -1 || orow+j == OHEIGHT || ocol+k == OWIDTH)){
+                            if (!(orow+j == -1 || ocol+k == -1 || orow+j == OHEIGHT || ocol+k == maxWidth)){
                                 //printf("weights[%d] = 0x%0x 0x%0x\n", w_index, (int)weights[w_index].range(63,32), (int)weights[w_index].range(31,0));
                                 //printf("img_in[%d] = 0x%0x 0x%0x\n", i_index, (int)img_in[i_index].range(63,32), (int)img_in[i_index].range(31,0));
 
@@ -127,7 +127,7 @@ void conv2D(hls::stream<in_pkt> &strm_in, hls::stream<out_pkt> &strm_out, int po
                 ,3frac   *   ,4frac   =   ,7frac
                  */
 
-                //printf("acc %d, %d\n", (int)acc, (int)cp);
+                //printf("acc %d - i %d\n", (int)acc, i);
 
                 range_t scaleStart = (i % PACKET) * 4;
                 range_t scaleEnd   = scaleStart + 3;
@@ -135,7 +135,7 @@ void conv2D(hls::stream<in_pkt> &strm_in, hls::stream<out_pkt> &strm_out, int po
                 //printf("%d - %d,%d\n", i, scaleStart, scaleEnd);
 
                 if (acc <= 0) acc_sat = 0;
-                else acc_sat = (acc >> scale);
+                else acc_sat = (acc >> (scale-1));		//TODO: -1 a todos os scales
 
                 if (acc_sat[0] == 1){
                 	acc_sat = acc_sat + 2;
@@ -146,7 +146,7 @@ void conv2D(hls::stream<in_pkt> &strm_in, hls::stream<out_pkt> &strm_out, int po
                 	acc_sat = 15;
 
                 accF.range(3,0) = acc_sat.range(3,0);
-				printf("acc %f\n", (float)accF);
+				//printf("acc_sat %2d | accF %f\n", (int)acc_sat, (float)accF);
 
 
                 if (pool == 1){
@@ -185,7 +185,7 @@ void conv2D(hls::stream<in_pkt> &strm_in, hls::stream<out_pkt> &strm_out, int po
                         tmpo.data.range(63,60) = acc_sat.range(3,0);
                         tmpo.strb = 0xF;
                         tmpo.keep = 0xF;
-                        if (orow == OHEIGHT-1 && ocol == OWIDTH-1) tmpo.last = 1;
+                        if (orow == OHEIGHT-1 && ocol == maxWidth-1) tmpo.last = 1;
                         else tmpo.last = 0;
                         strm_out.write(tmpo);
                         //printf("values %d %d\n", (int)tmpo.data.range(15,0), i);
@@ -230,7 +230,7 @@ void conv2D(hls::stream<in_pkt> &strm_in, hls::stream<out_pkt> &strm_out, int po
                             tmpo.data.range(63,60) = accArray[i].range(3,0);
                             tmpo.strb = 0xF;
                             tmpo.keep = 0xF;
-                            if (orow == OHEIGHT-1 && ocol == OWIDTH-1) tmpo.last = 1;
+                            if (orow == OHEIGHT-1 && ocol == maxWidth-1) tmpo.last = 1;
                             else tmpo.last = 0;
                             strm_out.write(tmpo);
                             //printf("values %d %d\n", (int)tmpo.data.range(15,0), i);
@@ -245,6 +245,9 @@ void conv2D(hls::stream<in_pkt> &strm_in, hls::stream<out_pkt> &strm_out, int po
                                 accArray[i] = acc_sat;
                     }
                 }
+
+                if (ocol == maxWidth-1)
+                	ocol = OWIDTH;
             }
         }
     }
