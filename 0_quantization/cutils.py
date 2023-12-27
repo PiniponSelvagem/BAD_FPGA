@@ -122,8 +122,7 @@ def packData(packed_bits, array, dataType, saveBinAsInteger=False, binPositiveOn
                 complement = (1 << bits_total) + scaled_value
                 binary = bin(complement)[2:].zfill(bits_total)
             #
-            #if True: #value != 0:
-            #    print(value, ",", scaled_value, " --- ", binary)
+            #print(value, ",", scaled_value, " --- ", binary)
             #
             if bits_total == 4:
                 if isOddElement:
@@ -145,6 +144,13 @@ def packData(packed_bits, array, dataType, saveBinAsInteger=False, binPositiveOn
                 packed_bits.extend(binary)
                 packed_bits.extend("1110")  # close the leftover byte
                 """
+    elif dataType["name"] == "ap_int16":
+        # int16
+        int_array = [int(value) for value in array]
+        binary_representation = struct.pack('h' * len(int_array), *int_array)
+        bits = bitarray()
+        bits.frombytes(binary_representation)
+        packed_bits.extend(bits)
     else:
         # float
         binary_representation = struct.pack('f' * len(array), *array)
