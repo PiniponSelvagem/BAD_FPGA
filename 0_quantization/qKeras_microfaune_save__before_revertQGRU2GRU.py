@@ -2,7 +2,6 @@ import time
 from datetime import timedelta
 
 import tensorflow as tf
-import keras.backend as K
 
 gpus = tf.config.experimental.list_physical_devices('GPU')
 for gpu in gpus:
@@ -10,16 +9,9 @@ for gpu in gpus:
 
 import numpy as np
 import json
-
-import cutils
 import qkeras.utils as qutils
-#import qkeras_microfaune_model as qmodel
-
-from smallMicrofauneModel import SmallModelMicrofauneAI
-
-models_folder = "model_debug"   #ModelConfig.folder
-model_name = "smallModel"       #ModelConfig.name
-model = SmallModelMicrofauneAI().modelQuantized()
+import qkeras_microfaune_model as qmodel
+import cutils
 
 # Extend the JSONEncoder class
 class NumpyEncoder(json.JSONEncoder):
@@ -32,12 +24,22 @@ class NumpyEncoder(json.JSONEncoder):
             return float(obj)
         return json.JSONEncoder.default(self, obj)
 
-model.load_weights(f"{models_folder}/{model_name}.h5")
+#from model_config.config_test import ModelConfig            # model_test
+#from model_config.config_0 import ModelConfig               # model_quant_411
+#from model_config.config_0_noQuantState import ModelConfig  # model_quant_411_noQuantState
+#from model_config.config_0_qconvbnorm import ModelConfig    # model_quant_411_qconvbnorm
+from model_config.config_0_qconvbnorm__input_relu import ModelConfig    # model_quant_411_qconvbnorm__input_relu
+#from model_config.config_1 import ModelConfig               # model_quant__conv-po2-81_gru-po2-81_bnorm-811
+
+model_folder = ModelConfig.folder
+model_name = ModelConfig.name
+#model_original, dual_model_original = qmodel.MicrofauneAI.model()
+model, dual_model = qmodel.MicrofauneAI(ModelConfig).modelQuantized()
+model.load_weights(f"{model_folder}/{model_name}__quantweights.h5")
 
 START_PADDING = 64  # number of elements to place on the z axis with zeros to achieve padding for HLS
 
-folder = "model_debug_dump_quantized"
-
+folder = "model_quantized_weights"
 
 layerName_toChannelFirst = [
     #"q_conv2d_batchnorm"
@@ -81,11 +83,24 @@ open(folder+"/dump_config.json", "w").write(jConfig)
 
 
 def rearange_gru_weights(data):
-    return data.reshape((2, -1), order='F')
+    if len(data.shape) > 1:
+        last_dim_size = data.shape[-1] // 3
+        new_data = data.reshape(data.shape[0], 3, last_dim_size, order='F')
+    else:
+        num_rows = len(data) // 3
+        #
+        new_data = data.reshape(num_rows, -1, order='F')
+    return new_data
 
 def rearange_gru_scales(data):
     if data.size > 1:
-        return data.reshape((2, -1), order='F')
+        filters = data.shape[0]
+        split = 3
+        jump = filters // split  # Jump value calculated as size of the last dimension divided by 'split'
+        #
+        new_array = data.reshape(split, jump).swapaxes(0, 1)
+        #
+        return new_array
     else:
         return data
 
@@ -120,7 +135,7 @@ class Layer:
 
 
 
-def processLayer(layerName, weightName, weight, isScale=False, saveBinAsInteger=False, isConv0=False):
+def processLayer(layerName, weightName, weight, data_type, isScale=False, saveBinAsInteger=False, isConv0=False):
     shape = weight.shape
     sdim = len(shape)
     data = np.array(weight)
@@ -146,8 +161,13 @@ def processLayer(layerName, weightName, weight, isScale=False, saveBinAsInteger=
     if layerName_to3d in weightName:
         if isScale:
             data = rearange_gru_scales(data)
+            # TODO: check if the code below is actually required for scales
+            #if ("kernel" in weightName): # reorder kernel for better memory access / no jumping around when access
+            #    data = data.transpose((0, 1))
         else:
             data = rearange_gru_weights(data)
+            if ("kernel" in weightName): # reorder kernel for better memory access / no jumping around when access
+                data = data.transpose((2, 1, 0))
     #
     shouldSplit = True
     for name in layerName_split_dim0:
@@ -219,35 +239,40 @@ for l in model.layers:
     print("'"+str(l.name)+"': "+str(i)+",")
     i+=1
 """
-#if "q_conv2d_batchnorm" in model.layers[2].name:    # WARNING: THIS CHECK MIGHT FAIL IF MODEL LAYERS ARE CHANGED
-if "q_bidirectional" in model.layers[2].name: #TODO: Remove this line in favor of the above line, before changing from gru only model to full model
+if "q_conv2d_batchnorm" in model.layers[2].name:    # WARNING: THIS CHECK MIGHT FAIL IF MODEL LAYERS ARE CHANGED
     isManualQmodel = True
+    """
     layers_idx = {
         'q_activation': 1,
-        'q_bidirectional': 2,
-        'q_bidirectional_1': 3
+        'q_conv2d_batchnorm': 2,
+        'q_activation_1': 3,
+        'q_conv2d_batchnorm_1': 4,
+        'q_activation_2': 5,
+        'max_pooling2d': 6,
+        'q_bidirectional': 8,
+        'q_bidirectional_1': 9
     }
     """ # MicrofuneQuantized
     layers_idx = {
-        'q_conv2d_batchnorm': 1,
-        'q_activation': 2,
-        'q_conv2d_batchnorm_1': 3,
-        'q_activation_1': 4,
-        'max_pooling2d': 5,
-        'q_conv2d_batchnorm_2': 6,
-        'q_activation_2': 7,
-        'q_conv2d_batchnorm_3': 8,
-        'q_activation_3': 9,
-        'max_pooling2d_1': 10,
-        'q_conv2d_batchnorm_4': 11,
-        'q_activation_4': 12,
-        'q_conv2d_batchnorm_5': 13,
-        'q_activation_5': 14,
-        'max_pooling2d_2': 15,
-        'q_bidirectional': 17,
-        'q_bidirectional_1': 18
+        'q_activation': 1,
+        'q_conv2d_batchnorm': 2,
+        'q_activation_1': 3,
+        'q_conv2d_batchnorm_1': 4,
+        'q_activation_2': 5,
+        'max_pooling2d': 6,
+        'q_conv2d_batchnorm_2': 7,
+        'q_activation_3': 8,
+        'q_conv2d_batchnorm_3': 9,
+        'q_activation_4': 10,
+        'max_pooling2d_1': 11,
+        'q_conv2d_batchnorm_4': 12,
+        'q_activation_5': 13,
+        'q_conv2d_batchnorm_5': 14,
+        'q_activation_6': 15,
+        'max_pooling2d_2': 16,
+        'q_bidirectional': 18,
+        'q_bidirectional_1': 19
     }
-    """
 else:
     layers_idx = {
         'conv2d': 1,
@@ -320,7 +345,7 @@ def createScaleHLS(kernel_scale):
 def kernelPaddingHLS(kernel):
     # reshape the 1st kernel for easy load in HLS, so padding during runtime is not necessary
     # by padding the 3rd dimension
-    new_kernel_shape = (kernel.shape[0], kernel.shape[1], START_PADDING, kernel.shape[3])
+    new_kernel_shape = (kernel.shape[0], kernel.shape[1], START_PADDING, kernel.shape[3]) #TODO
     new_kernel = np.zeros(new_kernel_shape)
     pad_width = [(0, 0)] * (len(new_kernel_shape) - len(kernel.shape))
     for i in range(len(kernel.shape)):
@@ -332,6 +357,9 @@ def kernelPaddingHLS(kernel):
     print(new_kernel.shape)
     return new_kernel
 
+def createBiasHLS(bias, scaleHLS):
+    biasInt = bias*4
+    return np.power(2, 2+scaleHLS) * biasInt
 
 """
 print("------ KERNEL ------")
@@ -408,97 +436,57 @@ for layerName in model_quant:
     if "conv2d" in layerName:
         print("- processing kernel")
         kernel = weight[0]
-        processLayer(layerName, layerName+"_kernel", kernel, isConv0=isConv0)
-        print("- processing bias")
-        bias_data_type = data_type.copy()
-        bias_data_type["bits_int"] += 1
-        processLayer(layerName, layerName+"_bias", weight[1], bias_data_type)
+        processLayer(layerName, layerName+"_kernel", kernel, data_type, isConv0=isConv0)
         #
         print("- processing kernel_scale")
         kernel_scale = getQuantizeScale(layerName, 0)
-        processLayer(layerName, layerName+"_kernel_scale", kernel_scale, isScale=True)
+        processLayer(layerName, layerName+"_kernel_scale", kernel_scale, data_type, isScale=True)
         print("- processing bias_scale")
-        processLayer(layerName, layerName+"_bias_scale", getQuantizeScale(layerName, 1), isScale=True)
+        processLayer(layerName, layerName+"_bias_scale", getQuantizeScale(layerName, 1), data_type, isScale=True)
         #
         print("- processing kernel_merged_scale")
         kernelWscale = mergeKernelScale(kernel, kernel_scale)
-        processLayer(layerName, layerName+"_kernel_merged_scale", kernelWscale, saveBinAsInteger=True, isConv0=isConv0)
+        processLayer(layerName, layerName+"_kernel_merged_scale", kernelWscale, data_type, saveBinAsInteger=True, isConv0=isConv0)   # TODO: This might be the same for GRU
         #
         print("- processing kernel_scale for HLS")
         scaleHLS = createScaleHLS(kernel_scale)
-        processLayer(layerName, layerName+"_kernel_scale_hls", scaleHLS, isScale=True, saveBinAsInteger=True)
+        processLayer(layerName, layerName+"_kernel_scale_hls", scaleHLS, data_type, isScale=True, saveBinAsInteger=True)
+        #
+        print("- processing bias")
+        bias = weight[1]
+        processLayer(layerName, layerName+"_bias", bias, data_type)
+        biasHLS = createBiasHLS(bias, scaleHLS)
+        bias_data_type = data_type.copy()
+        bias_data_type["name"] = "ap_int16"
+        processLayer(layerName, layerName+"_bias_hls", biasHLS, bias_data_type)
+        #
         isConv0 = False
     if "batch_normalization" in layerName:
-        processLayer(layerName, layerName+"_gamma", weight[0])
-        processLayer(layerName, layerName+"_beta", weight[1])
-        processLayer(layerName, layerName+"_mean", weight[2])
-        processLayer(layerName, layerName+"_variance", weight[3])
+        processLayer(layerName, layerName+"_gamma", weight[0], data_type)
+        processLayer(layerName, layerName+"_beta", weight[1], data_type)
+        processLayer(layerName, layerName+"_mean", weight[2], data_type)
+        processLayer(layerName, layerName+"_variance", weight[3], data_type)
         #
-        processLayer(layerName, layerName+"_gamma_scale", getQuantizeScale(layerName, 0), isScale=True)
-        processLayer(layerName, layerName+"_beta_scale", getQuantizeScale(layerName, 1), isScale=True)
-        processLayer(layerName, layerName+"_mean_scale", getQuantizeScale(layerName, 2), isScale=True)
-        processLayer(layerName, layerName+"_variance_scale", getQuantizeScale(layerName, 3), isScale=True)
+        processLayer(layerName, layerName+"_gamma_scale", getQuantizeScale(layerName, 0), data_type, isScale=True)
+        processLayer(layerName, layerName+"_beta_scale", getQuantizeScale(layerName, 1), data_type, isScale=True)
+        processLayer(layerName, layerName+"_mean_scale", getQuantizeScale(layerName, 2), data_type, isScale=True)
+        processLayer(layerName, layerName+"_variance_scale", getQuantizeScale(layerName, 3), data_type, isScale=True)
     if "bidirectional" in layerName:
-        print("- processing kernels")
-        f_kernel = weight[0]
-        f_rkernel = weight[1]
-        b_kernel = weight[3]
-        b_rkernel = weight[4]
-        processLayer(layerName, layerName+"_gru_forward_kernel", f_kernel)
-        processLayer(layerName, layerName+"_gru_forward_recurrent_kernel", f_rkernel)
-        processLayer(layerName, layerName+"_gru_forward_bias", weight[2])
-        processLayer(layerName, layerName+"_gru_backward_kernel", b_kernel)
-        processLayer(layerName, layerName+"_gru_backward_recurrent_kernel", b_rkernel)
-        processLayer(layerName, layerName+"_gru_backward_bias", weight[5])
-        print("f_kernel\n", f_kernel)
-        print("f_rkernel\n", f_rkernel)
-        print("b_kernel\n", b_kernel)
-        print("b_rkernel\n", b_rkernel)
+        processLayer(layerName, layerName+"_gru_forward_kernel", weight[0], data_type)
+        processLayer(layerName, layerName+"_gru_forward_recurrent_kernel", weight[1], data_type)
+        processLayer(layerName, layerName+"_gru_forward_bias", weight[2], data_type)
+        processLayer(layerName, layerName+"_gru_backward_kernel", weight[3], data_type)
+        processLayer(layerName, layerName+"_gru_backward_recurrent_kernel", weight[4], data_type)
+        processLayer(layerName, layerName+"_gru_backward_bias", weight[5], data_type)
         #
-        print("- processing scales")
-        f_kernel_scale = getQuantizeScale(layerName, 0)
-        f_rkernel_scale = getQuantizeScale(layerName, 1)
-        b_kernel_scale = getQuantizeScale(layerName, 4)
-        b_rkernel_scale = getQuantizeScale(layerName, 5)
-        processLayer(layerName, layerName+"_gru_forward_kernel_scale", f_kernel_scale, isScale=True)
-        processLayer(layerName, layerName+"_gru_forward_recurrent_kernel_scale", f_rkernel_scale, isScale=True)
-        processLayer(layerName, layerName+"_gru_forward_bias_scale", getQuantizeScale(layerName, 2), isScale=True)
-        processLayer(layerName, layerName+"_gru_forward_state_scale", getQuantizeScale(layerName, 3), isScale=True)
-        processLayer(layerName, layerName+"_gru_backward_kernel_scale", b_kernel_scale, isScale=True)
-        processLayer(layerName, layerName+"_gru_backward_recurrent_kernel_scale", b_rkernel_scale, isScale=True)
-        processLayer(layerName, layerName+"_gru_backward_bias_scale", getQuantizeScale(layerName, 6), isScale=True)
-        processLayer(layerName, layerName+"_gru_backward_state_scale", getQuantizeScale(layerName, 7), isScale=True)
-        print("f_kernel_scale\n", f_kernel_scale)
-        print("f_rkernel_scale\n", f_rkernel_scale)
-        print("b_kernel_scale\n", b_kernel_scale)
-        print("b_rkernel_scale\n", b_rkernel_scale)
-        #
-        print("- processing kernels merged with scales")
-        f_kernelWscale = mergeKernelScale(f_kernel, f_kernel_scale)
-        f_rkernelWscale = mergeKernelScale(f_rkernel, f_rkernel_scale)
-        b_kernelWscale = mergeKernelScale(b_kernel, b_kernel_scale)
-        b_rkernelWscale = mergeKernelScale(b_rkernel, b_rkernel_scale)
-        processLayer(layerName, layerName+"_gru_forward_kernel_merged_scale", f_kernelWscale, saveBinAsInteger=True)
-        processLayer(layerName, layerName+"_gru_forward_recurrent_kernel_merged_scale", f_rkernelWscale, saveBinAsInteger=True)
-        processLayer(layerName, layerName+"_gru_backward_kernel_merged_scale", b_kernelWscale, saveBinAsInteger=True)
-        processLayer(layerName, layerName+"_gru_backward_recurrent_kernel_merged_scale", b_rkernelWscale, saveBinAsInteger=True)
-        #
-        print("- processing scales for HLS")
-        f_kernel_scaleHLS = createScaleHLS(f_kernel_scale)
-        f_rkernel_scaleHLS = createScaleHLS(f_rkernel_scale)
-        b_kernel_scaleHLS = createScaleHLS(b_kernel_scale)
-        b_rkernel_scaleHLS = createScaleHLS(b_rkernel_scale)
-        processLayer(layerName, layerName+"_gru_forward_kernel_scale_hls", f_kernel_scaleHLS, isScale=True, saveBinAsInteger=True)
-        processLayer(layerName, layerName+"_gru_forward_recurrent_kernel_scale_hls", f_rkernel_scaleHLS, isScale=True, saveBinAsInteger=True)
-        processLayer(layerName, layerName+"_gru_backward_kernel_scale_hls", b_kernel_scaleHLS, isScale=True, saveBinAsInteger=True)
-        processLayer(layerName, layerName+"_gru_backward_recurrent_kernel_scale_hls", b_rkernel_scaleHLS, isScale=True, saveBinAsInteger=True)
-
-
-
-layer = model_quant[layerName]
-weight = layer["weights"]
-getQuantizeScale(layerName, 0)
-
+        processLayer(layerName, layerName+"_gru_forward_kernel_scale", getQuantizeScale(layerName, 0), data_type, isScale=True)
+        processLayer(layerName, layerName+"_gru_forward_recurrent_kernel_scale", getQuantizeScale(layerName, 1), data_type, isScale=True)
+        processLayer(layerName, layerName+"_gru_forward_bias_scale", getQuantizeScale(layerName, 2), data_type, isScale=True)
+        processLayer(layerName, layerName+"_gru_forward_state_scale", getQuantizeScale(layerName, 3), data_type, isScale=True)
+        processLayer(layerName, layerName+"_gru_backward_kernel_scale", getQuantizeScale(layerName, 4), data_type, isScale=True)
+        processLayer(layerName, layerName+"_gru_backward_recurrent_kernel_scale", getQuantizeScale(layerName, 5), data_type, isScale=True)
+        processLayer(layerName, layerName+"_gru_backward_bias_scale", getQuantizeScale(layerName, 6), data_type, isScale=True)
+        processLayer(layerName, layerName+"_gru_backward_state_scale", getQuantizeScale(layerName, 7), data_type, isScale=True)
 
 
 """
@@ -516,13 +504,14 @@ q = qs[6]   -> bias_quantizer
 q = qs[7]   -> state_quantizer
 """
 
+
 # save non quantized layers: time_distributed and time_distributed_1
 for layer in model.layers:
     layerName = layer.name
     weight = layer.weights
     if "time_distributed" in layerName:
-        processLayer(layerName, layerName+"_kernel", weight[0])
-        processLayer(layerName, layerName+"_bias", weight[1])
+        processLayer(layerName, layerName+"_kernel", weight[0], data_type)
+        processLayer(layerName, layerName+"_bias", weight[1], data_type)
 
 
 
@@ -533,5 +522,4 @@ elapsed = end - start
 
 
 print('Time elapsed: ' + str(timedelta(seconds=elapsed)))
-
 

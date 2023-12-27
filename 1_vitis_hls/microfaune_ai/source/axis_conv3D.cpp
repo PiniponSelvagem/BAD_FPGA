@@ -6,9 +6,9 @@
 #include "types.h"
 #include "size_conv3D.h"
 
-typedef ap_int<16> bias_t;
+
 typedef ap_int<13> count_t;
-typedef ap_int<18> accum_t;  //TODO: was 40 // I_BIT_WIDTH+W_BIT_WIDTH + 4
+typedef ap_int<16> accum_t;  //TODO: was 40 // I_BIT_WIDTH+W_BIT_WIDTH + 4
 typedef ap_int<4>  scale_t;
 typedef ap_uint<6> range_t;	 // range calculations results: 0-63
 
@@ -24,18 +24,24 @@ void conv2D(hls::stream<in_pkt> &strm_in, hls::stream<out_pkt> &strm_out, int po
     imap_t img_in[(K_SIZE+1)*IWIDTH*CHANNELS/PACKET];
     weigth_t weights[FILTERS*K_SIZE*K_SIZE*CHANNELS/PACKET];
     weigth_t scales[CHANNELS/PACKET];
-    weigth_t bias[CHANNELS/PACKET];
-#pragma HLS ARRAY_PARTITION variable=weights type=cyclic factor=2
-#pragma HLS ARRAY_PARTITION variable=img_in type=cyclic factor=2
+    accum_t bias[CHANNELS];
+#pragma HLS ARRAY_PARTITION variable=weights type=cyclic factor=4
+#pragma HLS ARRAY_PARTITION variable=img_in type=cyclic factor=4
 
     in_pkt tmp;
     out_pkt tmpo;
 
-    READ_BIAS: for (int i = 0; i < CHANNELS/PACKET; i++){
+
+
+    READ_BIAS: for (int i = 0; i < CHANNELS*BIAS_SIZE/BUS_WIDTH; i++){
         tmp = strm_in.read();
-        bias[i] = tmp.data.range(63, 0);
-        printf("bias[%d] = 0x%08x 0x%08x\n", i, (int)bias[i].range(63,32), (int)bias[i].range(31,0));
+        bias[i*4] = tmp.data.range(15, 0);
+        bias[i*4+1] = tmp.data.range(31, 16);
+        bias[i*4+2] = tmp.data.range(47, 32);
+        bias[i*4+3] = tmp.data.range(63, 48);
+        printf("bias = %d %d %d %d\n", (int)bias[i*4], (int)bias[i*4+1], (int)bias[i*4+2], (int)bias[i*4+3]);
     }
+
     READ_SCALES: for (int i = 0; i < CHANNELS/PACKET; i++){
         tmp = strm_in.read();
         scales[i] = tmp.data.range(63, 0);
@@ -50,29 +56,28 @@ void conv2D(hls::stream<in_pkt> &strm_in, hls::stream<out_pkt> &strm_out, int po
     READ_INIT_MAP: for (int i = 0; i < (K_SIZE-1)*maxWidth*CHANNELS/PACKET; i++){
         tmp = strm_in.read();
         img_in[i] = tmp.data.range(63, 0);
-        printf("img_in[%d] = 0x%08x 0x%08x\n", i, (int)img_in[i].range(63,32), (int)img_in[i].range(31,0));
+        //printf("img_in[%d] = 0x%08x 0x%08x\n", i, (int)img_in[i].range(63,32), (int)img_in[i].range(31,0));
     }
+
+
 
     int kk, xx, w_index, i_index, i_index1, rd_index, cp;
     int b_index, b0, b1;
     ap_ufixed<4,0> accF;
-    omap_t acc_sat;
-    accum_t acc;
+    accum_t acc_sat;
+    accum_t acc, acc_aux, acc_aux1;
     accum_t accArray[64];
+    bool even;
+    int ax, ocol, orow;
 
-    loop_orow: for(int orow = -1; orow < OHEIGHT-1; orow++){
-        //printf("orow = %d\n", (int)orow);
-        rd_index = 0;
-        loop_ocol: for(int ocol = -1, cp = 1; ocol < OWIDTH-1; ocol += 1, cp += 1){
-            //printf("ocol = %d\n", (int)ocol);
+    loop_orow: for(orow = -1; orow < OHEIGHT-1; orow++){
+#pragma HLS LOOP_TRIPCOUNT max=431
+    	rd_index = 0;
+        loop_ocol: for(ocol = -1, cp = 1; ocol < OWIDTH/*maxWidth*/-1; ocol += 1, cp += 1){		// TODO: OWIDTH --> maxWidth
+#pragma HLS LOOP_TRIPCOUNT max=40
     //#pragma HLS PIPELINE
             filters_loop: for(int i = 0; i < FILTERS; i++){
-                //printf("i (filter) = %d\n", (int)i);
-            	b_index = i/PACKET;
-            	b0 = (i % PACKET) * W_BIT_WIDTH;
-                b1 = (i % PACKET) * W_BIT_WIDTH + W_BIT_WIDTH-1;
-                accum_t acc = bias[b_index].range(b1, b0);
-                //printf("b_index %d, acc %d, range(%d,%d)\n", b_index, acc, b1, b0);
+                accum_t acc = bias[i];
 
                 w_index = i * K_SIZE * K_SIZE * CHANNELS/PACKET;
                 if (rd_index < maxWidth * CHANNELS/PACKET && orow < OHEIGHT - 3){
@@ -91,27 +96,42 @@ void conv2D(hls::stream<in_pkt> &strm_in, hls::stream<out_pkt> &strm_out, int po
                                 //printf("weights[%d] = 0x%0x 0x%0x\n", w_index, (int)weights[w_index].range(63,32), (int)weights[w_index].range(31,0));
                                 //printf("img_in[%d] = 0x%0x 0x%0x\n", i_index, (int)img_in[i_index].range(63,32), (int)img_in[i_index].range(31,0));
 
-                                acc += weights[w_index].range(3,0)   * img_in[i_index].range(3,0);
-                                acc += weights[w_index].range(7,4)   * img_in[i_index].range(7,4);
-                                acc += weights[w_index].range(11,8)  * img_in[i_index].range(11,8);
-                                acc += weights[w_index].range(15,12) * img_in[i_index].range(15,12);
+                            	/* USED IN DEBUG PRINTS AT THE END OF THIS IF SECTION */
+                            	//ap_int<4> debug_W;
+                            	//ap_fixed<4,1> debug_Wf;
+								//ap_int<4> debug_I;
+                            	//ap_fixed<4,1> debug_If;
+                                //debug_W.range(3,0) = (ap_int<4>)weights[w_index].range(3,0);
+                                //debug_Wf.range(3,0) = (ap_int<4>)weights[w_index].range(3,0);
+                                //debug_I.range(3,0) = img_in[i_index].range(3,0);
+                                //debug_If.range(3,0) = img_in[i_index].range(3,0);
+                                /******************************************************/
 
-                                acc += weights[w_index].range(19,16) * img_in[i_index].range(19,16);
-                                acc += weights[w_index].range(23,20) * img_in[i_index].range(23,20);
-                                acc += weights[w_index].range(27,24) * img_in[i_index].range(27,24);
-                                acc += weights[w_index].range(31,28) * img_in[i_index].range(31,28);
+                                acc += (ap_int<4>)weights[w_index].range(3,0)   * img_in[i_index].range(3,0);
+                                acc += (ap_int<4>)weights[w_index].range(7,4)   * img_in[i_index].range(7,4);
+                                acc += (ap_int<4>)weights[w_index].range(11,8)  * img_in[i_index].range(11,8);
+                                acc += (ap_int<4>)weights[w_index].range(15,12) * img_in[i_index].range(15,12);
 
-                                acc += weights[w_index].range(35,32) * img_in[i_index].range(35,32);
-                                acc += weights[w_index].range(39,36) * img_in[i_index].range(39,36);
-                                acc += weights[w_index].range(43,40) * img_in[i_index].range(43,40);
-                                acc += weights[w_index].range(47,44) * img_in[i_index].range(47,44);
+                                acc += (ap_int<4>)weights[w_index].range(19,16) * img_in[i_index].range(19,16);
+                                acc += (ap_int<4>)weights[w_index].range(23,20) * img_in[i_index].range(23,20);
+                                acc += (ap_int<4>)weights[w_index].range(27,24) * img_in[i_index].range(27,24);
+                                acc += (ap_int<4>)weights[w_index].range(31,28) * img_in[i_index].range(31,28);
 
-                                acc += weights[w_index].range(51,48) * img_in[i_index].range(51,48);
-                                acc += weights[w_index].range(55,52) * img_in[i_index].range(55,52);
-                                acc += weights[w_index].range(59,56) * img_in[i_index].range(59,56);
-                                acc += weights[w_index].range(63,60) * img_in[i_index].range(63,60);
+                                acc += (ap_int<4>)weights[w_index].range(35,32) * img_in[i_index].range(35,32);
+                                acc += (ap_int<4>)weights[w_index].range(39,36) * img_in[i_index].range(39,36);
+                                acc += (ap_int<4>)weights[w_index].range(43,40) * img_in[i_index].range(43,40);
+                                acc += (ap_int<4>)weights[w_index].range(47,44) * img_in[i_index].range(47,44);
+
+                                acc += (ap_int<4>)weights[w_index].range(51,48) * img_in[i_index].range(51,48);
+                                acc += (ap_int<4>)weights[w_index].range(55,52) * img_in[i_index].range(55,52);
+                                acc += (ap_int<4>)weights[w_index].range(59,56) * img_in[i_index].range(59,56);
+                                acc += (ap_int<4>)weights[w_index].range(63,60) * img_in[i_index].range(63,60);
                                 //printf("accin %d, %d, %d, %d\n", (int)i_index, (int)acc, (int)img_in[i_index].range(15,0), (int)img_in[i_index].range(31,16));
                                 //printf("i_index %d, acc %d\n", (int)i_index, (int)acc);
+                                //printf("i %d | i_index %d, acc %d, w %f\n", i, (int)i_index, (int)acc, (float)debug_W);
+                                //printf("i %d | i_index %d, acc %d, w %f\n", i, (int)i_index, (int)acc, (float)((ap_fixed<4,1>)weights[w_index].range(3,0)));
+
+                                //printf("i %d | i_index %d, acc %d = i %d (%f) * w %d (%f)\n", i, (int)i_index, (int)acc, (int)debug_I, (float)debug_If, (int)debug_W, (float)debug_Wf);
                             }
                             w_index += 1;
                         }
@@ -131,22 +151,42 @@ void conv2D(hls::stream<in_pkt> &strm_in, hls::stream<out_pkt> &strm_out, int po
 
                 range_t scaleStart = (i % PACKET) * 4;
                 range_t scaleEnd   = scaleStart + 3;
-                scale_t scale = scales[i/PACKET].range(scaleEnd,scaleStart);
+                scale_t scale = scales[i/PACKET].range(scaleEnd, scaleStart);
                 //printf("%d - %d,%d\n", i, scaleStart, scaleEnd);
 
+                /*
+                 * More complex rounding to nearest even, closer to QKeras
+                 *
                 if (acc <= 0) acc_sat = 0;
-                else acc_sat = (acc >> (scale-1));		//TODO: -1 a todos os scales
+                else {
+                	acc_aux = (acc >> (scale-1));		//TODO: -1 a todos os scales no python (por causa do bit anterior etc)
+                	acc_aux1 = acc_aux;
+                	acc_aux = (acc_aux << (scale-1));
+                	acc_aux = acc - acc_aux;
+                	if (acc_aux1[0] == 1){
+                		if (acc_aux != 0 or acc_aux1[1] == 1)
+                			acc_sat = acc_aux1 + 2;
+                		else
+                			acc_sat = acc_aux1;
+                	}
+                	else
+                		acc_sat = acc_aux1;
+                }
+                 */
+
+                if (acc <= 0) acc_sat = 0;
+                else acc_sat = (acc >> (scale-1));		//TODO: -1 a todos os scales no python (por causa do bit anterior etc)
 
                 if (acc_sat[0] == 1){
                 	acc_sat = acc_sat + 2;
                 }
 
-                acc_sat = acc_sat.range(4,1);
+                acc_sat = acc_sat.range(8,1);
                 if (acc_sat > 15)
                 	acc_sat = 15;
 
                 accF.range(3,0) = acc_sat.range(3,0);
-				//printf("acc_sat %2d | accF %f\n", (int)acc_sat, (float)accF);
+				//printf("j %d, i %d | acc_sat %2d | accF %f\n", orow, i, (int)acc_sat, (float)accF);
 
 
                 if (pool == 1){
@@ -188,7 +228,9 @@ void conv2D(hls::stream<in_pkt> &strm_in, hls::stream<out_pkt> &strm_out, int po
                         if (orow == OHEIGHT-1 && ocol == maxWidth-1) tmpo.last = 1;
                         else tmpo.last = 0;
                         strm_out.write(tmpo);
-                        //printf("values %d %d\n", (int)tmpo.data.range(15,0), i);
+
+                        //accF.range(3,0) = acc_sat.range(3,0);
+                        //printf("values %d %d %f\n", i, (int)acc_sat.range(3,0), (float)accF);
                     }
                     pool = 1;
                 }
@@ -233,7 +275,9 @@ void conv2D(hls::stream<in_pkt> &strm_in, hls::stream<out_pkt> &strm_out, int po
                             if (orow == OHEIGHT-1 && ocol == maxWidth-1) tmpo.last = 1;
                             else tmpo.last = 0;
                             strm_out.write(tmpo);
-                            //printf("values %d %d\n", (int)tmpo.data.range(15,0), i);
+
+                            //accF.range(3,0) = accArray[i].range(3,0);
+                            //printf("values %d %d %f\n", i, (int)accArray[i].range(3,0), (float)accF);
                         }
                         if (i == FILTERS-1) cp = 0;
                     }
@@ -250,5 +294,8 @@ void conv2D(hls::stream<in_pkt> &strm_in, hls::stream<out_pkt> &strm_out, int po
                 	ocol = OWIDTH;
             }
         }
+        if (ocol == maxWidth-1)
+        	ocol = OWIDTH;
     }
+
 }

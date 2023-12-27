@@ -34,6 +34,8 @@ class NumpyEncoder(json.JSONEncoder):
 
 model.load_weights(f"{models_folder}/{model_name}.h5")
 
+START_PADDING = 64  # number of elements to place on the z axis with zeros to achieve padding for HLS
+
 folder = "model_debug_dump_quantized"
 
 
@@ -343,7 +345,7 @@ def createScaleHLS(kernel_scale):
 def kernelPaddingHLS(kernel):
     # reshape the 1st kernel for easy load in HLS, so padding during runtime is not necessary
     # by padding the 3rd dimension
-    new_kernel_shape = (kernel.shape[0], kernel.shape[1], kernel.shape[3], kernel.shape[3])
+    new_kernel_shape = (kernel.shape[0], kernel.shape[1], START_PADDING, kernel.shape[3])
     new_kernel = np.zeros(new_kernel_shape)
     pad_width = [(0, 0)] * (len(new_kernel_shape) - len(kernel.shape))
     for i in range(len(kernel.shape)):

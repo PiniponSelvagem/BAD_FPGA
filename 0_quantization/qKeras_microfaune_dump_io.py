@@ -13,9 +13,7 @@ for gpu in gpus:
 
 import numpy as np
 import json
-import qkeras
 import qkeras_microfaune_model as qmodel
-import keras as K
 
 import cutils
 
@@ -30,6 +28,8 @@ data_type["bits_int"] = 0
 # use old rearange
 shouldRearrange = False
 
+doPaddingInput = False
+START_PADDING = 64  # number of elements to place on the z axis with zeros to achieve padding for HLS
 
 
 # Extend the JSONEncoder class
@@ -47,7 +47,8 @@ class NumpyEncoder(json.JSONEncoder):
 #from model_config.config_0 import ModelConfig               # model_quant_411
 #from model_config.config_0_noQuantState import ModelConfig  # model_quant_411_noQuantState
 #from model_config.config_0_qconvbnorm import ModelConfig    # model_quant_411_qconvbnorm
-from model_config.config_0_qconvbnorm__input_relu import ModelConfig    # model_quant_411_qconvbnorm__input_relu
+#from model_config.config_0_qconvbnorm__input_relu import ModelConfig    # model_quant_411_qconvbnorm__input_relu
+from model_config.config_0_qconvbnorm__input_relu_tensorflowBGRU import ModelConfig    # model_quant_411_qconvbnorm__input_relu_tensorflowBGRU
 #from model_config.config_1 import ModelConfig               # model_quant__conv-po2-81_gru-po2-81_bnorm-811
 
 datasets_dir = '../../datasets'
@@ -143,6 +144,19 @@ for layer_name in layers_names:
     print(layer_name)
     out = getOutputOfLayer(layer_name)
     sdim = len(out.shape)
+    if doPaddingInput:
+        if layer_name == "input_1" or layer_name == "q_activation":
+            # add padding to 1st input layer
+            original_shape = out.shape
+            # Create a new shape with the same dimensions, except the last dimension is set to 64
+            new_shape = list(original_shape)
+            new_shape[-1] = START_PADDING
+            # Reshape the array to the new shape
+            new_array = np.zeros(new_shape)
+            new_array[..., 0] = out[..., 0]
+            # Convert NumPy array to TensorFlow tensor
+            tf_tensor = tf.constant(new_array)
+            out = tf_tensor
     if shouldRearrange:
         # rearrange for channel first, ex: [1, 40, 10, 64] -> [1, 64, 40, 10]
         if sdim == 4:

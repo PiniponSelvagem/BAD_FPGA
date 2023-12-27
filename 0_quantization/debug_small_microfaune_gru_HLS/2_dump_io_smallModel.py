@@ -26,7 +26,8 @@ data_type["bits_int"] = 0
 # use old rearange
 shouldRearrange = False
 
-
+doPaddingInput = False
+START_PADDING = 64  # number of elements to place on the z axis with zeros to achieve padding for HLS
 
 # Extend the JSONEncoder class
 class NumpyEncoder(json.JSONEncoder):
@@ -63,9 +64,10 @@ print("Predicting...")
 X = np.array(
 [
     [
-        [[0.625]],
-        [[0.25]],
-        [[0.3125]],
+        [0.0625, 0.125,  0.1875],
+        [0.25,   0.3125, 0.375 ],
+        [0.4375, 0.5,    0.5625],
+        [0.625,  0.6875, 0.75  ]
     ]
 ])
 result = model.predict(X)
@@ -103,6 +105,19 @@ for layer_name in layers_names:
     print(layer_name)
     out = getOutputOfLayer(layer_name)
     sdim = len(out.shape)
+    if doPaddingInput:
+        if layer_name == "input_1" or layer_name == "q_activation":
+            # add padding to 1st input layer
+            original_shape = out.shape
+            # Create a new shape with the same dimensions, except the last dimension is set to 64
+            new_shape = list(original_shape)
+            new_shape[-1] = START_PADDING
+            # Reshape the array to the new shape
+            new_array = np.zeros(new_shape)
+            new_array[..., 0] = out[..., 0]
+            # Convert NumPy array to TensorFlow tensor
+            tf_tensor = tf.constant(new_array)
+            out = tf_tensor
     if shouldRearrange:
         # rearrange for channel first, ex: [1, 40, 10, 64] -> [1, 64, 40, 10]
         if sdim == 4:

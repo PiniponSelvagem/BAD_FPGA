@@ -28,44 +28,61 @@ for l in model.weights:
 """
 Model layers INPUT / OUTPUT (shape)
 input_1
-   >>> (None, 3, 1)
-   <<< (None, 3, 1)
+   >>> (None, 4, 3)
+   <<< (None, 4, 3)
 q_activation
-   >>> (None, 3, 1)
-   <<< (None, 3, 1)
+   >>> (None, 4, 3)
+   <<< (None, 4, 3)
 q_bidirectional
-   >>> (None, 3, 1)
-   <<< (None, 3, 8)
+   >>> (None, 4, 3)
+   <<< (None, 4, 4)
 q_bidirectional_1
-   >>> (None, 3, 8)
-   <<< (None, 3, 8)
+   >>> (None, 4, 4)
+   <<< (None, 4, 4)
+
+Model layers WEIGHTS (shape)
+q_bidirectional/forward_qgru/qgru_cell_7/kernel:0
+   --- (3, 6)
+q_bidirectional/forward_qgru/qgru_cell_7/recurrent_kernel:0
+   --- (2, 6)
+q_bidirectional/forward_qgru/qgru_cell_7/bias:0
+   --- (6,)
+q_bidirectional/backward_qgru/qgru_cell_8/kernel:0
+   --- (3, 6)
+q_bidirectional/backward_qgru/qgru_cell_8/recurrent_kernel:0
+   --- (2, 6)
+q_bidirectional/backward_qgru/qgru_cell_8/bias:0
+   --- (6,)
+q_bidirectional_1/forward_qgru_1/qgru_cell_10/kernel:0
+   --- (4, 6)
+q_bidirectional_1/forward_qgru_1/qgru_cell_10/recurrent_kernel:0
+   --- (2, 6)
+q_bidirectional_1/forward_qgru_1/qgru_cell_10/bias:0
+   --- (6,)
+q_bidirectional_1/backward_qgru_1/qgru_cell_11/kernel:0
+   --- (4, 6)
+q_bidirectional_1/backward_qgru_1/qgru_cell_11/recurrent_kernel:0
+   --- (2, 6)
+q_bidirectional_1/backward_qgru_1/qgru_cell_11/bias:0
+   --- (6,)
 """
+
 """
 Model layers WEIGHTS (shape)
 q_bidirectional/forward_qgru/qgru_cell_7/kernel:0
-   --- (1, 12)
+   --- (1, 6)
 q_bidirectional/forward_qgru/qgru_cell_7/recurrent_kernel:0
-   --- (4, 12)
+   --- (2, 6)
 q_bidirectional/forward_qgru/qgru_cell_7/bias:0
-   --- (12,)
+   --- (6,)
 q_bidirectional/backward_qgru/qgru_cell_8/kernel:0
-   --- (1, 12)
+   --- (1, 6)
 q_bidirectional/backward_qgru/qgru_cell_8/recurrent_kernel:0
-   --- (4, 12)
+   --- (2, 6)
 q_bidirectional/backward_qgru/qgru_cell_8/bias:0
-   --- (12,)
+   --- (6,)
 q_bidirectional_1/forward_qgru_1/qgru_cell_10/kernel:0
-   --- (8, 12)
-q_bidirectional_1/forward_qgru_1/qgru_cell_10/recurrent_kernel:0
-   --- (4, 12)
-q_bidirectional_1/forward_qgru_1/qgru_cell_10/bias:0
-   --- (12,)
-q_bidirectional_1/backward_qgru_1/qgru_cell_11/kernel:0
-   --- (8, 12)
-q_bidirectional_1/backward_qgru_1/qgru_cell_11/recurrent_kernel:0
-   --- (4, 12)
-q_bidirectional_1/backward_qgru_1/qgru_cell_11/bias:0
-   --- (12,)
+   --- (4, 6)
 """
 
 
@@ -99,14 +116,26 @@ kernel = [                  rkernel = [
 #################################
 # q_bidirectional__forward_qgru #
 #################################
-q_bidirectional__forward_qgru__kernel = np.array([[0.125,-0.125, 0.25,-0.25, 0.5,-0.5]])
-q_bidirectional__forward_qgru__recurrent_kernel = np.array(
+q_bidirectional__forward_qgru__kernel = np.array(
     [
-        [0.4375,-0.4375, 0.5625,-0.5625, 0.3125,-0.3125],
-        [0.5,-0.5, 0.0625,-0.625, 1,-1]
+        [0.125,-0.125, 0.25,-0.25, 0.5,-0.5],
+        [0.25,-0.25, 0.5,-0.5, 0.4375,-0.4375],
+        [0.0625,-0.0625, 0.675,-0.675, 0.75,-0.75]
     ]
 )
-q_bidirectional__forward_qgru__bias = np.array([0,0, 0,0, 0,0])
+q_bidirectional__forward_qgru__recurrent_kernel = np.array(
+    [
+        [0.0625,-0.0625, 0.5,-0.5, 0.75,-0.75],
+        [0.25,-0.25, 0.25,-0.25, 0.5,-0.5]
+    ]
+)
+q_bidirectional__forward_qgru__bias = np.array([0.25,0.5, -0.0625,0.125, 0.4375,0.0625])
+
+layer = model.layers[2]
+layer.weights[0].assign(q_bidirectional__forward_qgru__kernel)
+layer.weights[1].assign(q_bidirectional__forward_qgru__recurrent_kernel)
+layer.weights[2].assign(q_bidirectional__forward_qgru__bias)
+"""
 #
 ##################################
 # q_bidirectional__backward_qgru #
@@ -160,7 +189,7 @@ q_bidirectional_1__backward_qgru_1__recurrent_kernel = np.array(
 q_bidirectional_1__backward_qgru_1__bias = np.array([0,0, 0,0, 0,0])
 
 
-"""
+
 #################################
 # q_bidirectional__forward_qgru #
 #################################
@@ -239,8 +268,6 @@ q_bidirectional_1__backward_qgru_1__recurrent_kernel = np.array(
     ]
 )
 q_bidirectional_1__backward_qgru_1__bias = np.array([1,1,1,1, 1,1,1,1, 1,1,1,1])
-"""
-
 
 
 model.set_weights([
@@ -249,6 +276,18 @@ model.set_weights([
     q_bidirectional_1__forward_qgru_1__kernel, q_bidirectional_1__forward_qgru_1__recurrent_kernel, q_bidirectional_1__forward_qgru_1__bias,
     q_bidirectional_1__backward_qgru_1__kernel, q_bidirectional_1__backward_qgru_1__recurrent_kernel, q_bidirectional_1__backward_qgru_1__bias,
 ])
+"""
+"""
+layer = model.layers[2]
+w_bias = layer.weights[2]
+w_rbias = layer.weights[5]
+bias  = np.array([-0.0625, 0.125, 0.25, -0.125, 0.5, 0.4375])
+rbias = np.array([0.0625, 0.25, 0.125, -0.25, 0.4375, 0.3125])
+w_bias.assign(bias)
+w_rbias.assign(rbias)
+"""
+
+
 
 if not os.path.exists(save_dir):
     os.makedirs(save_dir)
@@ -264,9 +303,10 @@ input = np.array(
 [   # NOTE: THIS INPUT IS ONLY AFFECTED IN THIS SCRIPT
     #       TO CHANGE THE DUMP_IO INPUT, CHANGE ON THE OTHER SCRIPT "dump_io..."
     [
-        [[0.625]],
-        [[0.25]],
-        [[0.3125]],
+        [0.0625, 0.125,  0.1875],
+        [0.25,   0.3125, 0.375 ],
+        [0.4375, 0.5,    0.5625],
+        [0.625,  0.6875, 0.75  ]
     ]
 ])
 

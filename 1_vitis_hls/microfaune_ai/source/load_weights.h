@@ -18,39 +18,39 @@
 
 
 // INPUT -> later on this should be loaded from somewhere else?
-#define INPUT_1             INPUTS_PATH"1__q_activation.bin"
+#define INPUT             INPUTS_PATH"1__q_activation.bin"
 
 
 // conv2d_0
 #define CONV_0_KERNEL       WEIGHTS_PATH"q_conv2d_batchnorm_kernel_merged_scale.bin"
 #define CONV_0_KERNEL_SCALE WEIGHTS_PATH"q_conv2d_batchnorm_kernel_scale_hls.bin"
-#define CONV_0_BIAS         WEIGHTS_PATH"q_conv2d_batchnorm_bias.bin"
+#define CONV_0_BIAS         WEIGHTS_PATH"q_conv2d_batchnorm_bias_hls.bin"
 
 // conv2d_1
 #define CONV_1_KERNEL       WEIGHTS_PATH"q_conv2d_batchnorm_1_kernel_merged_scale.bin"
 #define CONV_1_KERNEL_SCALE WEIGHTS_PATH"q_conv2d_batchnorm_1_kernel_scale_hls.bin"
-#define CONV_1_BIAS         WEIGHTS_PATH"q_conv2d_batchnorm_1_bias.bin"
+#define CONV_1_BIAS         WEIGHTS_PATH"q_conv2d_batchnorm_1_bias_hls.bin"
 
 #ifndef DEBUG_MODEL
 // conv2d_2
 #define CONV_2_KERNEL       WEIGHTS_PATH"q_conv2d_batchnorm_2_kernel_merged_scale.bin"
 #define CONV_2_KERNEL_SCALE WEIGHTS_PATH"q_conv2d_batchnorm_2_kernel_scale_hls.bin"
-#define CONV_2_BIAS         WEIGHTS_PATH"q_conv2d_batchnorm_2_bias.bin"
+#define CONV_2_BIAS         WEIGHTS_PATH"q_conv2d_batchnorm_2_bias_hls.bin"
 
 // conv2d_3
 #define CONV_3_KERNEL       WEIGHTS_PATH"q_conv2d_batchnorm_3_kernel_merged_scale.bin"
 #define CONV_3_KERNEL_SCALE WEIGHTS_PATH"q_conv2d_batchnorm_3_kernel_scale_hls.bin"
-#define CONV_3_BIAS         WEIGHTS_PATH"q_conv2d_batchnorm_3_bias.bin"
+#define CONV_3_BIAS         WEIGHTS_PATH"q_conv2d_batchnorm_3_bias_hls.bin"
 
 // conv2d_4
 #define CONV_4_KERNEL       WEIGHTS_PATH"q_conv2d_batchnorm_4_kernel_merged_scale.bin"
 #define CONV_4_KERNEL_SCALE WEIGHTS_PATH"q_conv2d_batchnorm_4_kernel_scale_hls.bin"
-#define CONV_4_BIAS         WEIGHTS_PATH"q_conv2d_batchnorm_4_bias.bin"
+#define CONV_4_BIAS         WEIGHTS_PATH"q_conv2d_batchnorm_4_bias_hls.bin"
 
 // conv2d_5
 #define CONV_5_KERNEL       WEIGHTS_PATH"q_conv2d_batchnorm_5_kernel_merged_scale.bin"
 #define CONV_5_KERNEL_SCALE WEIGHTS_PATH"q_conv2d_batchnorm_5_kernel_scale_hls.bin"
-#define CONV_5_BIAS         WEIGHTS_PATH"q_conv2d_batchnorm_5_bias.bin"
+#define CONV_5_BIAS         WEIGHTS_PATH"q_conv2d_batchnorm_5_bias_hls.bin"
 #endif
 
 /*
@@ -135,12 +135,12 @@
 
 #define FILE_READ_BYTE_MULT sizeof(char)/(sizeof(weigth_t)/PACKET)
 
-void load(const char* path, void* array, int arraysize, int typesize) {
+void load(const char* path, void* array, int arraysize, int typeSize) {
     FILE* file = fopen(path, "rb");
 
     int idx = 0;
     if (file != NULL) {
-        #ifdef READ_APFIXED
+        #ifdef DEPRECATED__READ_APFIXED
         // Calculate the number of bytes to read
         size_t numBytes = (W + 7) / 8 * arraysize;
 
@@ -169,13 +169,10 @@ void load(const char* path, void* array, int arraysize, int typesize) {
         }
         delete[] buffer;
         #else
-        // Calculate the number of bytes to read
-        size_t numBytes = (W_BIT_WIDTH + 7) / 8 * arraysize;
-        //numBytes = numBytes / FILE_READ_BYTE_MULT;	// 2023-11-21 - im not aware of the problem to why i only read half of the file, but this seems to fix it
 
         // Read the binary data into the array
         char* buffer = (char*)array;
-        fread(buffer, sizeof(char), numBytes, file);
+        fread(buffer, typeSize, arraysize, file);
         fclose(file);
         #endif
         
@@ -187,46 +184,46 @@ void load(const char* path, void* array, int arraysize, int typesize) {
 }
 
 void loadWeights(
-	imap_t* input_1,	// --> maybe only for debug, can be removed later on
-	weigth_t* kernel_0, weigth_t* kernel_0_scale, weigth_t* bias_0,
-	weigth_t* kernel_1, weigth_t* kernel_1_scale, weigth_t* bias_1,
-	weigth_t* kernel_2, weigth_t* kernel_2_scale, weigth_t* bias_2,
-	weigth_t* kernel_3, weigth_t* kernel_3_scale, weigth_t* bias_3,
-	weigth_t* kernel_4, weigth_t* kernel_4_scale, weigth_t* bias_4,
-	weigth_t* kernel_5, weigth_t* kernel_5_scale, weigth_t* bias_5
+	imap_t* input,	// --> maybe only for debug, can be removed later on
+	weigth_t* kernel_0, weigth_t* kernel_0_scale, bias_t* bias_0,
+	weigth_t* kernel_1, weigth_t* kernel_1_scale, bias_t* bias_1,
+	weigth_t* kernel_2, weigth_t* kernel_2_scale, bias_t* bias_2,
+	weigth_t* kernel_3, weigth_t* kernel_3_scale, bias_t* bias_3,
+	weigth_t* kernel_4, weigth_t* kernel_4_scale, bias_t* bias_4,
+	weigth_t* kernel_5, weigth_t* kernel_5_scale, bias_t* bias_5
 ) {
-	load(INPUT_1, input_1, IHEIGHT*IWIDTH, sizeof(weigth_t));
+	load(INPUT, input, IHEIGHT*IWIDTH/PACKET, sizeof(imap_t));
 
     // conv2d_0
-	load(CONV_0_KERNEL, kernel_0, FILTERS*CHANNELS*K_SIZE*K_SIZE, sizeof(weigth_t));
-    load(CONV_0_KERNEL_SCALE, kernel_0_scale, CHANNELS, sizeof(weigth_t));
-    load(CONV_0_BIAS, bias_0, CHANNELS, sizeof(weigth_t));
+	load(CONV_0_KERNEL, kernel_0, FILTERS*CHANNELS*K_SIZE*K_SIZE/PACKET, sizeof(weigth_t));
+    load(CONV_0_KERNEL_SCALE, kernel_0_scale, CHANNELS/PACKET, sizeof(weigth_t));
+    load(CONV_0_BIAS, bias_0, CHANNELS, sizeof(bias_t));
 
     // conv2d_1
-    load(CONV_1_KERNEL, kernel_1, FILTERS*CHANNELS*K_SIZE*K_SIZE, sizeof(weigth_t));
-    load(CONV_1_KERNEL_SCALE, kernel_1_scale, CHANNELS, sizeof(weigth_t));
-    load(CONV_1_BIAS, bias_1, CHANNELS, sizeof(weigth_t));
+    load(CONV_1_KERNEL, kernel_1, FILTERS*CHANNELS*K_SIZE*K_SIZE/PACKET, sizeof(weigth_t));
+    load(CONV_1_KERNEL_SCALE, kernel_1_scale, CHANNELS/PACKET, sizeof(weigth_t));
+    load(CONV_1_BIAS, bias_1, CHANNELS, sizeof(bias_t));
 
 #ifndef DEBUG_MODEL
     // conv2d_2
-    load(CONV_2_KERNEL, kernel_2, FILTERS*CHANNELS*K_SIZE*K_SIZE, sizeof(weigth_t));
-    load(CONV_2_KERNEL_SCALE, kernel_2_scale, CHANNELS, sizeof(weigth_t));
-    load(CONV_2_BIAS, bias_2, CHANNELS, sizeof(weigth_t));
+    load(CONV_2_KERNEL, kernel_2, FILTERS*CHANNELS*K_SIZE*K_SIZE/PACKET, sizeof(weigth_t));
+    load(CONV_2_KERNEL_SCALE, kernel_2_scale, CHANNELS/PACKET, sizeof(weigth_t));
+    load(CONV_2_BIAS, bias_2, CHANNELS, sizeof(bias_t));
     
     // conv2d_3
-    load(CONV_3_KERNEL, kernel_3, FILTERS*CHANNELS*K_SIZE*K_SIZE, sizeof(weigth_t));
-    load(CONV_3_KERNEL_SCALE, kernel_3_scale, CHANNELS, sizeof(weigth_t));
-    load(CONV_3_BIAS, bias_3, CHANNELS, sizeof(weigth_t));
+    load(CONV_3_KERNEL, kernel_3, FILTERS*CHANNELS*K_SIZE*K_SIZE/PACKET, sizeof(weigth_t));
+    load(CONV_3_KERNEL_SCALE, kernel_3_scale, CHANNELS/PACKET, sizeof(weigth_t));
+    load(CONV_3_BIAS, bias_3, CHANNELS, sizeof(bias_t));
     
     // conv2d_4
-    load(CONV_4_KERNEL, kernel_4, FILTERS*CHANNELS*K_SIZE*K_SIZE, sizeof(weigth_t));
-    load(CONV_4_KERNEL_SCALE, kernel_4_scale, CHANNELS, sizeof(weigth_t));
-    load(CONV_4_BIAS, bias_4, CHANNELS, sizeof(weigth_t));
+    load(CONV_4_KERNEL, kernel_4, FILTERS*CHANNELS*K_SIZE*K_SIZE/PACKET, sizeof(weigth_t));
+    load(CONV_4_KERNEL_SCALE, kernel_4_scale, CHANNELS/PACKET, sizeof(weigth_t));
+    load(CONV_4_BIAS, bias_4, CHANNELS, sizeof(bias_t));
     
     // conv2d_5
-    load(CONV_5_KERNEL, kernel_5, FILTERS*CHANNELS*K_SIZE*K_SIZE, sizeof(weigth_t));
-    load(CONV_5_KERNEL_SCALE, kernel_5_scale, CHANNELS, sizeof(weigth_t));
-    load(CONV_5_BIAS, bias_5, CHANNELS, sizeof(weigth_t));
+    load(CONV_5_KERNEL, kernel_5, FILTERS*CHANNELS*K_SIZE*K_SIZE/PACKET, sizeof(weigth_t));
+    load(CONV_5_KERNEL_SCALE, kernel_5_scale, CHANNELS/PACKET, sizeof(weigth_t));
+    load(CONV_5_BIAS, bias_5, CHANNELS, sizeof(bias_t));
 #endif
 
     /*

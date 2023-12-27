@@ -26,7 +26,7 @@ class ModelConfig:
         ### model start ###
         n_filter = 2
         #
-        spec = keras.Input(shape=[3, 1], dtype=np.float32)
+        spec = keras.Input(shape=[4, 3], dtype=np.float32)
         x = QActivation(f"quantized_relu({bits},{integer_relu})")(spec)
         #
         x = QBidirectional(

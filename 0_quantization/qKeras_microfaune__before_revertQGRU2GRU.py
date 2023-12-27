@@ -21,29 +21,8 @@ random.seed(SEED)
 
 from tensorflow import keras
 
-#import qkeras.utils as qutils
-import six
-import tensorflow as tf
-import tensorflow.keras.backend as K
-from qkeras.qconv2d_batchnorm import QConv2DBatchnorm
-from qkeras.qdepthwiseconv2d_batchnorm import QDepthwiseConv2DBatchnorm
-from qkeras.qrecurrent import QSimpleRNN
-from qkeras.qrecurrent import QLSTM
-from qkeras.qrecurrent import QGRU
-from qkeras.qrecurrent import QBidirectional
-from qkeras.quantizers import quantized_po2
-import qkeras_microfaune_model as qmodel
-
-
-#from model_config.config_test import ModelConfig            # model_test
-#from model_config.config_0 import ModelConfig               # model_quant_411
-#from model_config.config_0_noQuantState import ModelConfig  # model_quant_411_noQuantState
-#from model_config.config_0_quantState_401 import ModelConfig  # model_quant_411_quantState_401
-#from model_config.config_0_quantState_801 import ModelConfig  # model_quant_411_quantState_801
-#from model_config.config_0_qconvbnorm import ModelConfig    # model_quant_411_qconvbnorm
-#from model_config.config_0_qconvbnorm__input_relu import ModelConfig    # model_quant_411_qconvbnorm__input_relu
-from model_config.config_0_qconvbnorm__input_relu_tensorflowBGRU import ModelConfig    # model_quant_411_qconvbnorm__input_relu_tensorflowBGRU
-#from model_config.config_1 import ModelConfig               # model_quant__conv-po2-81_gru-po2-81_bnorm-
+from qkeras import *
+import qkeras.utils as qutils
 
 import csv
 import pickle
@@ -55,6 +34,15 @@ import glob
 from sklearn.model_selection import StratifiedShuffleSplit
 from collections import Counter
 import qkeras_microfaune_model as qmodel
+
+#from model_config.config_test import ModelConfig            # model_test
+#from model_config.config_0 import ModelConfig               # model_quant_411
+#from model_config.config_0_noQuantState import ModelConfig  # model_quant_411_noQuantState
+#from model_config.config_0_quantState_401 import ModelConfig  # model_quant_411_quantState_401
+#from model_config.config_0_quantState_801 import ModelConfig  # model_quant_411_quantState_801
+#from model_config.config_0_qconvbnorm import ModelConfig    # model_quant_411_qconvbnorm
+from model_config.config_0_qconvbnorm__input_relu import ModelConfig    # model_quant_411_qconvbnorm__input_relu
+#from model_config.config_1 import ModelConfig               # model_quant__conv-po2-81_gru-po2-81_bnorm-811
 
 datasets_dir = '../../datasets'
 save_dir = ModelConfig.folder
@@ -199,6 +187,7 @@ print("Test set: ", Counter(Y_test))
 
 
 
+from datetime import datetime
 class DataGenerator(keras.utils.Sequence):
     def __init__(self, X, Y, batch_size=32):
         self.X = X
@@ -241,121 +230,7 @@ history = model.fit(data_generator, steps_per_epoch=steps_per_epoch, epochs=epoc
 if not os.path.exists(save_dir):
     os.makedirs(save_dir)
 model.save_weights(f"{save_dir}/{model_name}.h5")
-
-#
-# Taken from qkeras.utils, and modified so it dosent crash on non quantized layers like GRU
-#
-# Model utilities: before saving the weights, we want to apply the quantizers
-#
-def model_save_quantized_weights(model, filename=None):
-  """Quantizes model for inference and save it.
-  #
-  Takes a model with weights, apply quantization function to weights and
-  returns a dictionary with quantized weights.
-  #
-  User should be aware that "po2" quantization functions cannot really
-  be quantized in meaningful way in Keras. So, in order to preserve
-  compatibility with inference flow in Keras, we do not covert "po2"
-  weights and biases to exponents + signs (in case of quantize_po2), but
-  return instead (-1)**sign*(2**round(log2(x))). In the returned dictionary,
-  we will return the pair (sign, round(log2(x))).
-  #
-  Arguments:
-    model: model with weights to be quantized.
-    filename: if specified, we will save the hdf5 containing the quantized
-      weights so that we can use them for inference later on.
-  #
-  Returns:
-    dictionary containing layer name and quantized weights that can be used
-    by a hardware generator.
-  #
-  """
-  #
-  saved_weights = {}
-  #
-  print("... quantizing model")
-  for layer in model.layers:
-    if hasattr(layer, "get_quantizers"):
-      if any(isinstance(layer, t) for t in [QBidirectional]):   # ADDED to skip GRU and Bidirectional
-        continue       # ADDED to skip GRU and Bidirectional
-      weights = []
-      signs = []
-      #
-      if any(isinstance(layer, t) for t in [QConv2DBatchnorm, QDepthwiseConv2DBatchnorm]):
-        qs = layer.get_quantizers()
-        ws = layer.get_folded_weights()
-      elif any(isinstance(layer, t) for t in [QSimpleRNN, QLSTM, QGRU]):
-        qs = layer.get_quantizers()[:-1]
-        ws = layer.get_weights()
-      else:
-        qs = layer.get_quantizers()
-        ws = layer.get_weights()
-      #
-      has_sign = False
-      #
-      for quantizer, weight in zip(qs, ws):
-        if quantizer:
-          weight = tf.constant(weight)
-          weight = tf.keras.backend.eval(quantizer(weight))
-        #
-        # If quantizer is power-of-2 (quantized_po2 or quantized_relu_po2),
-        # we would like to process it here.
-        #
-        # However, we cannot, because we will loose sign information as
-        # quanized_po2 will be represented by the tuple (sign, log2(abs(w))).
-        #
-        # In addition, we will not be able to use the weights on the model
-        # any longer.
-        #
-        # So, instead of "saving" the weights in the model, we will return
-        # a dictionary so that the proper values can be propagated.
-        #
-        weights.append(weight)
-        #
-        has_sign = False
-        if quantizer:
-          if isinstance(quantizer, six.string_types):
-            q_name = quantizer
-          elif hasattr(quantizer, "__name__"):
-            q_name = quantizer.__name__
-          elif hasattr(quantizer, "name"):
-            q_name = quantizer.name
-          elif hasattr(quantizer, "__class__"):
-            q_name = quantizer.__class__.__name__
-          else:
-            q_name = ""
-        if quantizer and ("_po2" in q_name):
-          # Quantized_relu_po2 does not have a sign
-          if isinstance(quantizer, quantized_po2):
-            has_sign = True
-          sign = np.sign(weight)
-          # Makes sure values are -1 or +1 only
-          sign += (1.0 - np.abs(sign))
-          weight = np.round(np.log2(np.abs(weight)))
-          signs.append(sign)
-        else:
-          signs.append([])
-      #
-      saved_weights[layer.name] = {"weights": weights}
-      if has_sign:
-        saved_weights[layer.name]["signs"] = signs
-      #
-      if not any(isinstance(layer, t) for t in [QConv2DBatchnorm, QDepthwiseConv2DBatchnorm]):
-        layer.set_weights(weights)
-      else:
-        print(layer.name, " conv and batchnorm weights cannot be seperately"
-              " quantized because they will be folded before quantization.")
-    else:
-      if layer.get_weights():
-        print(" ", layer.name, "has not been quantized")
-  #
-  if filename:
-    model.save_weights(filename)
-  #
-  return saved_weights
-
-model_save_quantized_weights(model, f"{save_dir}/{model_name}__quantweights.h5")    # cant use this if GRU not quantized using QKeras
-
+qutils.model_save_quantized_weights(model, f"{save_dir}/{model_name}__quantweights.h5")
 
 if not os.path.exists(plots_dir):
     os.makedirs(plots_dir)

@@ -22,33 +22,39 @@ imap_t input_1[IHEIGHT*IWIDTH/PACKET];
 
 weigth_t kernel_0[FILTERS*CHANNELS*K_SIZE*K_SIZE/PACKET];
 weigth_t kernel_0_scale[CHANNELS/PACKET];
-weigth_t bias_0[CHANNELS/PACKET];
+bias_t bias_0[CHANNELS];
 
 weigth_t kernel_1[FILTERS*CHANNELS*K_SIZE*K_SIZE/PACKET];
 weigth_t kernel_1_scale[CHANNELS/PACKET];
-weigth_t bias_1[CHANNELS/PACKET];
+bias_t bias_1[CHANNELS];
 
 weigth_t kernel_2[FILTERS*CHANNELS*K_SIZE*K_SIZE/PACKET];
 weigth_t kernel_2_scale[CHANNELS/PACKET];
-weigth_t bias_2[CHANNELS/PACKET];
+bias_t bias_2[CHANNELS];
 
 weigth_t kernel_3[FILTERS*CHANNELS*K_SIZE*K_SIZE/PACKET];
 weigth_t kernel_3_scale[CHANNELS/PACKET];
-weigth_t bias_3[CHANNELS/PACKET];
+bias_t bias_3[CHANNELS];
 
 weigth_t kernel_4[FILTERS*CHANNELS*K_SIZE*K_SIZE/PACKET];
 weigth_t kernel_4_scale[CHANNELS/PACKET];
-weigth_t bias_4[CHANNELS/PACKET];
+bias_t bias_4[CHANNELS];
 
 weigth_t kernel_5[FILTERS*CHANNELS*K_SIZE*K_SIZE/PACKET];
 weigth_t kernel_5_scale[CHANNELS/PACKET];
-weigth_t bias_5[CHANNELS/PACKET];
+bias_t bias_5[CHANNELS];
 
-void writeBias(weigth_t* bias) {
+
+void writeBias(bias_t* bias) {
 	in_pkt tmp;
-    for (int i=0; i<(CHANNELS/PACKET); i++) {
-        tmp.data = bias[i];
-        str_in.write(tmp);
+	for (int i=0; i<(CHANNELS*BIAS_SIZE/BUS_WIDTH); i++) {
+    	tmp.data.range(15,0) = bias[4*i];
+    	tmp.data.range(31,16) = bias[4*i+1];
+    	tmp.data.range(47,32) = bias[4*i+2];
+    	tmp.data.range(63,48) = bias[4*i+3];
+    	str_in.write(tmp);
+    	printf("bias_tb = 0x%04x 0x%04x 0x%04x 0x%04x\n", (int)bias[i*4], (int)bias[i*4+1], (int)bias[i*4+2], (int)bias[i*4+3]);
+
     }
 }
 void writeScale(weigth_t* scale) {
@@ -69,12 +75,19 @@ void writeKernel(weigth_t* kernel) {
 }
 void writeInput(imap_t* input) {
 	in_pkt tmp;
-    for (int i=0, j=0; i<IHEIGHT*IWIDTH*CHANNELS/PACKET; i++) {
+    for (int i=0, j=0, i_pad=0; i<IHEIGHT*IWIDTH*CHANNELS/PACKET; i++) {
 		ap_uint<6> rangeStart = (j % PACKET) * 4;
 		ap_uint<6> rangeEnd   = rangeStart + 3;
-		//printf("i %d, j %d, rs %d, re %d\n", i, j, (int)rangeStart, (int)rangeEnd);
-		tmp.data = input[j/PACKET].range(rangeEnd,rangeStart);
-		++j;
+		//printf("i %d, j %d, rs %d, re %d | jP %f\n", i, j, (int)rangeStart, (int)rangeEnd, (float)(j/PACKET));
+		if (i_pad == 0) {
+			tmp.data = input[j/PACKET].range(rangeEnd,rangeStart);
+			++j;
+		}
+		else
+			tmp.data = 0x0000000000000000;
+		++i_pad;
+		if (i_pad == 4) i_pad = 0;
+		//printf("writeInput[%d] = 0x%0x 0x%0x\n", i, (int)tmp.data.range(63,32), (int)tmp.data.range(31,0));
         if (i == (IHEIGHT*IWIDTH*CHANNELS/PACKET-1)) tmp.last = (ap_int<1>)1;
         else tmp.last = (ap_int<1>)0;
         str_in.write(tmp);
@@ -120,11 +133,12 @@ void writeInputNextLayer() {
 				(float)outCF, (float)outDF, (float)outEF, (float)outFF
 		);
     	tmp = tmpo;
-    	tmp.last = (ap_int<1>)0;
+    	if (!str_out.empty())
+    		tmp.last = (ap_int<1>)0;
+    	else
+    		tmp.last = (ap_int<1>)1;
     	str_in.write(tmp);
     }
-	tmp.last = (ap_int<1>)1;
-	str_in.write(tmp);
 }
 void printLastLayerOutput() {
 	int i = 0;
@@ -168,7 +182,7 @@ void printLastLayerOutput() {
 
 int main() {
     loadWeights(
-		input_1,	// input_2,
+		input_1,
 		kernel_0, kernel_0_scale, bias_0,
 		kernel_1, kernel_1_scale, bias_1,
 		kernel_2, kernel_2_scale, bias_2,
@@ -177,6 +191,12 @@ int main() {
 		kernel_5, kernel_5_scale, bias_5
 	);
 
+    /*
+    printf("\ninput_1:\n");
+    for (int idx=0; idx<IHEIGHT*IWIDTH*CHANNELS/PACKET; idx++) {
+    	printf("idx=%d | 0x%016llx\n", idx, input_1[idx]);
+    }
+	*/
 
     printf("CONV_0\n");
     writeBias(bias_0);
@@ -200,7 +220,6 @@ int main() {
     printLastLayerOutput();
 #endif
 
-
 #ifndef DEBUG_MODEL
     printf("CONV_2\n");
     writeBias(bias_2);
@@ -221,18 +240,18 @@ int main() {
 #endif
 
     printf("CONV_4\n");
-    writeBias(bias_2);
-    writeScale(kernel_2_scale);
-    writeKernel(kernel_2);
+    writeBias(bias_4);
+    writeScale(kernel_4_scale);
+    writeKernel(kernel_4);
     writeInputNextLayer();
 #if HW_IP
     conv2D(str_in, str_out, 1, IWIDTH_2);
 #endif
 
     printf("CONV_5\n");
-    writeBias(bias_3);
-    writeScale(kernel_3_scale);
-    writeKernel(kernel_3);
+    writeBias(bias_5);
+    writeScale(kernel_5_scale);
+    writeKernel(kernel_5);
     writeInputNextLayer();
 #if HW_IP
     conv2D(str_in, str_out, 10, IWIDTH_2);
@@ -240,7 +259,6 @@ int main() {
 
     printLastLayerOutput();
 #endif
-
 
     int err_cnt = 0;
     return 0;
