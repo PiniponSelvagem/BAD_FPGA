@@ -15,5 +15,6 @@ typedef ap_uint<I_BIT_WIDTH*PACKET> omap_t;
 
 typedef ap_fixed<W,I, AP_RND, AP_SAT> quant_t;
 
+typedef float gru_t;
 
 #endif // !MY_TYPES

@@ -63,6 +63,19 @@ data_type["name"] = "ap_fixed"
 data_type["bits_total"] = 4
 data_type["bits_int"] = 1
 
+
+
+
+print("\nModel layers INPUT / OUTPUT (shape)")
+for l in model.layers:
+    print(str(l.name) +"\n   >>> "+ str(l.input.shape) +"\n   <<< "+ str(l.output.shape))
+
+print("\nModel layers WEIGHTS (shape)")
+for l in model.weights:
+    print(str(l.name) +"\n   --- "+ str(l.shape))
+
+
+
 start = time.time()
 #########################################################
 isManualQmodel = False
@@ -96,6 +109,24 @@ open(folder+"/dump_config.json", "w").write(jConfig)
 
 
 def rearange_gru_weights(data):
+	rows, cols = data.shape
+	split = 3
+	jump = cols // split  # Jump value calculated as size of the last dimension divided by 'split'
+	#
+	new_cols = jump * split
+	new_array = data[:, :new_cols].reshape(rows, split, jump).T
+	#
+	return new_array
+
+
+def rearange_gru_scales(data):
+    if data.size > 1:
+        return data.reshape((2, -1), order='F')
+    else:
+        return data
+"""
+OLD VERSION, keeping if necessary rollback
+def rearange_gru_weights(data):
     if len(data.shape) > 1:
         last_dim_size = data.shape[-1] // 3
         new_data = data.reshape(data.shape[0], 3, last_dim_size, order='F')
@@ -116,6 +147,7 @@ def rearange_gru_scales(data):
         return new_array
     else:
         return data
+"""
 
 
 
@@ -179,21 +211,29 @@ def processLayer(layerName, weightName, weight, data_type, isScale=False, saveBi
             #    data = data.transpose((0, 1))
         else:
             data = rearange_gru_weights(data)
+            """
+            # QGRU
             if ("kernel" in weightName): # reorder kernel for better memory access / no jumping around when access
                 data = data.transpose((2, 1, 0))
+            """
     #
     shouldSplit = True
     for name in layerName_split_dim0:
         if name not in weightName:
             shouldSplit = False
             break
+    """
+    # QGRU
     if isScale or isManualQmodel:
         # scale is only one dim always
         # QGRU bias does not require split because there is no reccurrent bias
         shouldSplit = False
     #
+        
+    """
     if shouldSplit:
-        bias, rbias = np.split(data, 2, axis=0)
+        data = data.transpose((0, 2, 1))
+        bias, rbias = np.split(data, 2, axis=1)
         bias = np.squeeze(bias)
         rbias = np.squeeze(rbias)
         biasName = weightName
@@ -202,6 +242,7 @@ def processLayer(layerName, weightName, weight, data_type, isScale=False, saveBi
         cutils.saveArray(folder, rbiasBias, rbias, rbiasBias, data_type, saveBinAsInteger=saveBinAsInteger)
     else:
         cutils.saveArray(folder, weightName, data, weightName, data_type, saveBinAsInteger=saveBinAsInteger)
+
 
 
 
@@ -609,12 +650,15 @@ for layer in model.layers:
     layerName = layer.name
     weight = layer.weights
     if "bidirectional" in layerName:
-        processLayer(layerName, layerName+"_gru_forward_kernel", weight[0], data_type)
-        processLayer(layerName, layerName+"_gru_forward_recurrent_kernel", weight[1], data_type)
-        processLayer(layerName, layerName+"_gru_forward_bias", weight[2], data_type)
-        processLayer(layerName, layerName+"_gru_backward_kernel", weight[3], data_type)
-        processLayer(layerName, layerName+"_gru_backward_recurrent_kernel", weight[4], data_type)
-        processLayer(layerName, layerName+"_gru_backward_bias", weight[5], data_type)
+        gru_data_type = data_type.copy()
+        gru_data_type["name"] = "float"
+        #gru_data_type["bits_int"] += 1
+        processLayer(layerName, layerName+"_gru_forward_kernel", weight[0], gru_data_type)
+        processLayer(layerName, layerName+"_gru_forward_recurrent_kernel", weight[1], gru_data_type)
+        processLayer(layerName, layerName+"_gru_forward_bias", weight[2], gru_data_type)
+        processLayer(layerName, layerName+"_gru_backward_kernel", weight[3], gru_data_type)
+        processLayer(layerName, layerName+"_gru_backward_recurrent_kernel", weight[4], gru_data_type)
+        processLayer(layerName, layerName+"_gru_backward_bias", weight[5], gru_data_type)
     if "time_distributed" in layerName:
         processLayer(layerName, layerName+"_kernel", weight[0], data_type)
         processLayer(layerName, layerName+"_bias", weight[1], data_type)

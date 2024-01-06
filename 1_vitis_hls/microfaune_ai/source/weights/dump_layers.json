@@ -769,9 +769,9 @@
         "trainable": true,
         "dtype": "float32",
         "layer": {
-            "class_name": "QGRU",
+            "class_name": "GRU",
             "config": {
-                "name": "qgru",
+                "name": "gru",
                 "trainable": true,
                 "dtype": "float32",
                 "return_sequences": true,
@@ -781,27 +781,8 @@
                 "unroll": false,
                 "time_major": false,
                 "units": 64,
-                "activation": {
-                    "class_name": "quantized_tanh",
-                    "config": {
-                        "bits": 4,
-                        "symmetric": false,
-                        "use_stochastic_rounding": false,
-                        "use_real_tanh": false
-                    }
-                },
-                "recurrent_activation": {
-                    "class_name": "quantized_relu",
-                    "config": {
-                        "bits": 4,
-                        "integer": 0,
-                        "use_sigmoid": 1,
-                        "negative_slope": 0.0,
-                        "use_stochastic_rounding": false,
-                        "relu_upper_bound": null,
-                        "qnoise_factor": 1.0
-                    }
-                },
+                "activation": "tanh",
+                "recurrent_activation": "sigmoid",
                 "use_bias": true,
                 "kernel_initializer": {
                     "class_name": "GlorotUniform",
@@ -824,68 +805,13 @@
                 "recurrent_regularizer": null,
                 "bias_regularizer": null,
                 "activity_regularizer": null,
-                "kernel_constraint": {
-                    "class_name": "Clip",
-                    "config": {
-                        "min_value": -2.0,
-                        "max_value": 2.0
-                    }
-                },
-                "recurrent_constraint": {
-                    "class_name": "Clip",
-                    "config": {
-                        "min_value": -2.0,
-                        "max_value": 2.0
-                    }
-                },
-                "bias_constraint": {
-                    "class_name": "Clip",
-                    "config": {
-                        "min_value": -2.0,
-                        "max_value": 2.0
-                    }
-                },
-                "kernel_quantizer": {
-                    "class_name": "quantized_bits",
-                    "config": {
-                        "bits": 4,
-                        "integer": 1,
-                        "symmetric": true,
-                        "alpha": "auto_po2",
-                        "keep_negative": true,
-                        "use_stochastic_rounding": false,
-                        "qnoise_factor": 1.0
-                    }
-                },
-                "recurrent_quantizer": {
-                    "class_name": "quantized_bits",
-                    "config": {
-                        "bits": 4,
-                        "integer": 1,
-                        "symmetric": true,
-                        "alpha": "auto_po2",
-                        "keep_negative": true,
-                        "use_stochastic_rounding": false,
-                        "qnoise_factor": 1.0
-                    }
-                },
-                "bias_quantizer": {
-                    "class_name": "quantized_bits",
-                    "config": {
-                        "bits": 4,
-                        "integer": 1,
-                        "symmetric": 1,
-                        "alpha": null,
-                        "keep_negative": true,
-                        "use_stochastic_rounding": false,
-                        "qnoise_factor": 1.0
-                    }
-                },
-                "state_quantizer": null,
+                "kernel_constraint": null,
+                "recurrent_constraint": null,
+                "bias_constraint": null,
                 "dropout": 0.0,
                 "recurrent_dropout": 0.0,
-                "implementation": 1,
-                "reset_after": false
+                "implementation": 2,
+                "reset_after": true
             }
         },
         "merge_mode": "concat"
@@ -895,9 +821,9 @@
         "trainable": true,
         "dtype": "float32",
         "layer": {
-            "class_name": "QGRU",
+            "class_name": "GRU",
             "config": {
-                "name": "qgru_1",
+                "name": "gru_1",
                 "trainable": true,
                 "dtype": "float32",
                 "return_sequences": true,
@@ -907,27 +833,8 @@
                 "unroll": false,
                 "time_major": false,
                 "units": 64,
-                "activation": {
-                    "class_name": "quantized_tanh",
-                    "config": {
-                        "bits": 4,
-                        "symmetric": false,
-                        "use_stochastic_rounding": false,
-                        "use_real_tanh": false
-                    }
-                },
-                "recurrent_activation": {
-                    "class_name": "quantized_relu",
-                    "config": {
-                        "bits": 4,
-                        "integer": 0,
-                        "use_sigmoid": 1,
-                        "negative_slope": 0.0,
-                        "use_stochastic_rounding": false,
-                        "relu_upper_bound": null,
-                        "qnoise_factor": 1.0
-                    }
-                },
+                "activation": "tanh",
+                "recurrent_activation": "sigmoid",
                 "use_bias": true,
                 "kernel_initializer": {
                     "class_name": "GlorotUniform",
@@ -950,68 +857,13 @@
                 "recurrent_regularizer": null,
                 "bias_regularizer": null,
                 "activity_regularizer": null,
-                "kernel_constraint": {
-                    "class_name": "Clip",
-                    "config": {
-                        "min_value": -2.0,
-                        "max_value": 2.0
-                    }
-                },
-                "recurrent_constraint": {
-                    "class_name": "Clip",
-                    "config": {
-                        "min_value": -2.0,
-                        "max_value": 2.0
-                    }
-                },
-                "bias_constraint": {
-                    "class_name": "Clip",
-                    "config": {
-                        "min_value": -2.0,
-                        "max_value": 2.0
-                    }
-                },
-                "kernel_quantizer": {
-                    "class_name": "quantized_bits",
-                    "config": {
-                        "bits": 4,
-                        "integer": 1,
-                        "symmetric": true,
-                        "alpha": "auto_po2",
-                        "keep_negative": true,
-                        "use_stochastic_rounding": false,
-                        "qnoise_factor": 1.0
-                    }
-                },
-                "recurrent_quantizer": {
-                    "class_name": "quantized_bits",
-                    "config": {
-                        "bits": 4,
-                        "integer": 1,
-                        "symmetric": true,
-                        "alpha": "auto_po2",
-                        "keep_negative": true,
-                        "use_stochastic_rounding": false,
-                        "qnoise_factor": 1.0
-                    }
-                },
-                "bias_quantizer": {
-                    "class_name": "quantized_bits",
-                    "config": {
-                        "bits": 4,
-                        "integer": 1,
-                        "symmetric": 1,
-                        "alpha": null,
-                        "keep_negative": true,
-                        "use_stochastic_rounding": false,
-                        "qnoise_factor": 1.0
-                    }
-                },
-                "state_quantizer": null,
+                "kernel_constraint": null,
+                "recurrent_constraint": null,
+                "bias_constraint": null,
                 "dropout": 0.0,
                 "recurrent_dropout": 0.0,
-                "implementation": 1,
-                "reset_after": false
+                "implementation": 2,
+                "reset_after": true
             }
         },
         "merge_mode": "concat"

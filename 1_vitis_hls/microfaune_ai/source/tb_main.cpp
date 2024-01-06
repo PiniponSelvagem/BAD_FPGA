@@ -8,6 +8,8 @@
 
 #include "load_weights.h"
 
+#include "tb_gru_soft.h"
+
 typedef ap_axis<64, 0, 0, 0> in_pkt;
 typedef ap_axis<64, 0, 0, 0> out_pkt;
 
@@ -18,6 +20,11 @@ hls::stream<out_pkt> str_out;
 void conv2D(hls::stream<in_pkt> &strm_in, hls::stream<out_pkt> &strm_out, int pool, int maxWidth);
 
 imap_t input_1[IHEIGHT*IWIDTH/PACKET];
+gru_t input_gru[IHEIGHT*FILTERS];
+
+gru_t outputConv[IHEIGHT*FILTERS];
+gru_t outputGRU0[IHEIGHT*(FILTERS*2)];
+gru_t outputGRU1[IHEIGHT*(FILTERS*2)];
 
 
 weigth_t kernel_0[FILTERS*CHANNELS*K_SIZE*K_SIZE/PACKET];
@@ -43,6 +50,31 @@ bias_t bias_4[CHANNELS];
 weigth_t kernel_5[FILTERS*CHANNELS*K_SIZE*K_SIZE/PACKET];
 weigth_t kernel_5_scale[CHANNELS/PACKET];
 bias_t bias_5[CHANNELS];
+
+
+
+gru_t gru0f_kernel[TG_GRU_IN_COLS*GRU_SPLIT_SIZE*TG_GRU_FILTERS];
+gru_t gru0f_rkernel[TG_GRU_FILTERS*GRU_SPLIT_SIZE*TG_GRU_FILTERS];
+gru_t gru0f_bias[TG_GRU_BIAS_SIZE];
+gru_t gru0f_rbias[TG_GRU_BIAS_SIZE];
+
+gru_t gru0b_kernel[TG_GRU_IN_COLS*GRU_SPLIT_SIZE*TG_GRU_FILTERS];
+gru_t gru0b_rkernel[TG_GRU_FILTERS*GRU_SPLIT_SIZE*TG_GRU_FILTERS];
+gru_t gru0b_bias[TG_GRU_BIAS_SIZE];
+gru_t gru0b_rbias[TG_GRU_BIAS_SIZE];
+
+
+gru_t gru1f_kernel[(TG_GRU_FILTERS*2)*GRU_SPLIT_SIZE*TG_GRU_FILTERS];
+gru_t gru1f_rkernel[TG_GRU_FILTERS*GRU_SPLIT_SIZE*TG_GRU_FILTERS];
+gru_t gru1f_bias[TG_GRU_BIAS_SIZE];
+gru_t gru1f_rbias[TG_GRU_BIAS_SIZE];
+
+gru_t gru1b_kernel[(TG_GRU_FILTERS*2)*GRU_SPLIT_SIZE*TG_GRU_FILTERS];
+gru_t gru1b_rkernel[TG_GRU_FILTERS*GRU_SPLIT_SIZE*TG_GRU_FILTERS];
+gru_t gru1b_bias[TG_GRU_BIAS_SIZE];
+gru_t gru1b_rbias[TG_GRU_BIAS_SIZE];
+
+
 
 
 void writeBias(bias_t* bias) {
@@ -179,16 +211,90 @@ void printLastLayerOutput() {
 		);
     }
 }
+void conv2gru() {
+	int i = 0;
+    out_pkt tmpo;
+	typedef ap_ufixed<4,0> outputF;
+    while (!str_out.empty()) {
+        tmpo = str_out.read();
+        int out0 = (int)tmpo.data.range(3,0);	outputF out0F; out0F.range(3,0) = tmpo.data.range(3,0);
+        int out1 = (int)tmpo.data.range(7,4);	outputF out1F; out1F.range(3,0) = tmpo.data.range(7,4);
+        int out2 = (int)tmpo.data.range(11,8);  outputF out2F; out2F.range(3,0) = tmpo.data.range(11,8);
+        int out3 = (int)tmpo.data.range(15,12); outputF out3F; out3F.range(3,0) = tmpo.data.range(15,12);
 
+        int out4 = (int)tmpo.data.range(19,16); outputF out4F; out4F.range(3,0) = tmpo.data.range(19,16);
+        int out5 = (int)tmpo.data.range(23,20); outputF out5F; out5F.range(3,0) = tmpo.data.range(23,20);
+        int out6 = (int)tmpo.data.range(27,24); outputF out6F; out6F.range(3,0) = tmpo.data.range(27,24);
+        int out7 = (int)tmpo.data.range(31,28); outputF out7F; out7F.range(3,0) = tmpo.data.range(31,28);
+
+        int out8 = (int)tmpo.data.range(35,32); outputF out8F; out8F.range(3,0) = tmpo.data.range(35,32);
+        int out9 = (int)tmpo.data.range(39,36); outputF out9F; out9F.range(3,0) = tmpo.data.range(39,36);
+        int outA = (int)tmpo.data.range(43,40); outputF outAF; outAF.range(3,0) = tmpo.data.range(43,40);
+        int outB = (int)tmpo.data.range(47,44); outputF outBF; outBF.range(3,0) = tmpo.data.range(47,44);
+
+        int outC = (int)tmpo.data.range(51,48); outputF outCF; outCF.range(3,0) = tmpo.data.range(51,48);
+        int outD = (int)tmpo.data.range(55,52); outputF outDF; outDF.range(3,0) = tmpo.data.range(55,52);
+        int outE = (int)tmpo.data.range(59,56); outputF outEF; outEF.range(3,0) = tmpo.data.range(59,56);
+        int outF = (int)tmpo.data.range(63,60); outputF outFF; outFF.range(3,0) = tmpo.data.range(63,60);
+
+        printf("%02d - result %2d, %2d, %2d, %2d,   %2d, %2d, %2d, %2d,   %2d, %2d, %2d, %2d,   %2d, %2d, %2d, %2d   "
+        		"|   %f, %f, %f, %f,   %f, %f, %f, %f,   %f, %f, %f, %f,   %f, %f, %f, %f\n", i,
+        		out0, out1, out2, out3,
+				out4, out5, out6, out7,
+				out8, out9, outA, outB,
+				outC, outD, outE, outF,
+				(float)out0F, (float)out1F, (float)out2F, (float)out3F,
+				(float)out4F, (float)out5F, (float)out6F, (float)out7F,
+				(float)out8F, (float)out9F, (float)outAF, (float)outBF,
+				(float)outCF, (float)outDF, (float)outEF, (float)outFF
+		);
+
+        outputConv[i++] = (float)out0F;
+        outputConv[i++] = (float)out1F;
+        outputConv[i++] = (float)out2F;
+        outputConv[i++] = (float)out3F;
+
+        outputConv[i++] = (float)out4F;
+        outputConv[i++] = (float)out5F;
+        outputConv[i++] = (float)out6F;
+        outputConv[i++] = (float)out7F;
+
+        outputConv[i++] = (float)out8F;
+        outputConv[i++] = (float)out9F;
+        outputConv[i++] = (float)outAF;
+        outputConv[i++] = (float)outBF;
+
+        outputConv[i++] = (float)outCF;
+        outputConv[i++] = (float)outDF;
+        outputConv[i++] = (float)outEF;
+        outputConv[i++] = (float)outFF;
+    }
+}
+void printGRUoutput(gru_t* output) {
+	#define OUT_WIDTH_GRU (FILTERS*2)
+	for (int i=0; i<IHEIGHT; ++i) {
+		printf("[%3d] - ", i);
+		for (int j=0; j<OUT_WIDTH_GRU; ++j) {
+			printf("%10f ", output[(i*OUT_WIDTH_GRU)+j]);
+		}
+		printf("\n");
+    }
+}
+
+#define DO_CONV
 int main() {
     loadWeights(
-		input_1,
+		input_1, (float*)outputConv,
 		kernel_0, kernel_0_scale, bias_0,
 		kernel_1, kernel_1_scale, bias_1,
 		kernel_2, kernel_2_scale, bias_2,
 		kernel_3, kernel_3_scale, bias_3,
 		kernel_4, kernel_4_scale, bias_4,
-		kernel_5, kernel_5_scale, bias_5
+		kernel_5, kernel_5_scale, bias_5,
+		gru0f_kernel, gru0f_rkernel, gru0f_bias, gru0f_rbias,
+		gru0b_kernel, gru0b_rkernel, gru0b_bias, gru0b_rbias,
+		gru1f_kernel, gru1f_rkernel, gru1f_bias, gru1f_rbias,
+		gru1b_kernel, gru1b_rkernel, gru1b_bias, gru1b_rbias
 	);
 
     /*
@@ -198,6 +304,7 @@ int main() {
     }
 	*/
 
+#ifdef DO_CONV
     printf("CONV_0\n");
     writeBias(bias_0);
     writeScale(kernel_0_scale);
@@ -257,8 +364,71 @@ int main() {
     conv2D(str_in, str_out, 10, IWIDTH_2);
 #endif
 
+#ifdef DEBUG_CONV
     printLastLayerOutput();
 #endif
+#endif
+
+    // Temporary method to convert from hardware to software data.
+    printf("---- conv2gru ----\n");
+    conv2gru();
+#else
+    printf("---- outputConv from TF ----\n");
+	for (int i=0; i<IHEIGHT; ++i) {
+		printf("[%3d] - ", i);
+		for (int j=0; j<(FILTERS); ++j) {
+			printf("%10f ", outputConv[(i*FILTERS)+j]);
+		}
+		printf("\n");
+    }
+#endif
+
+	printf("###################################### GRU_0 ######################################\n");
+	printf("---- 0 FORWARD ----\n");
+	soft_gru( // GRU_0_F
+		TG_GRU_FORWARD,
+		TG_GRU_0__IN_COLS,
+		outputConv,
+		gru0f_kernel,	gru0f_bias,
+		gru0f_rkernel,	gru0f_rbias,
+		outputGRU0
+	);
+
+	printf("---- 0 BACKWARD ----\n");
+	soft_gru( // GRU_0_B
+		TG_GRU_BACKWARD,
+		TG_GRU_0__IN_COLS,
+		outputConv,
+		gru0b_kernel,	gru0b_bias,
+		gru0b_rkernel, 	gru0b_rbias,
+		outputGRU0
+	);
+
+	printGRUoutput(outputGRU0);
+
+
+	printf("\n\n\n###################################### GRU_1 ######################################\n");
+	printf("---- 1 FORWARD ----\n");
+	soft_gru( // GRU_1_F
+		TG_GRU_FORWARD,
+		TG_GRU_FILTERS*2,
+		outputGRU0,
+		gru1f_kernel,	gru1f_bias,
+		gru1f_rkernel,	gru1f_rbias,
+		outputGRU1
+	);
+
+	printf("---- 1 BACKWARD ----\n");
+	soft_gru( // GRU_1_B
+		TG_GRU_BACKWARD,
+		TG_GRU_FILTERS*2,
+		outputGRU0,
+		gru1b_kernel,  	gru1b_bias,
+		gru1b_rkernel, 	gru1b_rbias,
+		outputGRU1
+	);
+
+	printGRUoutput(outputGRU1);
 
     int err_cnt = 0;
     return 0;

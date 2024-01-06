@@ -6,6 +6,9 @@ gpus = tf.config.experimental.list_physical_devices('GPU')
 for gpu in gpus:
     tf.config.experimental.set_memory_growth(gpu, True)
 
+# force use CPU by hidding GPU
+tf.config.set_visible_devices([], 'GPU')
+
 from qkeras import *
 
 import qkeras_microfaune_model as qmodel
