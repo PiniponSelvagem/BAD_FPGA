@@ -56,7 +56,7 @@ void conv2D(hls::stream<in_pkt> &strm_in, hls::stream<out_pkt> &strm_out, int po
     READ_INIT_MAP: for (int i = 0; i < (K_SIZE-1)*maxWidth*CHANNELS/PACKET; i++){
         tmp = strm_in.read();
         img_in[i] = tmp.data.range(63, 0);
-        //printf("img_in[%d] = 0x%08x 0x%08x\n", i, (int)img_in[i].range(63,32), (int)img_in[i].range(31,0));
+        printf("img_in[%d] = 0x%08x 0x%08x\n", i, (int)img_in[i].range(63,32), (int)img_in[i].range(31,0));
     }
 
 
@@ -73,7 +73,7 @@ void conv2D(hls::stream<in_pkt> &strm_in, hls::stream<out_pkt> &strm_out, int po
     loop_orow: for(orow = -1; orow < OHEIGHT-1; orow++){
 #pragma HLS LOOP_TRIPCOUNT max=431
     	rd_index = 0;
-        loop_ocol: for(ocol = -1, cp = 1; ocol < OWIDTH/*maxWidth*/-1; ocol += 1, cp += 1){		// TODO: OWIDTH --> maxWidth
+        loop_ocol: for(ocol = -1, cp = 1; ocol < OWIDTH-1; ocol += 1, cp += 1){
 #pragma HLS LOOP_TRIPCOUNT max=40
     //#pragma HLS PIPELINE
             filters_loop: for(int i = 0; i < FILTERS; i++){
@@ -156,7 +156,7 @@ void conv2D(hls::stream<in_pkt> &strm_in, hls::stream<out_pkt> &strm_out, int po
 
                 /*
                  * More complex rounding to nearest even, closer to QKeras
-                 *
+                 */
                 if (acc <= 0) acc_sat = 0;
                 else {
                 	acc_aux = (acc >> (scale-1));		//TODO: -1 a todos os scales no python (por causa do bit anterior etc)
@@ -172,14 +172,16 @@ void conv2D(hls::stream<in_pkt> &strm_in, hls::stream<out_pkt> &strm_out, int po
                 	else
                 		acc_sat = acc_aux1;
                 }
-                 */
 
+
+                /*
                 if (acc <= 0) acc_sat = 0;
                 else acc_sat = (acc >> (scale-1));		//TODO: -1 a todos os scales no python (por causa do bit anterior etc)
 
                 if (acc_sat[0] == 1){
                 	acc_sat = acc_sat + 2;
                 }
+                */
 
                 acc_sat = acc_sat.range(8,1);
                 if (acc_sat > 15)
@@ -289,13 +291,11 @@ void conv2D(hls::stream<in_pkt> &strm_in, hls::stream<out_pkt> &strm_out, int po
                                 accArray[i] = acc_sat;
                     }
                 }
-
-                if (ocol == maxWidth-1)
-                	ocol = OWIDTH;
             }
+
+            if (ocol == maxWidth-2)	//-2 because it can only do a 3x3 until 38, 18, etc
+            	ocol = OWIDTH;
         }
-        if (ocol == maxWidth-1)
-        	ocol = OWIDTH;
     }
 
 }

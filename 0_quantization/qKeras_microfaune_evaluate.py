@@ -30,7 +30,14 @@ wav_file = "audio_samples/bird_50124.wav" # data_bird_0     # 0.98303944 | 0.986
 #from model_config.config_0_noQuantState import ModelConfig  # model_quant_411_noQuantState
 #from model_config.config_0_qconvbnorm import ModelConfig    # model_quant_411_qconvbnorm
 #from model_config.config_0_qconvbnorm__input_relu import ModelConfig    # model_quant_411_qconvbnorm__input_relu
-from model_config.config_0_qconvbnorm__input_relu_tensorflowBGRU import ModelConfig    # model_quant_411_qconvbnorm__input_relu_tensorflowBGRU
+#from model_config.config_0_qconvbnorm__input_relu_tensorflowBGRU import ModelConfig    # model_quant_411_qconvbnorm__input_relu_tensorflowBGRU
+#from model_config.config_0_qconvbnorm__input_relu_tensorflowBGRU_GRUunits32 import ModelConfig    # model_quant_411_qconvbnorm__input_relu_tensorflowBGRU_GRUunits32
+#from model_config.config_0_qconvbnorm__input_relu_tensorflowBGRU_GRUunits16 import ModelConfig    # model_quant_411_qconvbnorm__input_relu_tensorflowBGRU_GRUunits16
+#from model_config.config_0_qconvbnorm__input_relu_tensorflowBGRU_GRUunits8 import ModelConfig    # model_quant_411_qconvbnorm__input_relu_tensorflowBGRU_GRUunits8
+#from model_config.config_0_qconvbnorm__input_relu_tensorflowBGRU_GRUunits4 import ModelConfig    # model_quant_411_qconvbnorm__input_relu_tensorflowBGRU_GRUunits4
+#from model_config.config_0_qconvbnorm__input_relu_tensorflowBGRU_GRUunits2 import ModelConfig    # model_quant_411_qconvbnorm__input_relu_tensorflowBGRU_GRUunits2
+from model_config.config_0_qconvbnorm__input_relu_tensorflowBGRU_GRUunits1 import ModelConfig    # model_quant_411_qconvbnorm__input_relu_tensorflowBGRU_GRUunits1
+
 #from model_config.config_1 import ModelConfig               # model_quant__conv-po2-81_gru-po2-81_bnorm-811
 
 model_folder = ModelConfig.folder

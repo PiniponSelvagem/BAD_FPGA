@@ -18,12 +18,12 @@ import qkeras_microfaune_model as qmodel
 import cutils
 
 data_type = {}
+"""
 data_type["name"] = "float"
 """
 data_type["name"] = "ap_fixed"
 data_type["bits_total"] = 4
 data_type["bits_int"] = 0
-"""
 
 # use old rearange
 shouldRearrange = False
@@ -49,6 +49,7 @@ class NumpyEncoder(json.JSONEncoder):
 #from model_config.config_0_qconvbnorm import ModelConfig    # model_quant_411_qconvbnorm
 #from model_config.config_0_qconvbnorm__input_relu import ModelConfig    # model_quant_411_qconvbnorm__input_relu
 from model_config.config_0_qconvbnorm__input_relu_tensorflowBGRU import ModelConfig    # model_quant_411_qconvbnorm__input_relu_tensorflowBGRU
+#from model_config.config_0_qconvbnorm__input_relu_tensorflowBGRU_GRUnoBias import ModelConfig    # model_quant_411_qconvbnorm__input_relu_tensorflowBGRU_GRUnoBias
 #from model_config.config_1 import ModelConfig               # model_quant__conv-po2-81_gru-po2-81_bnorm-811
 
 datasets_dir = '../../datasets'

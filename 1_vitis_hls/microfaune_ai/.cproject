@@ -163,8 +163,6 @@
                     					
                     <fileInfo id="cdt.managedbuild.config.gnu.exe.debug.834081978.1010351432" name="load_weights.h" rcbsApplicability="disable" resourcePath="testbench/load_weights.h" toolsToInvoke=""/>
                     					
-                    <fileInfo id="cdt.managedbuild.config.gnu.exe.debug.834081978.579076093" name="tb_gru_soft.h" rcbsApplicability="disable" resourcePath="testbench/tb_gru_soft.h" toolsToInvoke=""/>
-                    					
                     <fileInfo id="cdt.managedbuild.config.gnu.exe.debug.834081978.1493766395" name="tb_main.cpp" rcbsApplicability="disable" resourcePath="testbench/tb_main.cpp" toolsToInvoke="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.150446076.1308241441">
                         						
                         <tool id="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.150446076.1308241441" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.150446076">
@@ -348,8 +346,6 @@
                     </folderInfo>
                     					
                     <fileInfo id="cdt.managedbuild.config.gnu.exe.release.957561073.756796784" name="load_weights.h" rcbsApplicability="disable" resourcePath="testbench/load_weights.h" toolsToInvoke=""/>
-                    					
-                    <fileInfo id="cdt.managedbuild.config.gnu.exe.release.957561073.1687510090" name="tb_gru_soft.h" rcbsApplicability="disable" resourcePath="testbench/tb_gru_soft.h" toolsToInvoke=""/>
                     					
                     <fileInfo id="cdt.managedbuild.config.gnu.exe.release.957561073.29914944" name="tb_main.cpp" rcbsApplicability="disable" resourcePath="testbench/tb_main.cpp" toolsToInvoke="cdt.managedbuild.tool.gnu.cpp.compiler.exe.release.999948209.164494135">
                         						

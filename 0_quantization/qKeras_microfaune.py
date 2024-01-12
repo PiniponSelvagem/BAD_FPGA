@@ -42,7 +42,14 @@ import qkeras_microfaune_model as qmodel
 #from model_config.config_0_quantState_801 import ModelConfig  # model_quant_411_quantState_801
 #from model_config.config_0_qconvbnorm import ModelConfig    # model_quant_411_qconvbnorm
 #from model_config.config_0_qconvbnorm__input_relu import ModelConfig    # model_quant_411_qconvbnorm__input_relu
-from model_config.config_0_qconvbnorm__input_relu_tensorflowBGRU import ModelConfig    # model_quant_411_qconvbnorm__input_relu_tensorflowBGRU
+#from model_config.config_0_qconvbnorm__input_relu_tensorflowBGRU import ModelConfig    # model_quant_411_qconvbnorm__input_relu_tensorflowBGRU
+#from model_config.config_0_qconvbnorm__input_relu_tensorflowBGRU_GRUnoBias import ModelConfig    # model_quant_411_qconvbnorm__input_relu_tensorflowBGRU_GRUnoBias
+#from model_config.config_0_qconvbnorm__input_relu_tensorflowBGRU_GRUunits32 import ModelConfig    # model_quant_411_qconvbnorm__input_relu_tensorflowBGRU_GRUunits32
+#from model_config.config_0_qconvbnorm__input_relu_tensorflowBGRU_GRUunits16 import ModelConfig    # model_quant_411_qconvbnorm__input_relu_tensorflowBGRU_GRUunits16
+#from model_config.config_0_qconvbnorm__input_relu_tensorflowBGRU_GRUunits8 import ModelConfig    # model_quant_411_qconvbnorm__input_relu_tensorflowBGRU_GRUunits8
+#from model_config.config_0_qconvbnorm__input_relu_tensorflowBGRU_GRUunits4 import ModelConfig    # model_quant_411_qconvbnorm__input_relu_tensorflowBGRU_GRUunits4
+#from model_config.config_0_qconvbnorm__input_relu_tensorflowBGRU_GRUunits2 import ModelConfig    # model_quant_411_qconvbnorm__input_relu_tensorflowBGRU_GRUunits2
+from model_config.config_0_qconvbnorm__input_relu_tensorflowBGRU_GRUunits1 import ModelConfig    # model_quant_411_qconvbnorm__input_relu_tensorflowBGRU_GRUunits1
 #from model_config.config_1 import ModelConfig               # model_quant__conv-po2-81_gru-po2-81_bnorm-
 
 import csv

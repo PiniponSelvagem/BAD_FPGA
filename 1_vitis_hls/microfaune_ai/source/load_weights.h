@@ -5,7 +5,7 @@
 
 #include "types.h"
 #include "size_conv3D.h"
-#include "tb_gru_soft.h"
+#include "size_bgru.h"
 
 #define SOURCE_PATH		"E:\\Rodrigo\\ISEL\\2_Mestrado\\2-ANO_1-sem\\TFM\\BAD_FPGA\\1_vitis_hls\\microfaune_ai\\source\\"
 
@@ -20,6 +20,10 @@
 
 // INPUT -> later on this should be loaded from somewhere else?
 #define INPUT             INPUTS_PATH"1__q_activation.bin"
+#define INPUT_1           INPUTS_PATH"3__q_activation_1.bin"
+#define INPUT_2           INPUTS_PATH"6__max_pooling2d.bin"
+#define INPUT_3           INPUTS_PATH"8__q_activation_3.bin"
+#define INPUT_4           INPUTS_PATH"11__max_pooling2d_1.bin"
 #define INPUT_GRU         INPUTS_PATH"17__tf.math.reduce_max_FLOAT.bin"
 
 
@@ -182,7 +186,7 @@ void load(const char* path, void* array, int arraysize, int typeSize) {
 }
 
 void loadWeights(
-	imap_t* input,
+	imap_t* input, imap_t* input1, imap_t* input2, imap_t* input3, imap_t* input4,
 	float* inputGru,	// --> only for debug, can be removed later on
 	weigth_t* kernel_0, weigth_t* kernel_0_scale, bias_t* bias_0,
 	weigth_t* kernel_1, weigth_t* kernel_1_scale, bias_t* bias_1,
@@ -196,6 +200,10 @@ void loadWeights(
 	gru_t* gru1b_kernel, gru_t* gru1b_rkernel, gru_t* gru1b_bias, gru_t* gru1b_rbias
 ) {
 	load(INPUT, input, IHEIGHT*IWIDTH/PACKET, sizeof(imap_t));
+	load(INPUT_1, input1, IHEIGHT*IWIDTH*CHANNELS/PACKET, sizeof(imap_t));
+	load(INPUT_2, input2, IHEIGHT*(IWIDTH/2)*CHANNELS/PACKET, sizeof(imap_t));
+	load(INPUT_3, input3, IHEIGHT*(IWIDTH/2)*CHANNELS/PACKET, sizeof(imap_t));
+	load(INPUT_4, input4, IHEIGHT*(((IWIDTH/2)/2))*CHANNELS/PACKET, sizeof(imap_t));
 	load(INPUT_GRU, inputGru, IHEIGHT*FILTERS, sizeof(float));
 
     // conv2d_0

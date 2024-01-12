@@ -5,10 +5,10 @@
 
 #include "types.h"
 #include "size_conv3D.h"
+#include "size_bgru.h"
 
 #include "load_weights.h"
 
-#include "tb_gru_soft.h"
 
 typedef ap_axis<64, 0, 0, 0> in_pkt;
 typedef ap_axis<64, 0, 0, 0> out_pkt;
@@ -18,8 +18,20 @@ hls::stream<out_pkt> str_out;
 
 
 void conv2D(hls::stream<in_pkt> &strm_in, hls::stream<out_pkt> &strm_out, int pool, int maxWidth);
+void gru(
+	int isForward,
+	int kernelCols,
+	gru_t* input,
+	gru_t* kernel,    gru_t* bias,
+	gru_t* recKernel, gru_t* recBias,
+	gru_t* output
+);
 
-imap_t input_1[IHEIGHT*IWIDTH/PACKET];
+imap_t input_0[IHEIGHT*IWIDTH/PACKET];
+imap_t input_1[IHEIGHT*IWIDTH*CHANNELS/PACKET];
+imap_t input_2[IHEIGHT*IWIDTH_1*CHANNELS/PACKET];
+imap_t input_3[IHEIGHT*IWIDTH_1*CHANNELS/PACKET];
+imap_t input_4[IHEIGHT*IWIDTH_2*CHANNELS/PACKET];
 gru_t input_gru[IHEIGHT*FILTERS];
 
 gru_t outputConv[IHEIGHT*FILTERS];
@@ -53,26 +65,26 @@ bias_t bias_5[CHANNELS];
 
 
 
-gru_t gru0f_kernel[TG_GRU_IN_COLS*GRU_SPLIT_SIZE*TG_GRU_FILTERS];
-gru_t gru0f_rkernel[TG_GRU_FILTERS*GRU_SPLIT_SIZE*TG_GRU_FILTERS];
-gru_t gru0f_bias[TG_GRU_BIAS_SIZE];
-gru_t gru0f_rbias[TG_GRU_BIAS_SIZE];
+gru_t gru0f_kernel[GRU_IN_COLS*GRU_SPLIT_SIZE*GRU_FILTERS];
+gru_t gru0f_rkernel[GRU_FILTERS*GRU_SPLIT_SIZE*GRU_FILTERS];
+gru_t gru0f_bias[GRU_BIAS_SIZE];
+gru_t gru0f_rbias[GRU_BIAS_SIZE];
 
-gru_t gru0b_kernel[TG_GRU_IN_COLS*GRU_SPLIT_SIZE*TG_GRU_FILTERS];
-gru_t gru0b_rkernel[TG_GRU_FILTERS*GRU_SPLIT_SIZE*TG_GRU_FILTERS];
-gru_t gru0b_bias[TG_GRU_BIAS_SIZE];
-gru_t gru0b_rbias[TG_GRU_BIAS_SIZE];
+gru_t gru0b_kernel[GRU_IN_COLS*GRU_SPLIT_SIZE*GRU_FILTERS];
+gru_t gru0b_rkernel[GRU_FILTERS*GRU_SPLIT_SIZE*GRU_FILTERS];
+gru_t gru0b_bias[GRU_BIAS_SIZE];
+gru_t gru0b_rbias[GRU_BIAS_SIZE];
 
 
-gru_t gru1f_kernel[(TG_GRU_FILTERS*2)*GRU_SPLIT_SIZE*TG_GRU_FILTERS];
-gru_t gru1f_rkernel[TG_GRU_FILTERS*GRU_SPLIT_SIZE*TG_GRU_FILTERS];
-gru_t gru1f_bias[TG_GRU_BIAS_SIZE];
-gru_t gru1f_rbias[TG_GRU_BIAS_SIZE];
+gru_t gru1f_kernel[(GRU_FILTERS*2)*GRU_SPLIT_SIZE*GRU_FILTERS];
+gru_t gru1f_rkernel[GRU_FILTERS*GRU_SPLIT_SIZE*GRU_FILTERS];
+gru_t gru1f_bias[GRU_BIAS_SIZE];
+gru_t gru1f_rbias[GRU_BIAS_SIZE];
 
-gru_t gru1b_kernel[(TG_GRU_FILTERS*2)*GRU_SPLIT_SIZE*TG_GRU_FILTERS];
-gru_t gru1b_rkernel[TG_GRU_FILTERS*GRU_SPLIT_SIZE*TG_GRU_FILTERS];
-gru_t gru1b_bias[TG_GRU_BIAS_SIZE];
-gru_t gru1b_rbias[TG_GRU_BIAS_SIZE];
+gru_t gru1b_kernel[(GRU_FILTERS*2)*GRU_SPLIT_SIZE*GRU_FILTERS];
+gru_t gru1b_rkernel[GRU_FILTERS*GRU_SPLIT_SIZE*GRU_FILTERS];
+gru_t gru1b_bias[GRU_BIAS_SIZE];
+gru_t gru1b_rbias[GRU_BIAS_SIZE];
 
 
 
@@ -121,6 +133,16 @@ void writeInput(imap_t* input) {
 		if (i_pad == 4) i_pad = 0;
 		//printf("writeInput[%d] = 0x%0x 0x%0x\n", i, (int)tmp.data.range(63,32), (int)tmp.data.range(31,0));
         if (i == (IHEIGHT*IWIDTH*CHANNELS/PACKET-1)) tmp.last = (ap_int<1>)1;
+        else tmp.last = (ap_int<1>)0;
+        str_in.write(tmp);
+    }
+}
+void writeInput3(imap_t* input) {
+	in_pkt tmp;
+    for (int i=0; i<IHEIGHT*20*CHANNELS/PACKET; i++) {
+		//printf("i %d, j %d, rs %d, re %d | jP %f\n", i, j, (int)rangeStart, (int)rangeEnd, (float)(j/PACKET));
+		tmp.data = input[i].range(63,0);
+        if (i == (IHEIGHT*20*CHANNELS/PACKET-1)) tmp.last = (ap_int<1>)1;
         else tmp.last = (ap_int<1>)0;
         str_in.write(tmp);
     }
@@ -281,10 +303,12 @@ void printGRUoutput(gru_t* output) {
     }
 }
 
-#define DO_CONV
+//#define DEBUG_CONV
+//#define DO_CONV
 int main() {
     loadWeights(
-		input_1, (float*)outputConv,
+		input_0, input_1, input_2, input_3, input_4,
+		(float*)outputConv,
 		kernel_0, kernel_0_scale, bias_0,
 		kernel_1, kernel_1_scale, bias_1,
 		kernel_2, kernel_2_scale, bias_2,
@@ -298,9 +322,9 @@ int main() {
 	);
 
     /*
-    printf("\ninput_1:\n");
+    printf("\ninput_0:\n");
     for (int idx=0; idx<IHEIGHT*IWIDTH*CHANNELS/PACKET; idx++) {
-    	printf("idx=%d | 0x%016llx\n", idx, input_1[idx]);
+    	printf("idx=%d | 0x%016llx\n", idx, input_0[idx]);
     }
 	*/
 
@@ -309,7 +333,7 @@ int main() {
     writeBias(bias_0);
     writeScale(kernel_0_scale);
     writeKernel(kernel_0);
-    writeInput(input_1);
+    writeInput(input_0);
 #if HW_IP
     conv2D(str_in, str_out, 1, IWIDTH);
 #endif
@@ -342,9 +366,13 @@ int main() {
     writeScale(kernel_3_scale);
     writeKernel(kernel_3);
     writeInputNextLayer();
+    //writeInput3(input_3);
 #if HW_IP
     conv2D(str_in, str_out, 2, IWIDTH_1);
 #endif
+
+    //printLastLayerOutput();	// REMOVE AFTER DEBUG CONV_3 WITH writeInput3
+
 
     printf("CONV_4\n");
     writeBias(bias_4);
@@ -381,13 +409,13 @@ int main() {
 		}
 		printf("\n");
     }
-#endif
+#endif	// DO_CONV
 
 	printf("###################################### GRU_0 ######################################\n");
 	printf("---- 0 FORWARD ----\n");
-	soft_gru( // GRU_0_F
-		TG_GRU_FORWARD,
-		TG_GRU_0__IN_COLS,
+	gru( // GRU_0_F
+		GRU_FORWARD,
+		GRU_0__IN_COLS,
 		outputConv,
 		gru0f_kernel,	gru0f_bias,
 		gru0f_rkernel,	gru0f_rbias,
@@ -395,9 +423,9 @@ int main() {
 	);
 
 	printf("---- 0 BACKWARD ----\n");
-	soft_gru( // GRU_0_B
-		TG_GRU_BACKWARD,
-		TG_GRU_0__IN_COLS,
+	gru( // GRU_0_B
+		GRU_BACKWARD,
+		GRU_0__IN_COLS,
 		outputConv,
 		gru0b_kernel,	gru0b_bias,
 		gru0b_rkernel, 	gru0b_rbias,
@@ -409,9 +437,9 @@ int main() {
 
 	printf("\n\n\n###################################### GRU_1 ######################################\n");
 	printf("---- 1 FORWARD ----\n");
-	soft_gru( // GRU_1_F
-		TG_GRU_FORWARD,
-		TG_GRU_FILTERS*2,
+	gru( // GRU_1_F
+		GRU_FORWARD,
+		GRU_FILTERS*2,
 		outputGRU0,
 		gru1f_kernel,	gru1f_bias,
 		gru1f_rkernel,	gru1f_rbias,
@@ -419,9 +447,9 @@ int main() {
 	);
 
 	printf("---- 1 BACKWARD ----\n");
-	soft_gru( // GRU_1_B
-		TG_GRU_BACKWARD,
-		TG_GRU_FILTERS*2,
+	gru( // GRU_1_B
+		GRU_BACKWARD,
+		GRU_FILTERS*2,
 		outputGRU0,
 		gru1b_kernel,  	gru1b_bias,
 		gru1b_rkernel, 	gru1b_rbias,

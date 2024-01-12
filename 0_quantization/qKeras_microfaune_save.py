@@ -11,7 +11,13 @@ import numpy as np
 import json
 
 
-from model_config.config_0_qconvbnorm__input_relu_tensorflowBGRU import ModelConfig    # model_quant_411_qconvbnorm__input_relu_tensorflowBGRU
+#from model_config.config_0_qconvbnorm__input_relu_tensorflowBGRU import ModelConfig    # model_quant_411_qconvbnorm__input_relu_tensorflowBGRU
+#from model_config.config_0_qconvbnorm__input_relu_tensorflowBGRU_GRUunits32 import ModelConfig    # model_quant_411_qconvbnorm__input_relu_tensorflowBGRU_GRUunits32
+#from model_config.config_0_qconvbnorm__input_relu_tensorflowBGRU_GRUunits16 import ModelConfig    # model_quant_411_qconvbnorm__input_relu_tensorflowBGRU_GRUunits16
+#from model_config.config_0_qconvbnorm__input_relu_tensorflowBGRU_GRUunits8 import ModelConfig    # model_quant_411_qconvbnorm__input_relu_tensorflowBGRU_GRUunits8
+#from model_config.config_0_qconvbnorm__input_relu_tensorflowBGRU_GRUunits4 import ModelConfig    # model_quant_411_qconvbnorm__input_relu_tensorflowBGRU_GRUunits4
+#from model_config.config_0_qconvbnorm__input_relu_tensorflowBGRU_GRUunits2 import ModelConfig    # model_quant_411_qconvbnorm__input_relu_tensorflowBGRU_GRUunits2
+from model_config.config_0_qconvbnorm__input_relu_tensorflowBGRU_GRUunits1 import ModelConfig    # model_quant_411_qconvbnorm__input_relu_tensorflowBGRU_GRUunits1
 
 
 #import qkeras.utils as qutils
@@ -648,6 +654,7 @@ q = qs[7]   -> state_quantizer
 # save non quantized layers: time_distributed and time_distributed_1
 for layer in model.layers:
     layerName = layer.name
+    print(layerName)
     weight = layer.weights
     if "bidirectional" in layerName:
         gru_data_type = data_type.copy()
