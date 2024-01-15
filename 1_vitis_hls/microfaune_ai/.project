@@ -72,9 +72,24 @@
 			<location>E:/Rodrigo/ISEL/2_Mestrado/2-ANO_1-sem/TFM/BAD_FPGA/1_vitis_hls/microfaune_ai/source/types.h</location>
 		</link>
 		<link>
-			<name>testbench/load_weights.h</name>
+			<name>source/utils.h</name>
 			<type>1</type>
-			<location>E:/Rodrigo/ISEL/2_Mestrado/2-ANO_1-sem/TFM/BAD_FPGA/1_vitis_hls/microfaune_ai/source/load_weights.h</location>
+			<location>E:/Rodrigo/ISEL/2_Mestrado/2-ANO_1-sem/TFM/BAD_FPGA/1_vitis_hls/microfaune_ai/source/utils.h</location>
+		</link>
+		<link>
+			<name>testbench/loader.h</name>
+			<type>1</type>
+			<location>E:/Rodrigo/ISEL/2_Mestrado/2-ANO_1-sem/TFM/BAD_FPGA/1_vitis_hls/microfaune_ai/source/loader.h</location>
+		</link>
+		<link>
+			<name>testbench/soft_reducemax.h</name>
+			<type>1</type>
+			<location>E:/Rodrigo/ISEL/2_Mestrado/2-ANO_1-sem/TFM/BAD_FPGA/1_vitis_hls/microfaune_ai/source/soft_reducemax.h</location>
+		</link>
+		<link>
+			<name>testbench/soft_timedist.h</name>
+			<type>1</type>
+			<location>E:/Rodrigo/ISEL/2_Mestrado/2-ANO_1-sem/TFM/BAD_FPGA/1_vitis_hls/microfaune_ai/source/soft_timedist.h</location>
 		</link>
 		<link>
 			<name>testbench/tb_main.cpp</name>

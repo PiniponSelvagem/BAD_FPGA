@@ -7,7 +7,10 @@
 #include "size_conv3D.h"
 #include "size_bgru.h"
 
-#include "load_weights.h"
+#include "loader.h"
+
+#include "soft_timedist.h"
+#include "soft_reducemax.h"
 
 
 typedef ap_axis<64, 0, 0, 0> in_pkt;
@@ -37,6 +40,16 @@ gru_t input_gru[IHEIGHT*FILTERS];
 gru_t outputConv[IHEIGHT*FILTERS];
 gru_t outputGRU0[IHEIGHT*(FILTERS*2)];
 gru_t outputGRU1[IHEIGHT*(FILTERS*2)];
+
+float outputTD0[IHEIGHT*FILTERS];
+float outputLS[IHEIGHT];
+float outputGS[1];
+
+/* output expected validation */
+gru_t output_expect_GRU0[IHEIGHT*(FILTERS*2)];
+gru_t output_expect_GRU1[IHEIGHT*(FILTERS*2)];
+float output_expect_LS[IHEIGHT];
+float output_expect_GS[1];
 
 
 weigth_t kernel_0[FILTERS*CHANNELS*K_SIZE*K_SIZE/PACKET];
@@ -86,7 +99,11 @@ gru_t gru1b_rkernel[GRU_FILTERS*GRU_SPLIT_SIZE*GRU_FILTERS];
 gru_t gru1b_bias[GRU_BIAS_SIZE];
 gru_t gru1b_rbias[GRU_BIAS_SIZE];
 
+float td0_kernel[64*128];
+float td0_bias[64];
 
+float td1_kernel[1*64];
+float td1_bias[1];
 
 
 void writeBias(bias_t* bias) {
@@ -133,16 +150,6 @@ void writeInput(imap_t* input) {
 		if (i_pad == 4) i_pad = 0;
 		//printf("writeInput[%d] = 0x%0x 0x%0x\n", i, (int)tmp.data.range(63,32), (int)tmp.data.range(31,0));
         if (i == (IHEIGHT*IWIDTH*CHANNELS/PACKET-1)) tmp.last = (ap_int<1>)1;
-        else tmp.last = (ap_int<1>)0;
-        str_in.write(tmp);
-    }
-}
-void writeInput3(imap_t* input) {
-	in_pkt tmp;
-    for (int i=0; i<IHEIGHT*20*CHANNELS/PACKET; i++) {
-		//printf("i %d, j %d, rs %d, re %d | jP %f\n", i, j, (int)rangeStart, (int)rangeEnd, (float)(j/PACKET));
-		tmp.data = input[i].range(63,0);
-        if (i == (IHEIGHT*20*CHANNELS/PACKET-1)) tmp.last = (ap_int<1>)1;
         else tmp.last = (ap_int<1>)0;
         str_in.write(tmp);
     }
@@ -303,12 +310,40 @@ void printGRUoutput(gru_t* output) {
     }
 }
 
+
+// INFO: Currently this method can only compare float arrays!
+void compareStats(char* msg, float* actual, float* expected, int size, int breakAfter) {
+	printf(msg);
+	float* pActual = actual;
+	float* pExpected = expected;
+	for (int i=0; i<size; ++i) {
+		float vActual = *pActual;
+		float vExpected = *pExpected;
+		float change = vExpected - vActual;
+		++pActual;
+		++pExpected;
+
+		if (i<breakAfter)
+			printf("%12f | %12f | %12f\n", vActual, change, vExpected);
+		else
+			break;
+	}
+}
+
+#define PRINT_STATS
 //#define DEBUG_CONV
 //#define DO_CONV
+#define VALIDATE_OUTPUT
 int main() {
+	loadIO(
+		input_0,
+		outputConv,
+		output_expect_GRU0,
+		output_expect_GRU1,
+		output_expect_LS,
+		output_expect_GS
+	);
     loadWeights(
-		input_0, input_1, input_2, input_3, input_4,
-		(float*)outputConv,
 		kernel_0, kernel_0_scale, bias_0,
 		kernel_1, kernel_1_scale, bias_1,
 		kernel_2, kernel_2_scale, bias_2,
@@ -318,7 +353,9 @@ int main() {
 		gru0f_kernel, gru0f_rkernel, gru0f_bias, gru0f_rbias,
 		gru0b_kernel, gru0b_rkernel, gru0b_bias, gru0b_rbias,
 		gru1f_kernel, gru1f_rkernel, gru1f_bias, gru1f_rbias,
-		gru1b_kernel, gru1b_rkernel, gru1b_bias, gru1b_rbias
+		gru1b_kernel, gru1b_rkernel, gru1b_bias, gru1b_rbias,
+		td0_kernel, td0_bias,
+		td1_kernel, td1_bias
 	);
 
     /*
@@ -328,6 +365,7 @@ int main() {
     }
 	*/
 
+#ifndef PRINT_STATS
 #ifdef DO_CONV
     printf("CONV_0\n");
     writeBias(bias_0);
@@ -347,11 +385,6 @@ int main() {
     conv2D(str_in, str_out, 2, IWIDTH);
 #endif
 
-#ifdef DEBUG_MODEL
-    printLastLayerOutput();
-#endif
-
-#ifndef DEBUG_MODEL
     printf("CONV_2\n");
     writeBias(bias_2);
     writeScale(kernel_2_scale);
@@ -366,13 +399,9 @@ int main() {
     writeScale(kernel_3_scale);
     writeKernel(kernel_3);
     writeInputNextLayer();
-    //writeInput3(input_3);
 #if HW_IP
     conv2D(str_in, str_out, 2, IWIDTH_1);
 #endif
-
-    //printLastLayerOutput();	// REMOVE AFTER DEBUG CONV_3 WITH writeInput3
-
 
     printf("CONV_4\n");
     writeBias(bias_4);
@@ -395,7 +424,6 @@ int main() {
 #ifdef DEBUG_CONV
     printLastLayerOutput();
 #endif
-#endif
 
     // Temporary method to convert from hardware to software data.
     printf("---- conv2gru ----\n");
@@ -409,7 +437,7 @@ int main() {
 		}
 		printf("\n");
     }
-#endif	// DO_CONV
+#endif	// !DO_CONV
 
 	printf("###################################### GRU_0 ######################################\n");
 	printf("---- 0 FORWARD ----\n");
@@ -457,6 +485,273 @@ int main() {
 	);
 
 	printGRUoutput(outputGRU1);
+
+
+
+	printf("\n\n\nINFO: When GRU is changed to AP_FIXED, do not forget to convert the output to float for TD and RMAX layers.\n");
+
+
+
+	printf("\n\n\n###################################### TD_0 ######################################\n");
+    timedistributed_dense( // TDIST_0 + Dense
+    	GRU_FILTERS*2,
+        64, 128,
+        TD_0__OUT_COLS,
+		outputGRU1,
+		td0_kernel,
+		td0_bias,
+        outputTD0
+    );
+
+	for (int i=0; i<IHEIGHT; ++i) {
+		printf("[%3d] - ", i);
+		for (int j=0; j<64; ++j) {
+			printf("%10f ", outputTD0[(i*64)+j]);
+		}
+		printf("\n");
+	}
+
+	printf("\n\n\n###################################### TD_1 ######################################\n");
+    timedistributed_dense( // TDIST_1 + Dense
+    	TD_0__OUT_COLS,
+        1, 64,
+        1,
+		outputTD0,
+		td1_kernel,
+		td1_bias,
+		outputLS   // LOCAL OUTPUT
+    );
+
+	for (int i=0; i<IHEIGHT; ++i) {
+		printf("[%3d] - ", i);
+		printf("%10f ", outputLS[i]);
+		printf("\n");
+	}
+
+	printf("\n\n\n###################################### R_MX ######################################\n");
+    reducemax_1( // RMAX_1
+        outputLS,    // LOCAL OUTPUT -> 431
+        outputGS     // GLOBAL OUTPUT -> 1
+    );
+
+    printf("GS = %f\n", outputGS[0]);
+
+
+#ifdef VALIDATE_OUTPUT
+    printf("\n\n\n#### #### #### ####\n");
+#define BREAK_AFTER 8
+    compareStats("Stats GRU_0: (actual | difference | expected)\n", outputGRU0, output_expect_GRU0, IHEIGHT*(FILTERS*2), BREAK_AFTER);
+    compareStats("Stats GRU_1: (actual | difference | expected)\n", outputGRU1, output_expect_GRU1, IHEIGHT*(FILTERS*2), BREAK_AFTER);
+    compareStats("Stats LS: (actual | difference | expected)\n", outputLS, output_expect_LS, IHEIGHT, BREAK_AFTER);
+    compareStats("Stats GS: (actual | difference | expected)\n", outputGS, output_expect_GS, 1, BREAK_AFTER);
+#endif
+
+#else
+	/*
+	in, k, b,
+	m0,m1,m2, 		mb0,mb1,mb2,
+
+	state, rk, rb,
+	mi0,mi1,mi2, 	mib0,mib1,mib2
+
+	zsig,z,
+	rsig,r,
+	hhtanh,hh,
+	zstate,zhh,out
+	*/
+	float max[27] = {
+			0.999719, 0.524543, 0.241185,
+			0.456221, 0.415707, 0.322310,
+			7.924340, 6.778882, 2.562979,
+
+			0.999959, 0.499182, 0.241185,
+			0.557610, 0.551033, 0.422586,
+			6.568522, 6.467936, 4.367225,
+
+			10.781307, 0.999979,
+			8.283927, 0.999748,
+			5.797710, 0.999982,
+			0.995374, 0.989570, 0.999959
+	};
+	float min[27] = {
+			-0.987758, -0.434001, -0.148844,
+			-0.472353, -0.445030, -0.307011,
+			-5.175564, -5.188960, -3.300981,
+
+			-0.999953, -0.572762, -0.148844,
+			-0.485191, -0.426595, -0.421792,
+			-6.078226, -3.801662, -4.813569,
+
+			-6.392486,  0.000000,
+			-6.977444,  0.000000,
+			-5.400354, -0.999968,
+			-0.994267, -0.997171, -0.999953
+	};
+
+#define W_IN 8
+#define I_IN 1
+	// NOTE: IN, STATE and OUT is advised to be same size
+	float max_in = ap_fixed<W_IN,I_IN, AP_RND, AP_SAT>(max[0]).to_float();
+	float min_in = ap_fixed<W_IN,I_IN, AP_RND, AP_SAT>(min[0]).to_float();
+#define W_K 8
+#define I_K 1
+	float max_k  = ap_fixed<W_IN,I_IN, AP_RND, AP_SAT>(max[1]).to_float();
+	float min_k  = ap_fixed<W_IN,I_IN, AP_RND, AP_SAT>(min[1]).to_float();
+
+#define W_MX_CALC 8
+#define I_MX_CALC 1
+	float max_mx_calc_0 = ap_fixed<W_MX_CALC,I_MX_CALC, AP_RND, AP_SAT>(max[3]).to_float();
+	float min_mx_calc_0 = ap_fixed<W_MX_CALC,I_MX_CALC, AP_RND, AP_SAT>(min[3]).to_float();
+	float max_mx_calc_1 = ap_fixed<W_MX_CALC,I_MX_CALC, AP_RND, AP_SAT>(max[4]).to_float();
+	float min_mx_calc_1 = ap_fixed<W_MX_CALC,I_MX_CALC, AP_RND, AP_SAT>(min[4]).to_float();
+	float max_mx_calc_2 = ap_fixed<W_MX_CALC,I_MX_CALC, AP_RND, AP_SAT>(max[5]).to_float();
+	float min_mx_calc_2 = ap_fixed<W_MX_CALC,I_MX_CALC, AP_RND, AP_SAT>(min[5]).to_float();
+
+#define W_B 8
+#define I_B 1
+	float max_b = ap_fixed<W_B,I_B, AP_RND, AP_SAT>(max[2]).to_float();
+	float min_b = ap_fixed<W_B,I_B, AP_RND, AP_SAT>(min[2]).to_float();
+#define W_MXB 8
+#define I_MXB 4
+	float max_mxb_0 = ap_fixed<W_MXB,I_MXB, AP_RND, AP_SAT>(max[6]).to_float();
+	float min_mxb_0 = ap_fixed<W_MXB,I_MXB, AP_RND, AP_SAT>(min[6]).to_float();
+	float max_mxb_1 = ap_fixed<W_MXB,I_MXB, AP_RND, AP_SAT>(max[7]).to_float();
+	float min_mxb_1 = ap_fixed<W_MXB,I_MXB, AP_RND, AP_SAT>(min[7]).to_float();
+	float max_mxb_2 = ap_fixed<W_MXB,I_MXB, AP_RND, AP_SAT>(max[8]).to_float();
+	float min_mxb_2 = ap_fixed<W_MXB,I_MXB, AP_RND, AP_SAT>(min[8]).to_float();
+	///////////////////////////////////////////////////////////////////////
+
+#define W_STATE	8
+#define I_STATE	1
+	// NOTE: IN, STATE and OUT is advised to be same size
+	float max_state = ap_fixed<W_STATE,I_STATE, AP_RND, AP_SAT>(max[9]).to_float();
+	float min_state = ap_fixed<W_STATE,I_STATE, AP_RND, AP_SAT>(min[9]).to_float();
+#define W_RK 8
+#define I_RK 1
+	float max_rk    = ap_fixed<W_RK,I_RK, AP_RND, AP_SAT>(max[10]).to_float();
+	float min_rk    = ap_fixed<W_RK,I_RK, AP_RND, AP_SAT>(min[10]).to_float();
+
+#define W_MI_CALC 8
+#define I_MI_CALC 1
+	float max_mi_calc_0 = ap_fixed<W_MI_CALC,I_MI_CALC, AP_RND, AP_SAT>(max[12]).to_float();
+	float min_mi_calc_0 = ap_fixed<W_MI_CALC,I_MI_CALC, AP_RND, AP_SAT>(min[12]).to_float();
+	float max_mi_calc_1 = ap_fixed<W_MI_CALC,I_MI_CALC, AP_RND, AP_SAT>(max[13]).to_float();
+	float min_mi_calc_1 = ap_fixed<W_MI_CALC,I_MI_CALC, AP_RND, AP_SAT>(min[13]).to_float();
+	float max_mi_calc_2 = ap_fixed<W_MI_CALC,I_MI_CALC, AP_RND, AP_SAT>(max[14]).to_float();
+	float min_mi_calc_2 = ap_fixed<W_MI_CALC,I_MI_CALC, AP_RND, AP_SAT>(min[14]).to_float();
+
+#define W_RB 8
+#define I_RB 1
+	float max_rb = ap_fixed<W_RB,I_RB, AP_RND, AP_SAT>(max[11]).to_float();
+	float min_rb = ap_fixed<W_RB,I_RB, AP_RND, AP_SAT>(min[11]).to_float();
+#define W_MIB 8
+#define I_MIB 4
+	float max_mib_0 = ap_fixed<W_MIB,I_MIB, AP_RND, AP_SAT>(max[15]).to_float();
+	float min_mib_0 = ap_fixed<W_MIB,I_MIB, AP_RND, AP_SAT>(min[15]).to_float();
+	float max_mib_1 = ap_fixed<W_MIB,I_MIB, AP_RND, AP_SAT>(max[16]).to_float();
+	float min_mib_1 = ap_fixed<W_MIB,I_MIB, AP_RND, AP_SAT>(min[16]).to_float();
+	float max_mib_2 = ap_fixed<W_MIB,I_MIB, AP_RND, AP_SAT>(max[17]).to_float();
+	float min_mib_2 = ap_fixed<W_MIB,I_MIB, AP_RND, AP_SAT>(min[17]).to_float();
+	///////////////////////////////////////////////////////////////////////
+
+#define W_ZSIG_CALC 16
+#define I_ZSIG_CALC 8
+	// W 8 and I 4 -> saturated at 7, value expected 10
+	float max_zsig_calc = ap_fixed<W_ZSIG_CALC,I_ZSIG_CALC, AP_RND, AP_SAT>(max[18]).to_float();
+	float min_zsig_calc = ap_fixed<W_ZSIG_CALC,I_ZSIG_CALC, AP_RND, AP_SAT>(min[18]).to_float();
+#define W_Z 8
+#define I_Z 0
+	float max_z         = ap_ufixed<W_Z,I_Z, AP_RND, AP_SAT>(max[19]).to_float();
+	float min_z         = ap_ufixed<W_Z,I_Z, AP_RND, AP_SAT>(min[19]).to_float();
+
+#define W_RSIG_CALC 8
+#define I_RSIG_CALC 4
+	float max_rsig_calc = ap_fixed<W_RSIG_CALC,I_RSIG_CALC, AP_RND, AP_SAT>(max[20]).to_float();
+	float min_rsig_calc = ap_fixed<W_RSIG_CALC,I_RSIG_CALC, AP_RND, AP_SAT>(min[20]).to_float();
+#define W_R 8
+#define I_R 0
+	float max_r         = ap_ufixed<W_R,I_R, AP_RND, AP_SAT>(max[21]).to_float();
+	float min_r         = ap_ufixed<W_R,I_R, AP_RND, AP_SAT>(min[21]).to_float();
+
+#define W_HHTANH_CALC 8
+#define I_HHTANH_CALC 4
+	float max_hhtanh_calc = ap_fixed<W_HHTANH_CALC,I_HHTANH_CALC, AP_RND, AP_SAT>(max[22]).to_float();
+	float min_hhtanh_calc = ap_fixed<W_HHTANH_CALC,I_HHTANH_CALC, AP_RND, AP_SAT>(min[22]).to_float();
+#define W_HH 8 
+#define I_HH 1
+	float max_hh          = ap_fixed<W_HH,I_HH, AP_RND, AP_SAT>(max[23]).to_float();
+	float min_hh          = ap_fixed<W_HH,I_HH, AP_RND, AP_SAT>(min[23]).to_float();
+
+#define W_ZSTATE_CALC 8
+#define I_ZSTATE_CALC 1
+	float max_zstate_calc = ap_fixed<W_ZSTATE_CALC,I_ZSTATE_CALC, AP_RND, AP_SAT>(max[24]).to_float();
+	float min_zstate_calc = ap_fixed<W_ZSTATE_CALC,I_ZSTATE_CALC, AP_RND, AP_SAT>(min[24]).to_float();
+#define W_ZHH_CALC 8
+#define I_ZHH_CALC 1
+	float max_zhh_calc    = ap_fixed<W_ZHH_CALC,I_ZHH_CALC, AP_RND, AP_SAT>(max[25]).to_float();
+	float min_zhh_calc    = ap_fixed<W_ZHH_CALC,I_ZHH_CALC, AP_RND, AP_SAT>(min[25]).to_float();
+#define W_OUT 8
+#define I_OUT 1
+	// NOTE: IN, STATE and OUT is advised to be same size
+	float max_out         = ap_fixed<W_OUT,I_OUT, AP_RND, AP_SAT>(max[26]).to_float();
+	float min_out         = ap_fixed<W_OUT,I_OUT, AP_RND, AP_SAT>(min[26]).to_float();
+
+	printf( " ---- MAX ----\n"
+			"%f %f %f\n"
+			"%f %f %f\n"
+			"%f %f %f\n\n"
+			"%f %f %f\n"
+			"%f %f %f\n"
+			"%f %f %f\n\n"
+			"%f %f\n"
+			"%f %f\n"
+			"%f %f\n"
+			"%f %f %f\n\n\n",
+			max_in, max_k, max_b,
+			max_mx_calc_0, max_mx_calc_1, max_mx_calc_2,
+			max_mxb_0, max_mxb_1, max_mxb_2,
+
+			max_state, max_rk, max_rb,
+			max_mi_calc_0, max_mi_calc_1, max_mi_calc_2,
+			max_mib_0, max_mib_1, max_mib_2,
+
+			max_zsig_calc, max_z,
+			max_rsig_calc, max_r,
+			max_hhtanh_calc, max_hh,
+			max_zstate_calc, max_zhh_calc, max_out
+	);
+	printf( " ---- MIN ----\n"
+			"%f %f %f\n"
+			"%f %f %f\n"
+			"%f %f %f\n\n"
+			"%f %f %f\n"
+			"%f %f %f\n"
+			"%f %f %f\n\n"
+			"%f %f\n"
+			"%f %f\n"
+			"%f %f\n"
+			"%f %f %f\n\n\n",
+			min_in, min_k, min_b,
+			min_mx_calc_0, min_mx_calc_1, min_mx_calc_2,
+			min_mxb_0, min_mxb_1, min_mxb_2,
+
+			min_state, min_rk, min_rb,
+			min_mi_calc_0, min_mi_calc_1, min_mi_calc_2,
+			min_mib_0, min_mib_1, min_mib_2,
+
+			min_zsig_calc, min_z,
+			min_rsig_calc, min_r,
+			min_hhtanh_calc, min_hh,
+			min_zstate_calc, min_zhh_calc, min_out
+	);
+#endif // !PRINT_STATS
+
+	/*
+		for (float value=-1; value<=1; value += 0.01) {
+			float truncated = ap_fixed<4,1, AP_RND, AP_SAT>(value).to_float();
+			printf("VAL = %f | TC = %f\n", value, truncated);
+		}
+	*/
 
     int err_cnt = 0;
     return 0;

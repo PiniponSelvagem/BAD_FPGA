@@ -161,7 +161,7 @@
                         					
                     </folderInfo>
                     					
-                    <fileInfo id="cdt.managedbuild.config.gnu.exe.debug.834081978.1010351432" name="load_weights.h" rcbsApplicability="disable" resourcePath="testbench/load_weights.h" toolsToInvoke=""/>
+                    <fileInfo id="cdt.managedbuild.config.gnu.exe.debug.834081978.1290829172" name="soft_reducemax.h" rcbsApplicability="disable" resourcePath="testbench/soft_reducemax.h" toolsToInvoke=""/>
                     					
                     <fileInfo id="cdt.managedbuild.config.gnu.exe.debug.834081978.1493766395" name="tb_main.cpp" rcbsApplicability="disable" resourcePath="testbench/tb_main.cpp" toolsToInvoke="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.150446076.1308241441">
                         						
@@ -193,9 +193,11 @@
                         					
                     </fileInfo>
                     					
+                    <fileInfo id="cdt.managedbuild.config.gnu.exe.debug.834081978.1313829273" name="soft_timedist.h" rcbsApplicability="disable" resourcePath="testbench/soft_timedist.h" toolsToInvoke=""/>
+                    					
                     <sourceEntries>
                         						
-                        <entry excluding=".apc|.settings|.vs|.vscode|algorithm|*.c*|*.C*" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+                        <entry excluding=".apc|.reference|.settings|.vs|.vscode|algorithm|*.c*|*.C*" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
                         					
                     </sourceEntries>
                     				
@@ -345,7 +347,7 @@
                         					
                     </folderInfo>
                     					
-                    <fileInfo id="cdt.managedbuild.config.gnu.exe.release.957561073.756796784" name="load_weights.h" rcbsApplicability="disable" resourcePath="testbench/load_weights.h" toolsToInvoke=""/>
+                    <fileInfo id="cdt.managedbuild.config.gnu.exe.release.957561073.833775256" name="soft_reducemax.h" rcbsApplicability="disable" resourcePath="testbench/soft_reducemax.h" toolsToInvoke=""/>
                     					
                     <fileInfo id="cdt.managedbuild.config.gnu.exe.release.957561073.29914944" name="tb_main.cpp" rcbsApplicability="disable" resourcePath="testbench/tb_main.cpp" toolsToInvoke="cdt.managedbuild.tool.gnu.cpp.compiler.exe.release.999948209.164494135">
                         						
@@ -377,9 +379,11 @@
                         					
                     </fileInfo>
                     					
+                    <fileInfo id="cdt.managedbuild.config.gnu.exe.release.957561073.1271677756" name="soft_timedist.h" rcbsApplicability="disable" resourcePath="testbench/soft_timedist.h" toolsToInvoke=""/>
+                    					
                     <sourceEntries>
                         						
-                        <entry excluding=".apc|.settings|.vs|.vscode|algorithm|*.c*|*.C*" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+                        <entry excluding=".apc|.reference|.settings|.vs|.vscode|algorithm|*.c*|*.C*" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
                         					
                     </sourceEntries>
                     				
