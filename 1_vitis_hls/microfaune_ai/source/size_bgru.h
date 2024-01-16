@@ -13,7 +13,7 @@
 #define GRU_IN_COLS		CHANNELS
 
 #define GRU_BIAS_SIZE       (GRU_FILTERS*GRU_SPLIT_SIZE)
-#define GRU_KERNEL_COLS_MAX	(GRU_FILTERS*2)		// x2 to act has a limiter, related to GRU_1 backward kernel size
+#define GRU_KERNEL_COLS_MAX	(FILTERS*2)		// x2 to act has a limiter, related to GRU_1 backward kernel size
 #define GRU_KERNEL_REC_COLS	GRU_FILTERS
 
 

@@ -657,18 +657,18 @@ for layer in model.layers:
     print(layerName)
     weight = layer.weights
     if "bidirectional" in layerName:
-        gru_data_type = data_type.copy()
-        gru_data_type["name"] = "float"
-        #gru_data_type["bits_int"] += 1
-        processLayer(layerName, layerName+"_gru_forward_kernel", weight[0], gru_data_type)
-        processLayer(layerName, layerName+"_gru_forward_recurrent_kernel", weight[1], gru_data_type)
-        processLayer(layerName, layerName+"_gru_forward_bias", weight[2], gru_data_type)
-        processLayer(layerName, layerName+"_gru_backward_kernel", weight[3], gru_data_type)
-        processLayer(layerName, layerName+"_gru_backward_recurrent_kernel", weight[4], gru_data_type)
-        processLayer(layerName, layerName+"_gru_backward_bias", weight[5], gru_data_type)
+        float_data_type = data_type.copy()
+        float_data_type["name"] = "float"
+        #float_data_type["bits_int"] += 1
+        processLayer(layerName, layerName+"_gru_forward_kernel", weight[0], float_data_type)
+        processLayer(layerName, layerName+"_gru_forward_recurrent_kernel", weight[1], float_data_type)
+        processLayer(layerName, layerName+"_gru_forward_bias", weight[2], float_data_type)
+        processLayer(layerName, layerName+"_gru_backward_kernel", weight[3], float_data_type)
+        processLayer(layerName, layerName+"_gru_backward_recurrent_kernel", weight[4], float_data_type)
+        processLayer(layerName, layerName+"_gru_backward_bias", weight[5], float_data_type)
     if "time_distributed" in layerName:
-        processLayer(layerName, layerName+"_kernel", weight[0], data_type)
-        processLayer(layerName, layerName+"_bias", weight[1], data_type)
+        processLayer(layerName, layerName+"_kernel", weight[0], float_data_type)
+        processLayer(layerName, layerName+"_bias", weight[1], float_data_type)
 
 
 

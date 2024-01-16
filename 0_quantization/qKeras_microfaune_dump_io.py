@@ -43,14 +43,25 @@ class NumpyEncoder(json.JSONEncoder):
             return float(obj)
         return json.JSONEncoder.default(self, obj)
 
+
 #from model_config.config_test import ModelConfig            # model_test
 #from model_config.config_0 import ModelConfig               # model_quant_411
 #from model_config.config_0_noQuantState import ModelConfig  # model_quant_411_noQuantState
 #from model_config.config_0_qconvbnorm import ModelConfig    # model_quant_411_qconvbnorm
 #from model_config.config_0_qconvbnorm__input_relu import ModelConfig    # model_quant_411_qconvbnorm__input_relu
-from model_config.config_0_qconvbnorm__input_relu_tensorflowBGRU import ModelConfig    # model_quant_411_qconvbnorm__input_relu_tensorflowBGRU
+#
+#from model_config.config_0_qconvbnorm__input_relu_tensorflowBGRU import ModelConfig    # model_quant_411_qconvbnorm__input_relu_tensorflowBGRU
+#from model_config.config_0_qconvbnorm__input_relu_tensorflowBGRU import ModelConfig    # model_quant_411_qconvbnorm__input_relu_tensorflowBGRU
+#from model_config.config_0_qconvbnorm__input_relu_tensorflowBGRU_GRUunits32 import ModelConfig    # model_quant_411_qconvbnorm__input_relu_tensorflowBGRU_GRUunits32
+#from model_config.config_0_qconvbnorm__input_relu_tensorflowBGRU_GRUunits16 import ModelConfig    # model_quant_411_qconvbnorm__input_relu_tensorflowBGRU_GRUunits16
+#from model_config.config_0_qconvbnorm__input_relu_tensorflowBGRU_GRUunits8 import ModelConfig    # model_quant_411_qconvbnorm__input_relu_tensorflowBGRU_GRUunits8
+#from model_config.config_0_qconvbnorm__input_relu_tensorflowBGRU_GRUunits4 import ModelConfig    # model_quant_411_qconvbnorm__input_relu_tensorflowBGRU_GRUunits4
+#from model_config.config_0_qconvbnorm__input_relu_tensorflowBGRU_GRUunits2 import ModelConfig    # model_quant_411_qconvbnorm__input_relu_tensorflowBGRU_GRUunits2
+from model_config.config_0_qconvbnorm__input_relu_tensorflowBGRU_GRUunits1 import ModelConfig    # model_quant_411_qconvbnorm__input_relu_tensorflowBGRU_GRUunits1
+#
 #from model_config.config_0_qconvbnorm__input_relu_tensorflowBGRU_GRUnoBias import ModelConfig    # model_quant_411_qconvbnorm__input_relu_tensorflowBGRU_GRUnoBias
 #from model_config.config_1 import ModelConfig               # model_quant__conv-po2-81_gru-po2-81_bnorm-811
+
 
 datasets_dir = '../../datasets'
 model_dir = ModelConfig.folder
@@ -62,7 +73,15 @@ steps_per_epoch = ModelConfig.steps_per_epoch
 model, dual_model = qmodel.MicrofauneAI(ModelConfig).modelQuantized()
 dual_model.load_weights(f"{model_dir}/{model_name}.h5")
 
-audiofile = "bird_50124"
+audioIDX = 7
+if audioIDX == 0: audiofile = "bird_50124"
+if audioIDX == 1: audiofile = "bird_52046"
+if audioIDX == 2: audiofile = "bird_16835"
+if audioIDX == 3: audiofile = "bird_80705"
+if audioIDX == 4: audiofile = "no_bird_50678"
+if audioIDX == 5: audiofile = "no_bird_51034"
+if audioIDX == 6: audiofile = "no_bird_1931"
+if audioIDX == 7: audiofile = "no_bird_79266"
 audiofilepath = "audio_samples/"+audiofile+".wav"
 folder = "dump_io_quantized"
 filepath = folder+"/"+audiofile
@@ -175,8 +194,16 @@ for layer_name in layers_names:
     )
     #
     # 20231120 - hotfix to create binary outputs of every layer
-    cutils.saveArray(folder, str(i)+"__"+layer.name, np.array(out), str(i)+"__"+layer.name, data_type, binPositiveOnly=True)
+    if ("bidirectional" in layer.name) or ("time_distributed" in layer.name) or ("reduce_max" in layer.name) or ("reduce_max_1" in layer.name):
+        float_data_type = data_type.copy()
+        float_data_type["name"] = "float"
+        print(" > INFO: Using", float_data_type["name"], "data_type for this layer.")
+        cutils.saveArray(folder, str(i)+"__"+layer.name, np.array(out), str(i)+"__"+layer.name, float_data_type, binPositiveOnly=True)
+    else:
+        cutils.saveArray(folder, str(i)+"__"+layer.name, np.array(out), str(i)+"__"+layer.name, data_type, binPositiveOnly=True)
     #
+    """
+    #### JSON output disabled ####
     layersIO.append(layer)
     jLayer = json.dumps(layer, indent=4, default=lambda o: o.encode())
     open(filepath+"__"+str(i)+"__"+layer_name.replace(".", "_")+ext, "w").write(jLayer)
@@ -189,6 +216,7 @@ for layer_name in layers_names:
     layersIOflat.append(layerflat)
     jLayerFlat = json.dumps(layerflat, indent=4, default=lambda o: o.encode())
     open(filepath+"_flat__"+str(i)+"__"+layer_name.replace(".", "_")+ext, "w").write(jLayerFlat)
+    """
     i += 1
 
 """

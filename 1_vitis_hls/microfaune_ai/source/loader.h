@@ -19,7 +19,7 @@
 #define INPUT_NO_BIRD_3 7   // expected: 0.0648108646273613
 
 // SELECT INPUT
-#define SELECTED_INPUT INPUT_NO_BIRD_0
+#define SELECTED_INPUT INPUT_BIRD_0
 
 #if SELECTED_INPUT == INPUT_BIRD_0
     #define SELECTED_INPUT_PATH "bird_0_50124"
@@ -295,11 +295,11 @@ void loadWeights(
 	load(GRU_1_BACKWARD_RECURRENT_BIAS, gru1b_rbias, FILTERS*GRU_SPLIT_SIZE, sizeof(gru_t));
 
     // timedist_0
-    load(TDIST_0_KERNEL, td0_kernel, 128*64, sizeof(float));
-    load(TDIST_0_BIAS, td0_bias, 64, sizeof(float));
+    load(TDIST_0_KERNEL, td0_kernel, (FILTERS*2)*FILTERS, sizeof(float));
+    load(TDIST_0_BIAS, td0_bias, FILTERS, sizeof(float));
 
     // timedist_1
-    load(TDIST_1_KERNEL, td1_kernel, 64*1, sizeof(float));
+    load(TDIST_1_KERNEL, td1_kernel, FILTERS*1, sizeof(float));
     load(TDIST_1_BIAS, td1_bias, 1, sizeof(float));
 }
 

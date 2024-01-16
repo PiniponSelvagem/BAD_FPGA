@@ -86,3 +86,13 @@ __pycache__/
 /0_quantization/debug_small_microfaune_bgru_dual/model_debug_dump_quantized/
 /0_quantization/debug_small_microfaune_bgru/model_debug/
 /0_quantization/debug_small_microfaune_bgru_dual/model_debug/
+/0_quantization/debug_small_microfaune_conv0/
+/0_quantization/debug_small_microfaune_conv0_HLS/
+/0_quantization/debug_small_microfaune_gru_HLS/
+/0_quantization/debug_small_microfaune_gru_HLS__v2/
+/0_quantization/dump_io_quantized__nopad/
+/0_quantization/dump_io_quantized__padding_input/
+/0_quantization/dump_io_quantized_before_inputReLu/
+/0_quantization/model_quantized_weights__saved_with_TF/
+/0_quantization/model_quantized_weights_TEMP/
+/0_quantization/qkeras_GITHUB/

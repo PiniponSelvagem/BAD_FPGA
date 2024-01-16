@@ -160,7 +160,7 @@ void gru_syncState() {
 #endif // TRUNCATE_BITS
 
 
-#define STATISTICS
+//#define STATISTICS
 /*
 in, k, b,
 m0,m1,m2, 		mb0,mb1,mb2,

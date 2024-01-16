@@ -161,7 +161,7 @@
                         					
                     </folderInfo>
                     					
-                    <fileInfo id="cdt.managedbuild.config.gnu.exe.debug.834081978.1290829172" name="soft_reducemax.h" rcbsApplicability="disable" resourcePath="testbench/soft_reducemax.h" toolsToInvoke=""/>
+                    <fileInfo id="cdt.managedbuild.config.gnu.exe.debug.834081978.1104884407" name="loader.h" rcbsApplicability="disable" resourcePath="testbench/loader.h" toolsToInvoke=""/>
                     					
                     <fileInfo id="cdt.managedbuild.config.gnu.exe.debug.834081978.1493766395" name="tb_main.cpp" rcbsApplicability="disable" resourcePath="testbench/tb_main.cpp" toolsToInvoke="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.150446076.1308241441">
                         						
@@ -192,8 +192,6 @@
                         </tool>
                         					
                     </fileInfo>
-                    					
-                    <fileInfo id="cdt.managedbuild.config.gnu.exe.debug.834081978.1313829273" name="soft_timedist.h" rcbsApplicability="disable" resourcePath="testbench/soft_timedist.h" toolsToInvoke=""/>
                     					
                     <sourceEntries>
                         						
@@ -347,7 +345,7 @@
                         					
                     </folderInfo>
                     					
-                    <fileInfo id="cdt.managedbuild.config.gnu.exe.release.957561073.833775256" name="soft_reducemax.h" rcbsApplicability="disable" resourcePath="testbench/soft_reducemax.h" toolsToInvoke=""/>
+                    <fileInfo id="cdt.managedbuild.config.gnu.exe.release.957561073.1428526831" name="loader.h" rcbsApplicability="disable" resourcePath="testbench/loader.h" toolsToInvoke=""/>
                     					
                     <fileInfo id="cdt.managedbuild.config.gnu.exe.release.957561073.29914944" name="tb_main.cpp" rcbsApplicability="disable" resourcePath="testbench/tb_main.cpp" toolsToInvoke="cdt.managedbuild.tool.gnu.cpp.compiler.exe.release.999948209.164494135">
                         						
@@ -378,8 +376,6 @@
                         </tool>
                         					
                     </fileInfo>
-                    					
-                    <fileInfo id="cdt.managedbuild.config.gnu.exe.release.957561073.1271677756" name="soft_timedist.h" rcbsApplicability="disable" resourcePath="testbench/soft_timedist.h" toolsToInvoke=""/>
                     					
                     <sourceEntries>
                         						

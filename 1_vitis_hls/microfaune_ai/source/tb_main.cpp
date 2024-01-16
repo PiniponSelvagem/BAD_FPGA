@@ -99,10 +99,10 @@ gru_t gru1b_rkernel[GRU_FILTERS*GRU_SPLIT_SIZE*GRU_FILTERS];
 gru_t gru1b_bias[GRU_BIAS_SIZE];
 gru_t gru1b_rbias[GRU_BIAS_SIZE];
 
-float td0_kernel[64*128];
-float td0_bias[64];
+float td0_kernel[FILTERS*(FILTERS*2)];
+float td0_bias[FILTERS];
 
-float td1_kernel[1*64];
+float td1_kernel[1*FILTERS];
 float td1_bias[1];
 
 
@@ -330,7 +330,7 @@ void compareStats(char* msg, float* actual, float* expected, int size, int break
 	}
 }
 
-#define PRINT_STATS
+//#define PRINT_STATS
 //#define DEBUG_CONV
 //#define DO_CONV
 #define VALIDATE_OUTPUT
@@ -357,6 +357,8 @@ int main() {
 		td0_kernel, td0_bias,
 		td1_kernel, td1_bias
 	);
+    loadSigmoidTable();
+    loadTanhTable();
 
     /*
     printf("\ninput_0:\n");
@@ -495,7 +497,7 @@ int main() {
 	printf("\n\n\n###################################### TD_0 ######################################\n");
     timedistributed_dense( // TDIST_0 + Dense
     	GRU_FILTERS*2,
-        64, 128,
+		FILTERS, FILTERS*2,
         TD_0__OUT_COLS,
 		outputGRU1,
 		td0_kernel,
@@ -514,7 +516,7 @@ int main() {
 	printf("\n\n\n###################################### TD_1 ######################################\n");
     timedistributed_dense( // TDIST_1 + Dense
     	TD_0__OUT_COLS,
-        1, 64,
+        1, FILTERS,
         1,
 		outputTD0,
 		td1_kernel,
@@ -540,8 +542,8 @@ int main() {
 #ifdef VALIDATE_OUTPUT
     printf("\n\n\n#### #### #### ####\n");
 #define BREAK_AFTER 8
-    compareStats("Stats GRU_0: (actual | difference | expected)\n", outputGRU0, output_expect_GRU0, IHEIGHT*(FILTERS*2), BREAK_AFTER);
-    compareStats("Stats GRU_1: (actual | difference | expected)\n", outputGRU1, output_expect_GRU1, IHEIGHT*(FILTERS*2), BREAK_AFTER);
+    compareStats("Stats GRU_0: (actual | difference | expected)\n", outputGRU0, output_expect_GRU0, IHEIGHT*(GRU_FILTERS*2), BREAK_AFTER);
+    compareStats("Stats GRU_1: (actual | difference | expected)\n", outputGRU1, output_expect_GRU1, IHEIGHT*(GRU_FILTERS*2), BREAK_AFTER);
     compareStats("Stats LS: (actual | difference | expected)\n", outputLS, output_expect_LS, IHEIGHT, BREAK_AFTER);
     compareStats("Stats GS: (actual | difference | expected)\n", outputGS, output_expect_GS, 1, BREAK_AFTER);
 #endif

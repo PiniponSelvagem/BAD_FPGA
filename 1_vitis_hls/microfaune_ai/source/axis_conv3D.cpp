@@ -39,24 +39,24 @@ void conv2D(hls::stream<in_pkt> &strm_in, hls::stream<out_pkt> &strm_out, int po
         bias[i*4+1] = tmp.data.range(31, 16);
         bias[i*4+2] = tmp.data.range(47, 32);
         bias[i*4+3] = tmp.data.range(63, 48);
-        printf("bias = %d %d %d %d\n", (int)bias[i*4], (int)bias[i*4+1], (int)bias[i*4+2], (int)bias[i*4+3]);
+        //printf("bias = %d %d %d %d\n", (int)bias[i*4], (int)bias[i*4+1], (int)bias[i*4+2], (int)bias[i*4+3]);
     }
 
     READ_SCALES: for (int i = 0; i < CHANNELS/PACKET; i++){
         tmp = strm_in.read();
         scales[i] = tmp.data.range(63, 0);
-        printf("scale[%d] = 0x%08x 0x%08x\n", i, (int)scales[i].range(63,32), (int)scales[i].range(31,0));
+        //printf("scale[%d] = 0x%08x 0x%08x\n", i, (int)scales[i].range(63,32), (int)scales[i].range(31,0));
     }
     READ_WEIGHTS: for (int i = 0; i < FILTERS*K_SIZE*K_SIZE*CHANNELS/PACKET; i++){
         tmp = strm_in.read();
         weights[i] = tmp.data.range(63, 0);
-        printf("weights[%d] = 0x%08x 0x%08x\n", i, (int)weights[i].range(63,32), (int)weights[i].range(31,0));
+        //printf("weights[%d] = 0x%08x 0x%08x\n", i, (int)weights[i].range(63,32), (int)weights[i].range(31,0));
     }
 
     READ_INIT_MAP: for (int i = 0; i < (K_SIZE-1)*maxWidth*CHANNELS/PACKET; i++){
         tmp = strm_in.read();
         img_in[i] = tmp.data.range(63, 0);
-        printf("img_in[%d] = 0x%08x 0x%08x\n", i, (int)img_in[i].range(63,32), (int)img_in[i].range(31,0));
+        //printf("img_in[%d] = 0x%08x 0x%08x\n", i, (int)img_in[i].range(63,32), (int)img_in[i].range(31,0));
     }
 
 
