@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<autopilotfilemapping:AutoPilotFileMapping xmlns:autopilotfilemapping="www.autoesl.com/autopilotfilemapping">
+  <source>
+    <originFiles name="axis_bgru.cpp" path="E:\Rodrigo\ISEL\2_Mestrado\2-ANO_1-sem\TFM\BAD_FPGA\1_vitis_hls\microfaune_ai__gruCells1\source\axis_bgru.cpp"/>
+    <originFiles name="axis_conv3D.cpp" path="E:\Rodrigo\ISEL\2_Mestrado\2-ANO_1-sem\TFM\BAD_FPGA\1_vitis_hls\microfaune_ai__gruCells1\source\axis_conv3D.cpp"/>
+    <originFiles name="global_settings.h" path="E:\Rodrigo\ISEL\2_Mestrado\2-ANO_1-sem\TFM\BAD_FPGA\1_vitis_hls\microfaune_ai__gruCells1\source\global_settings.h"/>
+    <originFiles name="size_bgru.h" path="E:\Rodrigo\ISEL\2_Mestrado\2-ANO_1-sem\TFM\BAD_FPGA\1_vitis_hls\microfaune_ai__gruCells1\source\size_bgru.h"/>
+    <originFiles name="size_conv3D.h" path="E:\Rodrigo\ISEL\2_Mestrado\2-ANO_1-sem\TFM\BAD_FPGA\1_vitis_hls\microfaune_ai__gruCells1\source\size_conv3D.h"/>
+    <originFiles name="soft_reducemax.h" path="E:\Rodrigo\ISEL\2_Mestrado\2-ANO_1-sem\TFM\BAD_FPGA\1_vitis_hls\microfaune_ai__gruCells1\source\soft_reducemax.h"/>
+    <originFiles name="soft_timedist.h" path="E:\Rodrigo\ISEL\2_Mestrado\2-ANO_1-sem\TFM\BAD_FPGA\1_vitis_hls\microfaune_ai__gruCells1\source\soft_timedist.h"/>
+    <originFiles name="types.h" path="E:\Rodrigo\ISEL\2_Mestrado\2-ANO_1-sem\TFM\BAD_FPGA\1_vitis_hls\microfaune_ai__gruCells1\source\types.h"/>
+    <originFiles name="utils.cpp" path="E:\Rodrigo\ISEL\2_Mestrado\2-ANO_1-sem\TFM\BAD_FPGA\1_vitis_hls\microfaune_ai__gruCells1\source\utils.cpp"/>
+    <originFiles name="utils.h" path="E:\Rodrigo\ISEL\2_Mestrado\2-ANO_1-sem\TFM\BAD_FPGA\1_vitis_hls\microfaune_ai__gruCells1\source\utils.h"/>
+  </source>
+  <testbench>
+    <originFiles name="loader.h" path="E:\Rodrigo\ISEL\2_Mestrado\2-ANO_1-sem\TFM\BAD_FPGA\1_vitis_hls\microfaune_ai__gruCells1\source\loader.h"/>
+    <originFiles name="tb_main.cpp" path="E:\Rodrigo\ISEL\2_Mestrado\2-ANO_1-sem\TFM\BAD_FPGA\1_vitis_hls\microfaune_ai__gruCells1\source\tb_main.cpp"/>
+  </testbench>
+</autopilotfilemapping:AutoPilotFileMapping>
