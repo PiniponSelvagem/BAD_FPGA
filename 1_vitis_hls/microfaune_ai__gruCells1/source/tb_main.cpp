@@ -31,14 +31,14 @@ void gru(
 	gru_t* output
 );
 
-imap_t input_0[IHEIGHT*IWIDTH/PACKET];
-imap_t input_1[IHEIGHT*IWIDTH*CHANNELS/PACKET];
-imap_t input_2[IHEIGHT*IWIDTH_1*CHANNELS/PACKET];
-imap_t input_3[IHEIGHT*IWIDTH_1*CHANNELS/PACKET];
-imap_t input_4[IHEIGHT*IWIDTH_2*CHANNELS/PACKET];
+imap_t input_0[IHEIGHT*IWIDTH/PACKET_CNN];
+imap_t input_1[IHEIGHT*IWIDTH*CHANNELS/PACKET_CNN];
+imap_t input_2[IHEIGHT*IWIDTH_1*CHANNELS/PACKET_CNN];
+imap_t input_3[IHEIGHT*IWIDTH_1*CHANNELS/PACKET_CNN];
+imap_t input_4[IHEIGHT*IWIDTH_2*CHANNELS/PACKET_CNN];
 gru_t input_gru[IHEIGHT*FILTERS];
 
-gru_t outputConv[IHEIGHT*FILTERS];
+gru_t outputConv_float[IHEIGHT*FILTERS];
 gru_t outputGRU0[IHEIGHT*(FILTERS*2)];
 gru_t outputGRU1[IHEIGHT*(FILTERS*2)];
 
@@ -53,28 +53,28 @@ float output_expect_LS[IHEIGHT];
 float output_expect_GS[1];
 
 
-weigth_t kernel_0[FILTERS*CHANNELS*K_SIZE*K_SIZE/PACKET];
-weigth_t kernel_0_scale[CHANNELS/PACKET];
+weigth_t kernel_0[FILTERS*CHANNELS*K_SIZE*K_SIZE/PACKET_CNN];
+weigth_t kernel_0_scale[CHANNELS/PACKET_CNN];
 bias_t bias_0[CHANNELS];
 
-weigth_t kernel_1[FILTERS*CHANNELS*K_SIZE*K_SIZE/PACKET];
-weigth_t kernel_1_scale[CHANNELS/PACKET];
+weigth_t kernel_1[FILTERS*CHANNELS*K_SIZE*K_SIZE/PACKET_CNN];
+weigth_t kernel_1_scale[CHANNELS/PACKET_CNN];
 bias_t bias_1[CHANNELS];
 
-weigth_t kernel_2[FILTERS*CHANNELS*K_SIZE*K_SIZE/PACKET];
-weigth_t kernel_2_scale[CHANNELS/PACKET];
+weigth_t kernel_2[FILTERS*CHANNELS*K_SIZE*K_SIZE/PACKET_CNN];
+weigth_t kernel_2_scale[CHANNELS/PACKET_CNN];
 bias_t bias_2[CHANNELS];
 
-weigth_t kernel_3[FILTERS*CHANNELS*K_SIZE*K_SIZE/PACKET];
-weigth_t kernel_3_scale[CHANNELS/PACKET];
+weigth_t kernel_3[FILTERS*CHANNELS*K_SIZE*K_SIZE/PACKET_CNN];
+weigth_t kernel_3_scale[CHANNELS/PACKET_CNN];
 bias_t bias_3[CHANNELS];
 
-weigth_t kernel_4[FILTERS*CHANNELS*K_SIZE*K_SIZE/PACKET];
-weigth_t kernel_4_scale[CHANNELS/PACKET];
+weigth_t kernel_4[FILTERS*CHANNELS*K_SIZE*K_SIZE/PACKET_CNN];
+weigth_t kernel_4_scale[CHANNELS/PACKET_CNN];
 bias_t bias_4[CHANNELS];
 
-weigth_t kernel_5[FILTERS*CHANNELS*K_SIZE*K_SIZE/PACKET];
-weigth_t kernel_5_scale[CHANNELS/PACKET];
+weigth_t kernel_5[FILTERS*CHANNELS*K_SIZE*K_SIZE/PACKET_CNN];
+weigth_t kernel_5_scale[CHANNELS/PACKET_CNN];
 bias_t bias_5[CHANNELS];
 
 
@@ -121,28 +121,28 @@ void writeBias(bias_t* bias) {
 }
 void writeScale(weigth_t* scale) {
 	in_pkt tmp;
-    for (int i=0; i<(CHANNELS/PACKET); i++) {
+    for (int i=0; i<(CHANNELS/PACKET_CNN); i++) {
         tmp.data = scale[i];
         str_in.write(tmp);
     }
 }
 void writeKernel(weigth_t* kernel) {
 	in_pkt tmp;
-    for (int i=0; i<(FILTERS*K_SIZE*K_SIZE*CHANNELS/PACKET); i++) {
+    for (int i=0; i<(FILTERS*K_SIZE*K_SIZE*CHANNELS/PACKET_CNN); i++) {
         tmp.data = kernel[i];
-        if (i==(FILTERS*K_SIZE*K_SIZE*CHANNELS/PACKET-1)) tmp.last = (ap_int<1>)1;
+        if (i==(FILTERS*K_SIZE*K_SIZE*CHANNELS/PACKET_CNN-1)) tmp.last = (ap_int<1>)1;
         else tmp.last = (ap_int<1>)0;
         str_in.write(tmp);
     }
 }
 void writeInput(imap_t* input) {
 	in_pkt tmp;
-    for (int i=0, j=0, i_pad=0; i<IHEIGHT*IWIDTH*CHANNELS/PACKET; i++) {
-		ap_uint<6> rangeStart = (j % PACKET) * 4;
+    for (int i=0, j=0, i_pad=0; i<IHEIGHT*IWIDTH*CHANNELS/PACKET_CNN; i++) {
+		ap_uint<6> rangeStart = (j % PACKET_CNN) * 4;
 		ap_uint<6> rangeEnd   = rangeStart + 3;
-		//printf("i %d, j %d, rs %d, re %d | jP %f\n", i, j, (int)rangeStart, (int)rangeEnd, (float)(j/PACKET));
+		//printf("i %d, j %d, rs %d, re %d | jP %f\n", i, j, (int)rangeStart, (int)rangeEnd, (float)(j/PACKET_CNN));
 		if (i_pad == 0) {
-			tmp.data = input[j/PACKET].range(rangeEnd,rangeStart);
+			tmp.data = input[j/PACKET_CNN].range(rangeEnd,rangeStart);
 			++j;
 		}
 		else
@@ -150,7 +150,7 @@ void writeInput(imap_t* input) {
 		++i_pad;
 		if (i_pad == 4) i_pad = 0;
 		//printf("writeInput[%d] = 0x%0x 0x%0x\n", i, (int)tmp.data.range(63,32), (int)tmp.data.range(31,0));
-        if (i == (IHEIGHT*IWIDTH*CHANNELS/PACKET-1)) tmp.last = (ap_int<1>)1;
+        if (i == (IHEIGHT*IWIDTH*CHANNELS/PACKET_CNN-1)) tmp.last = (ap_int<1>)1;
         else tmp.last = (ap_int<1>)0;
         str_in.write(tmp);
     }
@@ -243,6 +243,117 @@ void printLastLayerOutput() {
 }
 void conv2gru() {
 	int i = 0;
+	in_pkt tmp;     // to send to next layer
+	out_pkt tmpo;   // to receive from prev layer
+	typedef ap_ufixed<4,0> outputF;
+    typedef ap_fixed<8,1> inputF;
+	printf(" --- conv2gru ---\n");
+	while (!str_out.empty()) {
+        /*
+        conv -> 4 bits 0 int
+        gru  -> 8 bits 1 int
+        --------------------
+        gru bits convertion conv2gru:
+        S -> sign == 0
+        C -> conv result
+        0 -> padding
+        [ SCCC C000 ]
+        */
+		tmpo = str_out.read();
+
+        /* DEBUG PRINTS */
+        // received
+        int out0 = (int)tmpo.data.range(3,0);	outputF out0F; out0F.range(3,0) = tmpo.data.range(3,0);
+        int out1 = (int)tmpo.data.range(7,4);	outputF out1F; out1F.range(3,0) = tmpo.data.range(7,4);
+        int out2 = (int)tmpo.data.range(11,8);  outputF out2F; out2F.range(3,0) = tmpo.data.range(11,8);
+        int out3 = (int)tmpo.data.range(15,12); outputF out3F; out3F.range(3,0) = tmpo.data.range(15,12);
+
+        int out4 = (int)tmpo.data.range(19,16); outputF out4F; out4F.range(3,0) = tmpo.data.range(19,16);
+        int out5 = (int)tmpo.data.range(23,20); outputF out5F; out5F.range(3,0) = tmpo.data.range(23,20);
+        int out6 = (int)tmpo.data.range(27,24); outputF out6F; out6F.range(3,0) = tmpo.data.range(27,24);
+        int out7 = (int)tmpo.data.range(31,28); outputF out7F; out7F.range(3,0) = tmpo.data.range(31,28);
+
+        int out8 = (int)tmpo.data.range(35,32); outputF out8F; out8F.range(3,0) = tmpo.data.range(35,32);
+        int out9 = (int)tmpo.data.range(39,36); outputF out9F; out9F.range(3,0) = tmpo.data.range(39,36);
+        int outA = (int)tmpo.data.range(43,40); outputF outAF; outAF.range(3,0) = tmpo.data.range(43,40);
+        int outB = (int)tmpo.data.range(47,44); outputF outBF; outBF.range(3,0) = tmpo.data.range(47,44);
+
+        int outC = (int)tmpo.data.range(51,48); outputF outCF; outCF.range(3,0) = tmpo.data.range(51,48);
+        int outD = (int)tmpo.data.range(55,52); outputF outDF; outDF.range(3,0) = tmpo.data.range(55,52);
+        int outE = (int)tmpo.data.range(59,56); outputF outEF; outEF.range(3,0) = tmpo.data.range(59,56);
+        int outF = (int)tmpo.data.range(63,60); outputF outFF; outFF.range(3,0) = tmpo.data.range(63,60);
+        
+        printf("%02d - result %2d, %2d, %2d, %2d,   %2d, %2d, %2d, %2d,   %2d, %2d, %2d, %2d,   %2d, %2d, %2d, %2d   "
+                "|   %f, %f, %f, %f,   %f, %f, %f, %f,   %f, %f, %f, %f,   %f, %f, %f, %f\n", i,
+                out0, out1, out2, out3,
+                out4, out5, out6, out7,
+                out8, out9, outA, outB,
+                outC, outD, outE, outF,
+                (float)out0F, (float)out1F, (float)out2F, (float)out3F,
+                (float)out4F, (float)out5F, (float)out6F, (float)out7F,
+                (float)out8F, (float)out9F, (float)outAF, (float)outBF,
+                (float)outCF, (float)outDF, (float)outEF, (float)outFF
+        );
+        /* END DEBUG PRINTS */
+
+        int out_offset = 64/2;   // because PACKET_CNN == 16, PACKET_GRU == 8, and that means 2 reads must be made for the convertion
+        int out_databits = 64/PACKET_CNN;
+        int in_databits = 64/PACKET_GRU;
+        for (int section = 0; section < 2; ++section) {
+            for (int subOffset = 0; subOffset < 64/PACKET_GRU; ++subOffset) {
+                int startPad  = 0;   int endPad  = 2;   // padding
+                int startData = 3;   int endData = 6;   // conv result
+                int startSign = 7;   int endSign = 7;   // sign bit always positive
+                startPad  += in_databits * subOffset;  endPad  += in_databits * subOffset;
+                startData += in_databits * subOffset;  endData += in_databits * subOffset;
+                startSign += in_databits * subOffset;  endSign += in_databits * subOffset;
+
+                int startOutData = 0;   int endOutData = 3;         // conv result data
+                startOutData += out_databits * subOffset + (out_offset * section);
+                endOutData   += out_databits * subOffset + (out_offset * section);
+
+                tmp.data.range(endPad, startPad)  = (int)0;
+                tmp.data.range(endData,startData) = (int)tmpo.data.range(endOutData,startOutData);
+                tmp.data.range(endSign,startSign) = (int)0;
+            }
+
+            if (section == 0) {
+                tmp.last = (ap_int<1>)0;
+                str_in.write(tmp);
+            }
+            else {
+                if (!str_out.empty())
+                    tmp.last = (ap_int<1>)0;
+                else
+                    tmp.last = (ap_int<1>)1;
+                str_in.write(tmp);
+            }
+
+            /* DEBUG PRINTS */
+            // sending
+            int in0 = (int)tmp.data.range(7,0);   inputF in0F; in0F.range(7,0) = tmp.data.range(7,0);
+            int in1 = (int)tmp.data.range(15,8);  inputF in1F; in1F.range(7,0) = tmp.data.range(15,8);
+            int in2 = (int)tmp.data.range(23,16); inputF in2F; in2F.range(7,0) = tmp.data.range(23,16);
+            int in3 = (int)tmp.data.range(31,24); inputF in3F; in3F.range(7,0) = tmp.data.range(31,24);
+
+            int in4 = (int)tmp.data.range(39,32); inputF in4F; in4F.range(7,0) = tmp.data.range(39,32);
+            int in5 = (int)tmp.data.range(47,40); inputF in5F; in5F.range(7,0) = tmp.data.range(47,40);
+            int in6 = (int)tmp.data.range(55,48); inputF in6F; in6F.range(7,0) = tmp.data.range(55,48);
+            int in7 = (int)tmp.data.range(63,56); inputF in7F; in7F.range(7,0) = tmp.data.range(63,56);
+
+            printf("%02d - [sending %01d] %2d, %2d, %2d, %2d,   %2d, %2d, %2d, %2d   |   %f, %f, %f, %f,   %f, %f, %f, %f\n", i, section,
+                    in0, in1, in2, in3,
+                    in4, in5, in6, in7,
+                    (float)in0F, (float)in1F, (float)in2F, (float)in3F,
+                    (float)in4F, (float)in5F, (float)in6F, (float)in7F
+            );
+            /* END DEBUG PRINTS */
+        }
+        ++i;    // used in DEBUG PRINTS
+	}
+}
+void conv2gru_float() {
+	int i = 0;
     out_pkt tmpo;
 	typedef ap_ufixed<4,0> outputF;
     while (!str_out.empty()) {
@@ -279,25 +390,25 @@ void conv2gru() {
 				(float)outCF, (float)outDF, (float)outEF, (float)outFF
 		);
 
-        outputConv[i++] = (float)out0F;
-        outputConv[i++] = (float)out1F;
-        outputConv[i++] = (float)out2F;
-        outputConv[i++] = (float)out3F;
+        outputConv_float[i++] = (float)out0F;
+        outputConv_float[i++] = (float)out1F;
+        outputConv_float[i++] = (float)out2F;
+        outputConv_float[i++] = (float)out3F;
 
-        outputConv[i++] = (float)out4F;
-        outputConv[i++] = (float)out5F;
-        outputConv[i++] = (float)out6F;
-        outputConv[i++] = (float)out7F;
+        outputConv_float[i++] = (float)out4F;
+        outputConv_float[i++] = (float)out5F;
+        outputConv_float[i++] = (float)out6F;
+        outputConv_float[i++] = (float)out7F;
 
-        outputConv[i++] = (float)out8F;
-        outputConv[i++] = (float)out9F;
-        outputConv[i++] = (float)outAF;
-        outputConv[i++] = (float)outBF;
+        outputConv_float[i++] = (float)out8F;
+        outputConv_float[i++] = (float)out9F;
+        outputConv_float[i++] = (float)outAF;
+        outputConv_float[i++] = (float)outBF;
 
-        outputConv[i++] = (float)outCF;
-        outputConv[i++] = (float)outDF;
-        outputConv[i++] = (float)outEF;
-        outputConv[i++] = (float)outFF;
+        outputConv_float[i++] = (float)outCF;
+        outputConv_float[i++] = (float)outDF;
+        outputConv_float[i++] = (float)outEF;
+        outputConv_float[i++] = (float)outFF;
     }
 }
 void printGRUoutput(gru_t* output) {
@@ -338,7 +449,7 @@ void compareStats(char* msg, float* actual, float* expected, int size, int break
 int main() {
 	loadIO(
 		input_0,
-		outputConv,
+		outputConv_float,
 		output_expect_GRU0,
 		output_expect_GRU1,
 		output_expect_LS,
@@ -363,7 +474,7 @@ int main() {
 
     /*
     printf("\ninput_0:\n");
-    for (int idx=0; idx<IHEIGHT*IWIDTH*CHANNELS/PACKET; idx++) {
+    for (int idx=0; idx<IHEIGHT*IWIDTH*CHANNELS/PACKET_CNN; idx++) {
     	printf("idx=%d | 0x%016llx\n", idx, input_0[idx]);
     }
 	*/
@@ -430,14 +541,16 @@ int main() {
 
     // Temporary method to convert from hardware to software data.
     printf("---- conv2gru ----\n");
-    conv2gru();
+    conv2gru_float();
+    
 #else
+
     /*
-    printf("---- outputConv from TF ----\n");
+    printf("---- outputConv_float from TF ----\n");
 	for (int i=0; i<IHEIGHT; ++i) {
 		printf("[%3d] - ", i);
 		for (int j=0; j<(FILTERS); ++j) {
-			printf("%10f ", outputConv[(i*FILTERS)+j]);
+			printf("%10f ", outputConv_float[(i*FILTERS)+j]);
 		}
 		printf("\n");
     }
@@ -449,7 +562,7 @@ int main() {
 	gru( // GRU_0_F
 		GRU_FORWARD,
 		GRU_0__IN_COLS,
-		outputConv,
+		outputConv_float,
 		gru0f_kernel,	gru0f_bias,
 		gru0f_rkernel,	gru0f_rbias,
 		outputGRU0
@@ -459,7 +572,7 @@ int main() {
 	gru( // GRU_0_B
 		GRU_BACKWARD,
 		GRU_0__IN_COLS,
-		outputConv,
+		outputConv_float,
 		gru0b_kernel,	gru0b_bias,
 		gru0b_rkernel, 	gru0b_rbias,
 		outputGRU0
@@ -550,7 +663,6 @@ int main() {
     compareStats("Stats LS: (actual | difference | expected)\n", outputLS, output_expect_LS, IHEIGHT, BREAK_AFTER);
     compareStats("Stats GS: (actual | difference | expected)\n", outputGS, output_expect_GS, 1, BREAK_AFTER);
 #endif
-
 #else
 	/*
 	in, k, b,

@@ -96,3 +96,11 @@ __pycache__/
 /0_quantization/model_quantized_weights__saved_with_TF/
 /0_quantization/model_quantized_weights_TEMP/
 /0_quantization/qkeras_GITHUB/
+/1_vitis_hls/microfaune_ai__aGRU_dev/
+/1_vitis_hls/microfaune_ai__beforeHLS/
+/1_vitis_hls/microfaune_ai__gruCells1/algorithm/
+/1_vitis_hls/microfaune_ai__HLS_old/
+/1_vitis_hls/microfaune_ai__preQmanual/
+/1_vitis_hls/microfaune_ai__smallDebug/
+/1_vitis_hls/microfaune_ai__smallDebug_bigru/
+/1_vitis_hls/microfaune_ai__gruCells1/.vscode/

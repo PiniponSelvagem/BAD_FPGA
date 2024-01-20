@@ -21,9 +21,9 @@ void conv2D(hls::stream<in_pkt> &strm_in, hls::stream<out_pkt> &strm_out, int po
 #pragma HLS interface axis port=strm_in
 #pragma HLS INTERFACE axis port=strm_out
 
-    imap_t img_in[(K_SIZE+1)*IWIDTH*CHANNELS/PACKET];
-    weigth_t weights[FILTERS*K_SIZE*K_SIZE*CHANNELS/PACKET];
-    weigth_t scales[CHANNELS/PACKET];
+    imap_t img_in[(K_SIZE+1)*IWIDTH*CHANNELS/PACKET_CNN];
+    weigth_t weights[FILTERS*K_SIZE*K_SIZE*CHANNELS/PACKET_CNN];
+    weigth_t scales[CHANNELS/PACKET_CNN];
     accum_t bias[CHANNELS];
 #pragma HLS ARRAY_PARTITION variable=weights type=cyclic factor=4
 #pragma HLS ARRAY_PARTITION variable=img_in type=cyclic factor=4
@@ -42,18 +42,18 @@ void conv2D(hls::stream<in_pkt> &strm_in, hls::stream<out_pkt> &strm_out, int po
         //printf("bias = %d %d %d %d\n", (int)bias[i*4], (int)bias[i*4+1], (int)bias[i*4+2], (int)bias[i*4+3]);
     }
 
-    READ_SCALES: for (int i = 0; i < CHANNELS/PACKET; i++){
+    READ_SCALES: for (int i = 0; i < CHANNELS/PACKET_CNN; i++){
         tmp = strm_in.read();
         scales[i] = tmp.data.range(63, 0);
         //printf("scale[%d] = 0x%08x 0x%08x\n", i, (int)scales[i].range(63,32), (int)scales[i].range(31,0));
     }
-    READ_WEIGHTS: for (int i = 0; i < FILTERS*K_SIZE*K_SIZE*CHANNELS/PACKET; i++){
+    READ_WEIGHTS: for (int i = 0; i < FILTERS*K_SIZE*K_SIZE*CHANNELS/PACKET_CNN; i++){
         tmp = strm_in.read();
         weights[i] = tmp.data.range(63, 0);
         //printf("weights[%d] = 0x%08x 0x%08x\n", i, (int)weights[i].range(63,32), (int)weights[i].range(31,0));
     }
 
-    READ_INIT_MAP: for (int i = 0; i < (K_SIZE-1)*maxWidth*CHANNELS/PACKET; i++){
+    READ_INIT_MAP: for (int i = 0; i < (K_SIZE-1)*maxWidth*CHANNELS/PACKET_CNN; i++){
         tmp = strm_in.read();
         img_in[i] = tmp.data.range(63, 0);
         //printf("img_in[%d] = 0x%08x 0x%08x\n", i, (int)img_in[i].range(63,32), (int)img_in[i].range(31,0));
@@ -79,17 +79,17 @@ void conv2D(hls::stream<in_pkt> &strm_in, hls::stream<out_pkt> &strm_out, int po
             filters_loop: for(int i = 0; i < FILTERS; i++){
                 accum_t acc = bias[i];
 
-                w_index = i * K_SIZE * K_SIZE * CHANNELS/PACKET;
-                if (rd_index < maxWidth * CHANNELS/PACKET && orow < OHEIGHT - 3){
+                w_index = i * K_SIZE * K_SIZE * CHANNELS/PACKET_CNN;
+                if (rd_index < maxWidth * CHANNELS/PACKET_CNN && orow < OHEIGHT - 3){
                     tmp = strm_in.read();
-                    img_in[(orow+3)%4 * maxWidth*CHANNELS/PACKET + rd_index] = tmp.data.range(63, 0);
+                    img_in[(orow+3)%4 * maxWidth*CHANNELS/PACKET_CNN + rd_index] = tmp.data.range(63, 0);
                 }
                 rd_index += 1;
                 for (int j = 0; j < K_SIZE; j++){
                     for (int k = 0; k < K_SIZE; k++){
-                        for (int l = 0; l < CHANNELS/PACKET; l++){
+                        for (int l = 0; l < CHANNELS/PACKET_CNN; l++){
 #pragma HLS UNROLL factor = 4
-                            i_index = ((orow+j)%4) * maxWidth*CHANNELS/PACKET + (ocol+k) * CHANNELS/PACKET + l;
+                            i_index = ((orow+j)%4) * maxWidth*CHANNELS/PACKET_CNN + (ocol+k) * CHANNELS/PACKET_CNN + l;
                             //printf("bi = %d\n", (int)i_index);
                             //printf("orow= %d | ocol= %d | i (filter)= %d | j= %d | k= %d | l= %d\n", (int)orow, (int)ocol, (int)i, (int)j, (int)k, (int)l);
                             if (!(orow+j == -1 || ocol+k == -1 || orow+j == OHEIGHT || ocol+k == maxWidth)){
@@ -149,9 +149,9 @@ void conv2D(hls::stream<in_pkt> &strm_in, hls::stream<out_pkt> &strm_out, int po
 
                 //printf("acc %d - i %d\n", (int)acc, i);
 
-                range_t scaleStart = (i % PACKET) * 4;
+                range_t scaleStart = (i % PACKET_CNN) * 4;
                 range_t scaleEnd   = scaleStart + 3;
-                scale_t scale = scales[i/PACKET].range(scaleEnd, scaleStart);
+                scale_t scale = scales[i/PACKET_CNN].range(scaleEnd, scaleStart);
                 //printf("%d - %d,%d\n", i, scaleStart, scaleEnd);
 
                 /*

@@ -220,7 +220,7 @@ void loadIO(
 	float* outputLS,
 	float* outputGS
 ) {
-	load(INPUT, input, IHEIGHT*IWIDTH/PACKET, sizeof(imap_t));
+	load(INPUT, input, IHEIGHT*IWIDTH/PACKET_CNN, sizeof(imap_t));
 	load(OUTPUT_CONV, outputConv, IHEIGHT*FILTERS, sizeof(float));
 	load(OUTPUT_GRU0, outputGRU0, IHEIGHT*(FILTERS*2), sizeof(float));
 	load(OUTPUT_GRU1, outputGRU1, IHEIGHT*(FILTERS*2), sizeof(float));
@@ -243,33 +243,33 @@ void loadWeights(
 	float* td1_kernel, float* td1_bias
 ) {
     // conv2d_0
-	load(CONV_0_KERNEL, kernel_0, FILTERS*CHANNELS*K_SIZE*K_SIZE/PACKET, sizeof(weigth_t));
-    load(CONV_0_KERNEL_SCALE, kernel_0_scale, CHANNELS/PACKET, sizeof(weigth_t));
+	load(CONV_0_KERNEL, kernel_0, FILTERS*CHANNELS*K_SIZE*K_SIZE/PACKET_CNN, sizeof(weigth_t));
+    load(CONV_0_KERNEL_SCALE, kernel_0_scale, CHANNELS/PACKET_CNN, sizeof(weigth_t));
     load(CONV_0_BIAS, bias_0, CHANNELS, sizeof(bias_t));
 
     // conv2d_1
-    load(CONV_1_KERNEL, kernel_1, FILTERS*CHANNELS*K_SIZE*K_SIZE/PACKET, sizeof(weigth_t));
-    load(CONV_1_KERNEL_SCALE, kernel_1_scale, CHANNELS/PACKET, sizeof(weigth_t));
+    load(CONV_1_KERNEL, kernel_1, FILTERS*CHANNELS*K_SIZE*K_SIZE/PACKET_CNN, sizeof(weigth_t));
+    load(CONV_1_KERNEL_SCALE, kernel_1_scale, CHANNELS/PACKET_CNN, sizeof(weigth_t));
     load(CONV_1_BIAS, bias_1, CHANNELS, sizeof(bias_t));
 
     // conv2d_2
-    load(CONV_2_KERNEL, kernel_2, FILTERS*CHANNELS*K_SIZE*K_SIZE/PACKET, sizeof(weigth_t));
-    load(CONV_2_KERNEL_SCALE, kernel_2_scale, CHANNELS/PACKET, sizeof(weigth_t));
+    load(CONV_2_KERNEL, kernel_2, FILTERS*CHANNELS*K_SIZE*K_SIZE/PACKET_CNN, sizeof(weigth_t));
+    load(CONV_2_KERNEL_SCALE, kernel_2_scale, CHANNELS/PACKET_CNN, sizeof(weigth_t));
     load(CONV_2_BIAS, bias_2, CHANNELS, sizeof(bias_t));
     
     // conv2d_3
-    load(CONV_3_KERNEL, kernel_3, FILTERS*CHANNELS*K_SIZE*K_SIZE/PACKET, sizeof(weigth_t));
-    load(CONV_3_KERNEL_SCALE, kernel_3_scale, CHANNELS/PACKET, sizeof(weigth_t));
+    load(CONV_3_KERNEL, kernel_3, FILTERS*CHANNELS*K_SIZE*K_SIZE/PACKET_CNN, sizeof(weigth_t));
+    load(CONV_3_KERNEL_SCALE, kernel_3_scale, CHANNELS/PACKET_CNN, sizeof(weigth_t));
     load(CONV_3_BIAS, bias_3, CHANNELS, sizeof(bias_t));
     
     // conv2d_4
-    load(CONV_4_KERNEL, kernel_4, FILTERS*CHANNELS*K_SIZE*K_SIZE/PACKET, sizeof(weigth_t));
-    load(CONV_4_KERNEL_SCALE, kernel_4_scale, CHANNELS/PACKET, sizeof(weigth_t));
+    load(CONV_4_KERNEL, kernel_4, FILTERS*CHANNELS*K_SIZE*K_SIZE/PACKET_CNN, sizeof(weigth_t));
+    load(CONV_4_KERNEL_SCALE, kernel_4_scale, CHANNELS/PACKET_CNN, sizeof(weigth_t));
     load(CONV_4_BIAS, bias_4, CHANNELS, sizeof(bias_t));
     
     // conv2d_5
-    load(CONV_5_KERNEL, kernel_5, FILTERS*CHANNELS*K_SIZE*K_SIZE/PACKET, sizeof(weigth_t));
-    load(CONV_5_KERNEL_SCALE, kernel_5_scale, CHANNELS/PACKET, sizeof(weigth_t));
+    load(CONV_5_KERNEL, kernel_5, FILTERS*CHANNELS*K_SIZE*K_SIZE/PACKET_CNN, sizeof(weigth_t));
+    load(CONV_5_KERNEL_SCALE, kernel_5_scale, CHANNELS/PACKET_CNN, sizeof(weigth_t));
     load(CONV_5_BIAS, bias_5, CHANNELS, sizeof(bias_t));
 
     // gru_0_forward
