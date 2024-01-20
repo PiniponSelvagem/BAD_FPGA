@@ -32,7 +32,7 @@ void timedistributed_dense(
                 float i = *((float*)input + pinput_offset_row + kcol);
                 acc += k * i;
             }
-            float out = SIGMOID(acc);
+            float out = SIGMOID_FLOAT(acc);
             float* poutput = output + poutput_offset_row + ocol;
             *poutput = out;
         }

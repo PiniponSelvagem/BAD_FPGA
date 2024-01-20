@@ -8,10 +8,10 @@
 #include "size_bgru.h"
 
 /******************* SELECT INPUT *******************/
-#define INPUT_BIRD_0 0      // expected 1 cell: 0.9706467986106873 | expected 64 cells: 0.9919541478157043
-#define INPUT_BIRD_1 1      // expected 1 cell: 0.5680659413337708 | expected 64 cells: 0.9428370594978333
-#define INPUT_BIRD_2 2      // expected 1 cell: 0.9324995875358582 | expected 64 cells: 0.9812303781509399
-#define INPUT_BIRD_3 3      // expected 1 cell: 0.9636806845664978 | expected 64 cells: 0.9797500371932983
+#define INPUT_BIRD_0 0      // expected 1 cell: 0.9706467986106873   | expected 64 cells: 0.9919541478157043
+#define INPUT_BIRD_1 1      // expected 1 cell: 0.5680659413337708   | expected 64 cells: 0.9428370594978333
+#define INPUT_BIRD_2 2      // expected 1 cell: 0.9324995875358582   | expected 64 cells: 0.9812303781509399
+#define INPUT_BIRD_3 3      // expected 1 cell: 0.9636806845664978   | expected 64 cells: 0.9797500371932983
 
 #define INPUT_NO_BIRD_0 4   // expected 1 cell: 0.041791435331106186 | expected 64 cells: 0.0710141733288765
 #define INPUT_NO_BIRD_1 5   // expected 1 cell: 0.40294381976127625  | expected 64 cells: 0.12189839780330658
@@ -235,7 +235,7 @@ void loadWeights(
 	weigth_t* kernel_3, weigth_t* kernel_3_scale, bias_t* bias_3,
 	weigth_t* kernel_4, weigth_t* kernel_4_scale, bias_t* bias_4,
 	weigth_t* kernel_5, weigth_t* kernel_5_scale, bias_t* bias_5,
-	gru_t* gru0f_kernel, gru_t* gru0f_rkernel, gru_t* gru0f_bias, gru_t* gru0f_rbias,
+	gru_weigth_t* gru0f_kernel, gru_weigth_t* gru0f_rkernel, gru_weigth_t* gru0f_bias, gru_weigth_t* gru0f_rbias,
 	gru_t* gru0b_kernel, gru_t* gru0b_rkernel, gru_t* gru0b_bias, gru_t* gru0b_rbias,
 	gru_t* gru1f_kernel, gru_t* gru1f_rkernel, gru_t* gru1f_bias, gru_t* gru1f_rbias,
 	gru_t* gru1b_kernel, gru_t* gru1b_rkernel, gru_t* gru1b_bias, gru_t* gru1b_rbias,
@@ -273,10 +273,10 @@ void loadWeights(
     load(CONV_5_BIAS, bias_5, CHANNELS, sizeof(bias_t));
 
     // gru_0_forward
-    load(GRU_0_FORWARD_KERNEL, gru0f_kernel, GRU_FILTERS*CHANNELS*GRU_SPLIT_SIZE, sizeof(gru_t));
-    load(GRU_0_FORWARD_RECURRENT_KERNEL, gru0f_rkernel, GRU_FILTERS*GRU_FILTERS*GRU_SPLIT_SIZE, sizeof(gru_t));
-    load(GRU_0_FORWARD_BIAS, gru0f_bias, GRU_FILTERS*GRU_SPLIT_SIZE, sizeof(gru_t));
-    load(GRU_0_FORWARD_RECURRENT_BIAS, gru0f_rbias, GRU_FILTERS*GRU_SPLIT_SIZE, sizeof(gru_t));
+    load(GRU_0_FORWARD_KERNEL, gru0f_kernel, GRU_FILTERS*CHANNELS*GRU_SPLIT_SIZE, G_WG_W_BIT_WIDTH);
+    load(GRU_0_FORWARD_RECURRENT_KERNEL, gru0f_rkernel, GRU_FILTERS*GRU_FILTERS*GRU_SPLIT_SIZE, sizeof(G_WG_W_BIT_WIDTH));
+    load(GRU_0_FORWARD_BIAS, gru0f_bias, GRU_FILTERS*GRU_SPLIT_SIZE, sizeof(G_WG_W_BIT_WIDTH));
+    load(GRU_0_FORWARD_RECURRENT_BIAS, gru0f_rbias, GRU_FILTERS*GRU_SPLIT_SIZE, sizeof(G_WG_W_BIT_WIDTH));
     // gru_0_backward
     load(GRU_0_BACKWARD_KERNEL, gru0b_kernel, GRU_FILTERS*CHANNELS*GRU_SPLIT_SIZE, sizeof(gru_t));
     load(GRU_0_BACKWARD_RECURRENT_KERNEL, gru0b_rkernel, GRU_FILTERS*GRU_FILTERS*GRU_SPLIT_SIZE, sizeof(gru_t));

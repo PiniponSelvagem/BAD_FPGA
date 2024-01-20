@@ -657,12 +657,18 @@ for layer in model.layers:
     print(layerName)
     weight = layer.weights
     if "bidirectional" in layerName:
+        k_rk_b_rb_data_type = {}
+        k_rk_b_rb_data_type["name"] = "ap_fixed"
+        k_rk_b_rb_data_type["bits_total"] = 8
+        k_rk_b_rb_data_type["bits_int"] = 1
+
         float_data_type = data_type.copy()
         float_data_type["name"] = "float"
         #float_data_type["bits_int"] += 1
-        processLayer(layerName, layerName+"_gru_forward_kernel", weight[0], float_data_type)
-        processLayer(layerName, layerName+"_gru_forward_recurrent_kernel", weight[1], float_data_type)
-        processLayer(layerName, layerName+"_gru_forward_bias", weight[2], float_data_type)
+        processLayer(layerName, layerName+"_gru_forward_kernel", weight[0], k_rk_b_rb_data_type)
+        processLayer(layerName, layerName+"_gru_forward_recurrent_kernel", weight[1], k_rk_b_rb_data_type)
+        processLayer(layerName, layerName+"_gru_forward_bias", weight[2], k_rk_b_rb_data_type)
+        
         processLayer(layerName, layerName+"_gru_backward_kernel", weight[3], float_data_type)
         processLayer(layerName, layerName+"_gru_backward_recurrent_kernel", weight[4], float_data_type)
         processLayer(layerName, layerName+"_gru_backward_bias", weight[5], float_data_type)

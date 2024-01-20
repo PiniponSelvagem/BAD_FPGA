@@ -4,10 +4,14 @@
 #include "global_settings.h"
 
 /* GLOBAL TYPES */
+/* CONV */
 typedef ap_int<W_BIT_WIDTH*PACKET_CNN> weigth_t;
 typedef ap_int<BIAS_SIZE> bias_t;
 typedef ap_uint<I_BIT_WIDTH*PACKET_CNN> imap_t;		// 2023-11-24 before was ap_int
 typedef ap_uint<I_BIT_WIDTH*PACKET_CNN> omap_t;
+
+/* GRU */
+typedef ap_fixed<G_WG_W_BIT_WIDTH, G_WG_I_BIT_WIDTH> gru_weigth_t;
 
 /* LAYER TYPES */
 #define W W_BIT_WIDTH

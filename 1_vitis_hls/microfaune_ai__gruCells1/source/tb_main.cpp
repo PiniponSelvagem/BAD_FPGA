@@ -14,6 +14,13 @@
 
 #include "utils.h"
 
+
+//#define PRINT_STATS
+//#define DEBUG_CONV
+//#define DO_CONV
+#define VALIDATE_OUTPUT
+
+
 typedef ap_axis<64, 0, 0, 0> in_pkt;
 typedef ap_axis<64, 0, 0, 0> out_pkt;
 
@@ -23,11 +30,10 @@ hls::stream<out_pkt> str_out;
 
 void conv2D(hls::stream<in_pkt> &strm_in, hls::stream<out_pkt> &strm_out, int pool, int maxWidth);
 void gru(
+	hls::stream<in_pkt> &strm_in,
 	int isForward,
 	int kernelCols,
-	gru_t* input,
-	gru_t* kernel,    gru_t* bias,
-	gru_t* recKernel, gru_t* recBias,
+	int kernelSize,
 	gru_t* output
 );
 
@@ -78,11 +84,10 @@ weigth_t kernel_5_scale[CHANNELS/PACKET_CNN];
 bias_t bias_5[CHANNELS];
 
 
-
-gru_t gru0f_kernel[GRU_IN_COLS*GRU_SPLIT_SIZE*GRU_FILTERS];
-gru_t gru0f_rkernel[GRU_FILTERS*GRU_SPLIT_SIZE*GRU_FILTERS];
-gru_t gru0f_bias[GRU_BIAS_SIZE];
-gru_t gru0f_rbias[GRU_BIAS_SIZE];
+gru_weigth_t gru0f_kernel[GRU0F_KERNEL_SIZE];
+gru_weigth_t gru0f_rkernel[GRU_RKERNEL_SIZE];
+gru_weigth_t gru0f_bias[GRU_BIAS_SIZE];
+gru_weigth_t gru0f_rbias[GRU_BIAS_SIZE];
 
 gru_t gru0b_kernel[GRU_IN_COLS*GRU_SPLIT_SIZE*GRU_FILTERS];
 gru_t gru0b_rkernel[GRU_FILTERS*GRU_SPLIT_SIZE*GRU_FILTERS];
@@ -241,6 +246,23 @@ void printLastLayerOutput() {
 		);
     }
 }
+
+void writeWeigthGRU(gru_weigth_t* weigth, size_t size) {
+	in_pkt tmp;
+    tmp.last = (ap_int<1>)0;
+    for (int i=0; i<size; ) {
+        tmp.data.range(7,0)   = (int)weigth[i++].range(7,0);
+        tmp.data.range(15,8)  = (int)weigth[i++].range(7,0);
+        tmp.data.range(23,16) = (int)weigth[i++].range(7,0);
+        tmp.data.range(31,24) = (int)weigth[i++].range(7,0);
+
+        tmp.data.range(39,32) = (int)weigth[i++].range(7,0);
+        tmp.data.range(47,40) = (int)weigth[i++].range(7,0);
+        tmp.data.range(55,48) = (int)weigth[i++].range(7,0);
+        tmp.data.range(63,56) = (int)weigth[i++].range(7,0);
+        str_in.write(tmp);
+    }
+}
 void conv2gru() {
 	int i = 0;
 	in_pkt tmp;     // to send to next layer
@@ -248,6 +270,43 @@ void conv2gru() {
 	typedef ap_ufixed<4,0> outputF;
     typedef ap_fixed<8,1> inputF;
 	printf(" --- conv2gru ---\n");
+
+#ifndef DO_CONV
+    printf("INFO: DO_CONV is not defined. Filling output stream for GRU input...\n");
+    int cycles = 0;
+    while(i<IHEIGHT*FILTERS) {
+        outputF out0 = outputConv_float[i++];     tmpo.data.range(3,0)   = out0.range(3,0);
+        outputF out1 = outputConv_float[i++];     tmpo.data.range(7,4)   = out1.range(3,0);
+        outputF out2 = outputConv_float[i++];     tmpo.data.range(11,8)  = out2.range(3,0);
+        outputF out3 = outputConv_float[i++];     tmpo.data.range(15,12) = out3.range(3,0);
+
+        outputF out4 = outputConv_float[i++];     tmpo.data.range(19,16) = out4.range(3,0);
+        outputF out5 = outputConv_float[i++];     tmpo.data.range(23,20) = out5.range(3,0);
+        outputF out6 = outputConv_float[i++];     tmpo.data.range(27,24) = out6.range(3,0);
+        outputF out7 = outputConv_float[i++];     tmpo.data.range(31,28) = out7.range(3,0);
+
+        outputF out8 = outputConv_float[i++];     tmpo.data.range(35,32) = out8.range(3,0);
+        outputF out9 = outputConv_float[i++];     tmpo.data.range(39,36) = out9.range(3,0);
+        outputF outA = outputConv_float[i++];     tmpo.data.range(43,40) = outA.range(3,0);
+        outputF outB = outputConv_float[i++];     tmpo.data.range(47,44) = outB.range(3,0);
+
+        outputF outC = outputConv_float[i++];     tmpo.data.range(51,48) = outC.range(3,0);
+        outputF outD = outputConv_float[i++];     tmpo.data.range(55,52) = outD.range(3,0);
+        outputF outE = outputConv_float[i++];     tmpo.data.range(59,56) = outE.range(3,0);
+        outputF outF = outputConv_float[i++];     tmpo.data.range(63,60) = outF.range(3,0);
+
+        if (i+1 < IHEIGHT*FILTERS)
+            tmpo.last = (ap_int<1>)0;
+        else
+            tmpo.last = (ap_int<1>)1;
+        str_out.write(tmpo);
+
+        ++cycles;
+    }
+    printf("INFO: Stream filled in %d cycles.\n", cycles);
+    i = 0;  // reset i to initial value
+#endif
+
 	while (!str_out.empty()) {
         /*
         conv -> 4 bits 0 int
@@ -261,6 +320,7 @@ void conv2gru() {
         */
 		tmpo = str_out.read();
 
+#ifdef DEBUG_CONV2GRU
         /* DEBUG PRINTS */
         // received
         int out0 = (int)tmpo.data.range(3,0);	outputF out0F; out0F.range(3,0) = tmpo.data.range(3,0);
@@ -295,6 +355,7 @@ void conv2gru() {
                 (float)outCF, (float)outDF, (float)outEF, (float)outFF
         );
         /* END DEBUG PRINTS */
+#endif
 
         int out_offset = 64/2;   // because PACKET_CNN == 16, PACKET_GRU == 8, and that means 2 reads must be made for the convertion
         int out_databits = 64/PACKET_CNN;
@@ -329,6 +390,7 @@ void conv2gru() {
                 str_in.write(tmp);
             }
 
+#ifdef DEBUG_CONV2GRU
             /* DEBUG PRINTS */
             // sending
             int in0 = (int)tmp.data.range(7,0);   inputF in0F; in0F.range(7,0) = tmp.data.range(7,0);
@@ -348,8 +410,11 @@ void conv2gru() {
                     (float)in4F, (float)in5F, (float)in6F, (float)in7F
             );
             /* END DEBUG PRINTS */
+#endif
         }
+#ifdef DEBUG_CONV2GRU
         ++i;    // used in DEBUG PRINTS
+#endif
 	}
 }
 void conv2gru_float() {
@@ -442,10 +507,7 @@ void compareStats(char* msg, float* actual, float* expected, int size, int break
 	}
 }
 
-//#define PRINT_STATS
-//#define DEBUG_CONV
-//#define DO_CONV
-#define VALIDATE_OUTPUT
+
 int main() {
 	loadIO(
 		input_0,
@@ -547,32 +609,40 @@ int main() {
 
     /*
     printf("---- outputConv_float from TF ----\n");
-	for (int i=0; i<IHEIGHT; ++i) {
-		printf("[%3d] - ", i);
-		for (int j=0; j<(FILTERS); ++j) {
-			printf("%10f ", outputConv_float[(i*FILTERS)+j]);
-		}
-		printf("\n");
+    for (int i=0; i<IHEIGHT; ++i) {
+        printf("[%3d] - ", i);
+        for (int j=0; j<(FILTERS); ++j) {
+            printf("%10f ", outputConv_float[(i*FILTERS)+j]);
+        }
+        printf("\n");
     }
     */
+
+
 #endif	// !DO_CONV
 
 	printf("###################################### GRU_0 ######################################\n");
 	printf("---- 0 FORWARD ----\n");
+    writeWeigthGRU(gru0f_kernel, GRU0F_KERNEL_SIZE);
+    writeWeigthGRU(gru0f_bias, GRU_BIAS_SIZE);
+    writeWeigthGRU(gru0f_rkernel, GRU_RKERNEL_SIZE);
+    writeWeigthGRU(gru0f_rbias, GRU_BIAS_SIZE);
+    conv2gru();
 	gru( // GRU_0_F
+		str_in,
 		GRU_FORWARD,
 		GRU_0__IN_COLS,
-		outputConv_float,
-		gru0f_kernel,	gru0f_bias,
-		gru0f_rkernel,	gru0f_rbias,
+        GRU0F_KERNEL_SIZE,
 		outputGRU0
 	);
 
+    printGRUoutput(outputGRU0);
+/*
 	printf("---- 0 BACKWARD ----\n");
 	gru( // GRU_0_B
+		outputConv_float,
 		GRU_BACKWARD,
 		GRU_0__IN_COLS,
-		outputConv_float,
 		gru0b_kernel,	gru0b_bias,
 		gru0b_rkernel, 	gru0b_rbias,
 		outputGRU0
@@ -584,9 +654,9 @@ int main() {
 	printf("\n\n\n###################################### GRU_1 ######################################\n");
 	printf("---- 1 FORWARD ----\n");
 	gru( // GRU_1_F
+		outputGRU0,
 		GRU_FORWARD,
 		GRU_FILTERS*2,
-		outputGRU0,
 		gru1f_kernel,	gru1f_bias,
 		gru1f_rkernel,	gru1f_rbias,
 		outputGRU1
@@ -594,9 +664,9 @@ int main() {
 
 	printf("---- 1 BACKWARD ----\n");
 	gru( // GRU_1_B
+		outputGRU0,
 		GRU_BACKWARD,
 		GRU_FILTERS*2,
-		outputGRU0,
 		gru1b_kernel,  	gru1b_bias,
 		gru1b_rkernel, 	gru1b_rbias,
 		outputGRU1
@@ -654,7 +724,6 @@ int main() {
 
     printf("GS = %f\n", outputGS[0]);
 
-
 #ifdef VALIDATE_OUTPUT
     printf("\n\n\n#### #### #### ####\n");
 #define BREAK_AFTER 8
@@ -663,6 +732,8 @@ int main() {
     compareStats("Stats LS: (actual | difference | expected)\n", outputLS, output_expect_LS, IHEIGHT, BREAK_AFTER);
     compareStats("Stats GS: (actual | difference | expected)\n", outputGS, output_expect_GS, 1, BREAK_AFTER);
 #endif
+*/
+
 #else
 	/*
 	in, k, b,

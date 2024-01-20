@@ -5,9 +5,18 @@
 
 
 #define BUS_WIDTH 64
+
+/* CONV */
 #define W_BIT_WIDTH 4			// 16
 #define I_BIT_WIDTH 4			// 16 but TensorFlow uses float/double, so maybe 32 or 64?
 #define BIAS_SIZE 16
+
+/* GRU */
+#define G_IN_W_BIT_WIDTH 8
+#define G_IN_I_BIT_WIDTH 1
+#define G_WG_W_BIT_WIDTH 8
+#define G_WG_I_BIT_WIDTH 1
+
 
 #define PACKET_CNN   16			// number of weights inside each transfer of axis in CNN, conv
 #define PACKET_GRU   8			// number of weights inside each transfer of axis in GRU
