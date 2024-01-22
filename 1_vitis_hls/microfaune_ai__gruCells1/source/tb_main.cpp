@@ -34,7 +34,7 @@ void gru(
 	int isForward,
 	int kernelCols,
 	int kernelSize,
-	gru_t* output
+	gru_omap_t* output
 );
 
 imap_t input_0[IHEIGHT*IWIDTH/PACKET_CNN];
@@ -42,19 +42,21 @@ imap_t input_1[IHEIGHT*IWIDTH*CHANNELS/PACKET_CNN];
 imap_t input_2[IHEIGHT*IWIDTH_1*CHANNELS/PACKET_CNN];
 imap_t input_3[IHEIGHT*IWIDTH_1*CHANNELS/PACKET_CNN];
 imap_t input_4[IHEIGHT*IWIDTH_2*CHANNELS/PACKET_CNN];
-gru_t input_gru[IHEIGHT*FILTERS];
+float input_gru[IHEIGHT*FILTERS];
 
-gru_t outputConv_float[IHEIGHT*FILTERS];
-gru_t outputGRU0[IHEIGHT*(FILTERS*2)];
-gru_t outputGRU1[IHEIGHT*(FILTERS*2)];
+float outputConv_float[IHEIGHT*FILTERS];
+gru_imap_t outputConv_converted[IHEIGHT*FILTERS];
+gru_omap_t outputGRU0[IHEIGHT*(GRU_FILTERS*2)];
+gru_omap_t outputGRU1[IHEIGHT*(GRU_FILTERS*2)];
+float outputGRU1_float[IHEIGHT*(GRU_FILTERS*2)];
 
 float outputTD0[IHEIGHT*FILTERS];
 float outputLS[IHEIGHT];
 float outputGS[1];
 
 /* output expected validation */
-gru_t output_expect_GRU0[IHEIGHT*(FILTERS*2)];
-gru_t output_expect_GRU1[IHEIGHT*(FILTERS*2)];
+float output_expect_GRU0[IHEIGHT*(GRU_FILTERS*2)];
+float output_expect_GRU1[IHEIGHT*(GRU_FILTERS*2)];
 float output_expect_LS[IHEIGHT];
 float output_expect_GS[1];
 
@@ -84,26 +86,27 @@ weigth_t kernel_5_scale[CHANNELS/PACKET_CNN];
 bias_t bias_5[CHANNELS];
 
 
-gru_weigth_t gru0f_kernel[GRU0F_KERNEL_SIZE];
+gru_weigth_t gru0f_kernel[GRU0_KERNEL_SIZE];
 gru_weigth_t gru0f_rkernel[GRU_RKERNEL_SIZE];
 gru_weigth_t gru0f_bias[GRU_BIAS_SIZE];
 gru_weigth_t gru0f_rbias[GRU_BIAS_SIZE];
 
-gru_t gru0b_kernel[GRU_IN_COLS*GRU_SPLIT_SIZE*GRU_FILTERS];
-gru_t gru0b_rkernel[GRU_FILTERS*GRU_SPLIT_SIZE*GRU_FILTERS];
-gru_t gru0b_bias[GRU_BIAS_SIZE];
-gru_t gru0b_rbias[GRU_BIAS_SIZE];
+gru_weigth_t gru0b_kernel[GRU0_KERNEL_SIZE];
+gru_weigth_t gru0b_rkernel[GRU_RKERNEL_SIZE];
+gru_weigth_t gru0b_bias[GRU_BIAS_SIZE];
+gru_weigth_t gru0b_rbias[GRU_BIAS_SIZE];
 
 
-gru_t gru1f_kernel[(GRU_FILTERS*2)*GRU_SPLIT_SIZE*GRU_FILTERS];
-gru_t gru1f_rkernel[GRU_FILTERS*GRU_SPLIT_SIZE*GRU_FILTERS];
-gru_t gru1f_bias[GRU_BIAS_SIZE];
-gru_t gru1f_rbias[GRU_BIAS_SIZE];
+gru_weigth_t gru1f_kernel[GRU1_KERNEL_SIZE];
+gru_weigth_t gru1f_rkernel[GRU_RKERNEL_SIZE];
+gru_weigth_t gru1f_bias[GRU_BIAS_SIZE];
+gru_weigth_t gru1f_rbias[GRU_BIAS_SIZE];
 
-gru_t gru1b_kernel[(GRU_FILTERS*2)*GRU_SPLIT_SIZE*GRU_FILTERS];
-gru_t gru1b_rkernel[GRU_FILTERS*GRU_SPLIT_SIZE*GRU_FILTERS];
-gru_t gru1b_bias[GRU_BIAS_SIZE];
-gru_t gru1b_rbias[GRU_BIAS_SIZE];
+gru_weigth_t gru1b_kernel[GRU1_KERNEL_SIZE];
+gru_weigth_t gru1b_rkernel[GRU_RKERNEL_SIZE];
+gru_weigth_t gru1b_bias[GRU_BIAS_SIZE];
+gru_weigth_t gru1b_rbias[GRU_BIAS_SIZE];
+
 
 float td0_kernel[FILTERS*(FILTERS*2)];
 float td0_bias[FILTERS];
@@ -264,6 +267,11 @@ void writeWeigthGRU(gru_weigth_t* weigth, size_t size) {
     }
 }
 void conv2gru() {
+    /*
+     * Currently this function saves the output of last CONV to an array.
+     * To send the output to GRU, writeInputNextGRU function should be used.
+     */
+
 	int i = 0;
 	in_pkt tmp;     // to send to next layer
 	out_pkt tmpo;   // to receive from prev layer
@@ -320,43 +328,6 @@ void conv2gru() {
         */
 		tmpo = str_out.read();
 
-#ifdef DEBUG_CONV2GRU
-        /* DEBUG PRINTS */
-        // received
-        int out0 = (int)tmpo.data.range(3,0);	outputF out0F; out0F.range(3,0) = tmpo.data.range(3,0);
-        int out1 = (int)tmpo.data.range(7,4);	outputF out1F; out1F.range(3,0) = tmpo.data.range(7,4);
-        int out2 = (int)tmpo.data.range(11,8);  outputF out2F; out2F.range(3,0) = tmpo.data.range(11,8);
-        int out3 = (int)tmpo.data.range(15,12); outputF out3F; out3F.range(3,0) = tmpo.data.range(15,12);
-
-        int out4 = (int)tmpo.data.range(19,16); outputF out4F; out4F.range(3,0) = tmpo.data.range(19,16);
-        int out5 = (int)tmpo.data.range(23,20); outputF out5F; out5F.range(3,0) = tmpo.data.range(23,20);
-        int out6 = (int)tmpo.data.range(27,24); outputF out6F; out6F.range(3,0) = tmpo.data.range(27,24);
-        int out7 = (int)tmpo.data.range(31,28); outputF out7F; out7F.range(3,0) = tmpo.data.range(31,28);
-
-        int out8 = (int)tmpo.data.range(35,32); outputF out8F; out8F.range(3,0) = tmpo.data.range(35,32);
-        int out9 = (int)tmpo.data.range(39,36); outputF out9F; out9F.range(3,0) = tmpo.data.range(39,36);
-        int outA = (int)tmpo.data.range(43,40); outputF outAF; outAF.range(3,0) = tmpo.data.range(43,40);
-        int outB = (int)tmpo.data.range(47,44); outputF outBF; outBF.range(3,0) = tmpo.data.range(47,44);
-
-        int outC = (int)tmpo.data.range(51,48); outputF outCF; outCF.range(3,0) = tmpo.data.range(51,48);
-        int outD = (int)tmpo.data.range(55,52); outputF outDF; outDF.range(3,0) = tmpo.data.range(55,52);
-        int outE = (int)tmpo.data.range(59,56); outputF outEF; outEF.range(3,0) = tmpo.data.range(59,56);
-        int outF = (int)tmpo.data.range(63,60); outputF outFF; outFF.range(3,0) = tmpo.data.range(63,60);
-        
-        printf("%02d - result %2d, %2d, %2d, %2d,   %2d, %2d, %2d, %2d,   %2d, %2d, %2d, %2d,   %2d, %2d, %2d, %2d   "
-                "|   %f, %f, %f, %f,   %f, %f, %f, %f,   %f, %f, %f, %f,   %f, %f, %f, %f\n", i,
-                out0, out1, out2, out3,
-                out4, out5, out6, out7,
-                out8, out9, outA, outB,
-                outC, outD, outE, outF,
-                (float)out0F, (float)out1F, (float)out2F, (float)out3F,
-                (float)out4F, (float)out5F, (float)out6F, (float)out7F,
-                (float)out8F, (float)out9F, (float)outAF, (float)outBF,
-                (float)outCF, (float)outDF, (float)outEF, (float)outFF
-        );
-        /* END DEBUG PRINTS */
-#endif
-
         int out_offset = 64/2;   // because PACKET_CNN == 16, PACKET_GRU == 8, and that means 2 reads must be made for the convertion
         int out_databits = 64/PACKET_CNN;
         int in_databits = 64/PACKET_GRU;
@@ -376,46 +347,75 @@ void conv2gru() {
                 tmp.data.range(endPad, startPad)  = (int)0;
                 tmp.data.range(endData,startData) = (int)tmpo.data.range(endOutData,startOutData);
                 tmp.data.range(endSign,startSign) = (int)0;
+
+                outputConv_converted[i++].range(7,0) = tmp.data.range(endSign,startPad);
             }
-
-            if (section == 0) {
-                tmp.last = (ap_int<1>)0;
-                str_in.write(tmp);
-            }
-            else {
-                if (!str_out.empty())
-                    tmp.last = (ap_int<1>)0;
-                else
-                    tmp.last = (ap_int<1>)1;
-                str_in.write(tmp);
-            }
-
-#ifdef DEBUG_CONV2GRU
-            /* DEBUG PRINTS */
-            // sending
-            int in0 = (int)tmp.data.range(7,0);   inputF in0F; in0F.range(7,0) = tmp.data.range(7,0);
-            int in1 = (int)tmp.data.range(15,8);  inputF in1F; in1F.range(7,0) = tmp.data.range(15,8);
-            int in2 = (int)tmp.data.range(23,16); inputF in2F; in2F.range(7,0) = tmp.data.range(23,16);
-            int in3 = (int)tmp.data.range(31,24); inputF in3F; in3F.range(7,0) = tmp.data.range(31,24);
-
-            int in4 = (int)tmp.data.range(39,32); inputF in4F; in4F.range(7,0) = tmp.data.range(39,32);
-            int in5 = (int)tmp.data.range(47,40); inputF in5F; in5F.range(7,0) = tmp.data.range(47,40);
-            int in6 = (int)tmp.data.range(55,48); inputF in6F; in6F.range(7,0) = tmp.data.range(55,48);
-            int in7 = (int)tmp.data.range(63,56); inputF in7F; in7F.range(7,0) = tmp.data.range(63,56);
-
-            printf("%02d - [sending %01d] %2d, %2d, %2d, %2d,   %2d, %2d, %2d, %2d   |   %f, %f, %f, %f,   %f, %f, %f, %f\n", i, section,
-                    in0, in1, in2, in3,
-                    in4, in5, in6, in7,
-                    (float)in0F, (float)in1F, (float)in2F, (float)in3F,
-                    (float)in4F, (float)in5F, (float)in6F, (float)in7F
-            );
-            /* END DEBUG PRINTS */
-#endif
         }
-#ifdef DEBUG_CONV2GRU
-        ++i;    // used in DEBUG PRINTS
-#endif
 	}
+}
+void writeInputNextGRU(gru_omap_t* outputGRU, int nCols, int isForward, int isGRU1=0) {
+    /* This function send the input in 2 ways:
+     * Lets say we have a 2D array 3*3.
+     * If isForward == 1, the array is sent LEFT to RIGHT, TOP to BOTTOM.
+     * (numbers in the following array are the send order)
+     * [
+     *  [1 2 3]
+     *  [4 5 6]
+     *  [7 8 9]
+     * ]
+     * If isForward == 0, the array is sent LEFT to RIGHT, BOTTOM to TOP.
+     * (numbers in the following array are the send order)
+     * [
+     *  [7 8 9]
+     *  [4 5 6]
+     *  [1 2 3]
+     * ]
+     * 
+     * NOTE:
+     * - THIS FUNCTION WAS ONLY TESTED AND WORKING FOR 64 AND 2 COLUMNS.
+     */
+	in_pkt tmp;     // to send to next layer
+
+    int idx;
+    for (int i = 0; i < IHEIGHT; ++i) {
+        // Calculate the LINE based on the direction
+        if (isForward) {
+            idx = i * nCols;
+        } else {
+            idx = (IHEIGHT - 1 - i) * nCols;
+        }
+
+        // Iterate over COLS
+        for (int j = 0; j < nCols; ) {            
+            for (int subOffset = 0; subOffset < 64/PACKET_GRU; ++subOffset) {
+                int dataBits = 8;
+                int startData = 0;                  int endData = dataBits-1;
+                startData += dataBits * subOffset;  endData += dataBits * subOffset;
+                if (!isGRU1) {
+                    tmp.data.range(endData,startData) = outputGRU[idx + j].range(7,0);
+                }
+                else {
+                    if (startData < (8*2)) {
+                        /* Why the wierd (8*2) ?
+                        * - GRU_1 will read lines with only 2 columns.
+                        * - But we are sending 8 values, so the last 6 value must be used as padding with 0.
+                        * - This simplifies the GRU_1 "READ_INIT_MAP" loop for now.
+                        * - Super unefficient, so a solution to this mess must be found.
+                        */
+                        tmp.data.range(endData,startData) = outputGRU[idx + j].range(7,0);
+                    }
+                    else
+                        tmp.data.range(endData,startData) = 0;
+                }
+                ++j;
+            }
+            if (i<IHEIGHT-1)
+                tmp.last = (ap_int<1>)0;
+            else
+                tmp.last = (ap_int<1>)1;
+            str_in.write(tmp);
+        }
+    }
 }
 void conv2gru_float() {
 	int i = 0;
@@ -476,17 +476,23 @@ void conv2gru_float() {
         outputConv_float[i++] = (float)outFF;
     }
 }
-void printGRUoutput(gru_t* output) {
+void printGRUoutput(gru_omap_t* output) {
 	#define OUT_WIDTH_GRU (GRU_FILTERS*2)
 	for (int i=0; i<IHEIGHT; ++i) {
 		printf("[%3d] - ", i);
 		for (int j=0; j<OUT_WIDTH_GRU; ++j) {
-			printf("%10f ", output[(i*OUT_WIDTH_GRU)+j]);
+			printf("%10f ", output[(i*OUT_WIDTH_GRU)+j].to_float());
 		}
 		printf("\n");
     }
 }
 
+void gru2td() {
+    printf(" --- gru2td ---\n");
+    for (int i=0; i<IHEIGHT*(GRU_FILTERS*2); ++i) {
+        outputGRU1_float[i] = outputGRU1[i].to_float();
+    }
+}
 
 // INFO: Currently this method can only compare float arrays!
 void compareStats(char* msg, float* actual, float* expected, int size, int breakAfter) {
@@ -502,8 +508,29 @@ void compareStats(char* msg, float* actual, float* expected, int size, int break
 
 		if (i<breakAfter)
 			printf("%12f | %12f | %12f\n", vActual, change, vExpected);
-		else
+		else {
+            printf("     ...     |      ...     |      ...\n");
 			break;
+        }
+	}
+}
+void compareStats_APF(char* msg, gru_omap_t* actual, float* expected, int size, int breakAfter) {
+	printf(msg);
+	gru_omap_t* pActual = actual;
+	float* pExpected = expected;
+	for (int i=0; i<size; ++i) {
+		gru_omap_t vActual = *pActual;
+		float vExpected = *pExpected;
+		float change = vExpected - vActual.to_float();
+		++pActual;
+		++pExpected;
+
+		if (i<breakAfter)
+			printf("%12f | %12f | %12f\n", vActual.to_float(), change, vExpected);
+		else {
+            printf("     ...     |      ...     |      ...\n");
+			break;
+        }
 	}
 }
 
@@ -517,6 +544,7 @@ int main() {
 		output_expect_LS,
 		output_expect_GS
 	);
+    
     loadWeights(
 		kernel_0, kernel_0_scale, bias_0,
 		kernel_1, kernel_1_scale, bias_1,
@@ -621,71 +649,86 @@ int main() {
 
 #endif	// !DO_CONV
 
+    conv2gru();
+    /*
+    for (int i=0; i<431*64; ++i) {
+        printf("[%d] = %f", i, outputConv_converted[i].to_float());
+        printf("  ---  {%d}-> %f\n", i, outputConv_float[i]);
+    }
+    */
+
 	printf("###################################### GRU_0 ######################################\n");
 	printf("---- 0 FORWARD ----\n");
-    writeWeigthGRU(gru0f_kernel, GRU0F_KERNEL_SIZE);
+    writeWeigthGRU(gru0f_kernel, GRU0_KERNEL_SIZE);
     writeWeigthGRU(gru0f_bias, GRU_BIAS_SIZE);
     writeWeigthGRU(gru0f_rkernel, GRU_RKERNEL_SIZE);
     writeWeigthGRU(gru0f_rbias, GRU_BIAS_SIZE);
-    conv2gru();
+    writeInputNextGRU(outputConv_converted, FILTERS, GRU_FORWARD);
 	gru( // GRU_0_F
 		str_in,
 		GRU_FORWARD,
 		GRU_0__IN_COLS,
-        GRU0F_KERNEL_SIZE,
+        GRU0_KERNEL_SIZE,
 		outputGRU0
 	);
-
     printGRUoutput(outputGRU0);
-/*
+
 	printf("---- 0 BACKWARD ----\n");
+    writeWeigthGRU(gru0b_kernel, GRU0_KERNEL_SIZE);
+    writeWeigthGRU(gru0b_bias, GRU_BIAS_SIZE);
+    writeWeigthGRU(gru0b_rkernel, GRU_RKERNEL_SIZE);
+    writeWeigthGRU(gru0b_rbias, GRU_BIAS_SIZE);
+    writeInputNextGRU(outputConv_converted, FILTERS, GRU_BACKWARD);     // send again same output of conv as input
 	gru( // GRU_0_B
-		outputConv_float,
+		str_in,
 		GRU_BACKWARD,
 		GRU_0__IN_COLS,
-		gru0b_kernel,	gru0b_bias,
-		gru0b_rkernel, 	gru0b_rbias,
+        GRU0_KERNEL_SIZE,
 		outputGRU0
 	);
-
 	printGRUoutput(outputGRU0);
-
 
 	printf("\n\n\n###################################### GRU_1 ######################################\n");
 	printf("---- 1 FORWARD ----\n");
+    writeWeigthGRU(gru1f_kernel, GRU1_KERNEL_SIZE);
+    writeWeigthGRU(gru1f_bias, GRU_BIAS_SIZE);
+    writeWeigthGRU(gru1f_rkernel, GRU_RKERNEL_SIZE);
+    writeWeigthGRU(gru1f_rbias, GRU_BIAS_SIZE);
+    writeInputNextGRU(outputGRU0, GRU_FILTERS*2, GRU_FORWARD, 1);
 	gru( // GRU_1_F
-		outputGRU0,
+		str_in,
 		GRU_FORWARD,
 		GRU_FILTERS*2,
-		gru1f_kernel,	gru1f_bias,
-		gru1f_rkernel,	gru1f_rbias,
+		GRU1_KERNEL_SIZE,
 		outputGRU1
 	);
-
+    
 	printf("---- 1 BACKWARD ----\n");
+    writeWeigthGRU(gru1b_kernel, GRU1_KERNEL_SIZE);
+    writeWeigthGRU(gru1b_bias, GRU_BIAS_SIZE);
+    writeWeigthGRU(gru1b_rkernel, GRU_RKERNEL_SIZE);
+    writeWeigthGRU(gru1b_rbias, GRU_BIAS_SIZE);
+    writeInputNextGRU(outputGRU0, GRU_FILTERS*2, GRU_BACKWARD, 1);
 	gru( // GRU_1_B
-		outputGRU0,
+		str_in,
 		GRU_BACKWARD,
 		GRU_FILTERS*2,
-		gru1b_kernel,  	gru1b_bias,
-		gru1b_rkernel, 	gru1b_rbias,
+		GRU1_KERNEL_SIZE,
 		outputGRU1
 	);
-
 	printGRUoutput(outputGRU1);
 
 
 
-	printf("\n\n\nINFO: When GRU is changed to AP_FIXED, do not forget to convert the output to float for TD and RMAX layers.\n");
-
-
+	printf("\n\n\n");
+	gru2td();
 
 	printf("\n\n\n###################################### TD_0 ######################################\n");
     timedistributed_dense( // TDIST_0 + Dense
     	GRU_FILTERS*2,
         FILTERS, GRU_FILTERS*2,
         TD_0__OUT_COLS,
-		outputGRU1,
+		outputGRU1_float,
 		td0_kernel,
 		td0_bias,
         outputTD0
@@ -727,12 +770,11 @@ int main() {
 #ifdef VALIDATE_OUTPUT
     printf("\n\n\n#### #### #### ####\n");
 #define BREAK_AFTER 8
-    compareStats("Stats GRU_0: (actual | difference | expected)\n", outputGRU0, output_expect_GRU0, IHEIGHT*(GRU_FILTERS*2), BREAK_AFTER);
-    compareStats("Stats GRU_1: (actual | difference | expected)\n", outputGRU1, output_expect_GRU1, IHEIGHT*(GRU_FILTERS*2), BREAK_AFTER);
+    compareStats_APF("Stats GRU_0: (actual | difference | expected)\n", outputGRU0, output_expect_GRU0, IHEIGHT*(GRU_FILTERS*2), BREAK_AFTER);
+    compareStats_APF("Stats GRU_1: (actual | difference | expected)\n", outputGRU1, output_expect_GRU1, IHEIGHT*(GRU_FILTERS*2), BREAK_AFTER);
     compareStats("Stats LS: (actual | difference | expected)\n", outputLS, output_expect_LS, IHEIGHT, BREAK_AFTER);
     compareStats("Stats GS: (actual | difference | expected)\n", outputGS, output_expect_GS, 1, BREAK_AFTER);
 #endif
-*/
 
 #else
 	/*

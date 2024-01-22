@@ -14,12 +14,6 @@ typedef ap_axis<64, 0, 0, 0> in_pkt;
 typedef ap_axis<64, 0, 0, 0> out_pkt;
 
 
-/* GRU internal types */
-#define I_MXB 4     // max bits used on average for matrix_x array
-typedef ap_fixed<G_IN_W_BIT_WIDTH,G_IN_I_BIT_WIDTH> gru_imap_t;
-typedef ap_fixed<I_MXB+G_IN_W_BIT_WIDTH+G_WG_W_BIT_WIDTH, I_MXB> gru_matrix_t;
-typedef ap_fixed<G_IN_W_BIT_WIDTH,G_IN_I_BIT_WIDTH> gru_omap_t;
-
 gru_imap_t input[GRU_IN_MAX_COLS];
 gru_weigth_t kernel[GRU_IN_COLS*GRU_SPLIT_SIZE*GRU_FILTERS];
 gru_weigth_t bias[GRU_BIAS_SIZE];
@@ -199,7 +193,7 @@ void gru_cell(
     const gru_imap_t* input,
     const gru_weigth_t* kernel,    	        const gru_weigth_t* bias,
     const gru_weigth_t* recurrent_kernel,   const gru_weigth_t* recurrent_bias,
-	gru_t* output
+	gru_omap_t* output
 ) {
 #ifdef DEBUG_GRU
 	printf("#### STEP START ####\n");
@@ -217,6 +211,7 @@ void gru_cell(
             gru_imap_t iVal = *(input + j);
             gru_weigth_t kVal = *((gru_weigth_t*)kernel + pkernel_offset_row + j);
             matrix_x[i] += iVal * kVal;
+            //printf("ival = %f, kval = %f\n", iVal.to_float(), kVal.to_float());
         }
     }
 #ifdef DEBUG_GRU
@@ -252,22 +247,22 @@ void gru_cell(
     printf("matrix_inner (bias_add) = [%f, %f, %f]\n", matrix_inner[0].to_float(), matrix_inner[1].to_float(), matrix_inner[2].to_float());
 #endif
 
-    gru_t z = Q_Z((gru_t)SIGMOID(Q_ZSIG_CALC(matrix_x[0].to_float() + matrix_inner[0].to_float())));
-    gru_t r = Q_R((gru_t)SIGMOID(Q_RSIG_CALC(matrix_x[1].to_float() + matrix_inner[1].to_float())));
-    gru_t hh = Q_HH((gru_t)TANH(Q_HHTANH_CALC(matrix_x[2].to_float() + (r * matrix_inner[2].to_float()))));
+    gru_sigmoid_t z = SIGMOID(matrix_x[0] + matrix_inner[0]);
+    gru_sigmoid_t r = SIGMOID(matrix_x[1] + matrix_inner[1]);
+    gru_tanh_t hh   = TANH(matrix_x[2] + (r * matrix_inner[2]));
 
 #ifdef DEBUG_GRU
-    printf("z = %f\n", z);
-    printf("r = %f\n", r);
-    printf("hh = %f\n", hh);
+    printf("z = %f\n", z.to_float());
+    printf("r = %f\n", r.to_float());
+    printf("hh = %f\n", hh.to_float());
 #endif
 
-    gru_t out = Q_OUT(((Q_ZSTATE_CALC(z * state[0][idx].to_float())) + Q_ZHH_CALC(((1 - z) * hh))));
+    gru_omap_t out = (z * state[0][idx]) + ((1 - z) * hh);
 
     state[1][idx] = out;
     *output = out;
 #ifdef DEBUG_GRU
-    printf("h = %f\n", out);
+    printf("h = %f\n", out.to_float());
     printf("#### STEP END ####\n\n");
 #endif
 }
@@ -294,10 +289,13 @@ void gru(
     int isForward,
     int kernelCols,
 	int kernelSize,
-	gru_t* output
+	gru_omap_t* output
 ) {
 #pragma HLS INTERFACE ap_ctrl_none port=return
 #pragma HLS INTERFACE axis port=strm_in
+
+#pragma HLS ARRAY_PARTITION variable=kernel type=cyclic factor=4
+
     gru_clearState();
     int row;
     int offset;
@@ -351,7 +349,8 @@ void gru(
 
         	//gru_t* input_row = input + (row * kernelCols);	/*inSize*/
             READ_INIT_MAP: for (int in = 0; in < GRU_IN_MAX_COLS; ) {
-                // TODO: break at gru_1, because input is smaller
+                if (in >= kernelCols)
+                    break;
 
                 tmp = strm_in.read();
                 input[in++].range(7,0) = (int)tmp.data.range(7,0);
@@ -365,7 +364,8 @@ void gru(
                 input[in++].range(7,0) = (int)tmp.data.range(63,56);
             }
 
-        	gru_t* output_cell = output + (row * (GRU_FILTERS*2)) + (idx + offset);
+            //printf("ROW = %d\n", row);
+        	gru_omap_t* output_cell = output + (row * (GRU_FILTERS*2)) + (idx + offset);
             gru_cell(idx, kernelCols, input, kernel, bias, rkernel, rbias, output_cell);
         }
         // exit contidions and inc/dec iteration

@@ -668,10 +668,9 @@ for layer in model.layers:
         processLayer(layerName, layerName+"_gru_forward_kernel", weight[0], k_rk_b_rb_data_type)
         processLayer(layerName, layerName+"_gru_forward_recurrent_kernel", weight[1], k_rk_b_rb_data_type)
         processLayer(layerName, layerName+"_gru_forward_bias", weight[2], k_rk_b_rb_data_type)
-        
-        processLayer(layerName, layerName+"_gru_backward_kernel", weight[3], float_data_type)
-        processLayer(layerName, layerName+"_gru_backward_recurrent_kernel", weight[4], float_data_type)
-        processLayer(layerName, layerName+"_gru_backward_bias", weight[5], float_data_type)
+        processLayer(layerName, layerName+"_gru_backward_kernel", weight[3], k_rk_b_rb_data_type)
+        processLayer(layerName, layerName+"_gru_backward_recurrent_kernel", weight[4], k_rk_b_rb_data_type)
+        processLayer(layerName, layerName+"_gru_backward_bias", weight[5], k_rk_b_rb_data_type)
     if "time_distributed" in layerName:
         processLayer(layerName, layerName+"_kernel", weight[0], float_data_type)
         processLayer(layerName, layerName+"_bias", weight[1], float_data_type)

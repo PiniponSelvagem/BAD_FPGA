@@ -222,8 +222,8 @@ void loadIO(
 ) {
 	load(INPUT, input, IHEIGHT*IWIDTH/PACKET_CNN, sizeof(imap_t));
 	load(OUTPUT_CONV, outputConv, IHEIGHT*FILTERS, sizeof(float));
-	load(OUTPUT_GRU0, outputGRU0, IHEIGHT*(FILTERS*2), sizeof(float));
-	load(OUTPUT_GRU1, outputGRU1, IHEIGHT*(FILTERS*2), sizeof(float));
+	load(OUTPUT_GRU0, outputGRU0, IHEIGHT*(GRU_FILTERS*2), sizeof(float));
+	load(OUTPUT_GRU1, outputGRU1, IHEIGHT*(GRU_FILTERS*2), sizeof(float));
 	load(OUTPUT_LS, outputLS, IHEIGHT, sizeof(float));
 	load(OUTPUT_GS, outputGS, 1, sizeof(float));
 }
@@ -236,9 +236,9 @@ void loadWeights(
 	weigth_t* kernel_4, weigth_t* kernel_4_scale, bias_t* bias_4,
 	weigth_t* kernel_5, weigth_t* kernel_5_scale, bias_t* bias_5,
 	gru_weigth_t* gru0f_kernel, gru_weigth_t* gru0f_rkernel, gru_weigth_t* gru0f_bias, gru_weigth_t* gru0f_rbias,
-	gru_t* gru0b_kernel, gru_t* gru0b_rkernel, gru_t* gru0b_bias, gru_t* gru0b_rbias,
-	gru_t* gru1f_kernel, gru_t* gru1f_rkernel, gru_t* gru1f_bias, gru_t* gru1f_rbias,
-	gru_t* gru1b_kernel, gru_t* gru1b_rkernel, gru_t* gru1b_bias, gru_t* gru1b_rbias,
+	gru_weigth_t* gru0b_kernel, gru_weigth_t* gru0b_rkernel, gru_weigth_t* gru0b_bias, gru_weigth_t* gru0b_rbias,
+	gru_weigth_t* gru1f_kernel, gru_weigth_t* gru1f_rkernel, gru_weigth_t* gru1f_bias, gru_weigth_t* gru1f_rbias,
+	gru_weigth_t* gru1b_kernel, gru_weigth_t* gru1b_rkernel, gru_weigth_t* gru1b_bias, gru_weigth_t* gru1b_rbias,
 	float* td0_kernel, float* td0_bias,
 	float* td1_kernel, float* td1_bias
 ) {
@@ -278,21 +278,21 @@ void loadWeights(
     load(GRU_0_FORWARD_BIAS, gru0f_bias, GRU_FILTERS*GRU_SPLIT_SIZE, sizeof(G_WG_W_BIT_WIDTH));
     load(GRU_0_FORWARD_RECURRENT_BIAS, gru0f_rbias, GRU_FILTERS*GRU_SPLIT_SIZE, sizeof(G_WG_W_BIT_WIDTH));
     // gru_0_backward
-    load(GRU_0_BACKWARD_KERNEL, gru0b_kernel, GRU_FILTERS*CHANNELS*GRU_SPLIT_SIZE, sizeof(gru_t));
-    load(GRU_0_BACKWARD_RECURRENT_KERNEL, gru0b_rkernel, GRU_FILTERS*GRU_FILTERS*GRU_SPLIT_SIZE, sizeof(gru_t));
-    load(GRU_0_BACKWARD_BIAS, gru0b_bias, GRU_FILTERS*GRU_SPLIT_SIZE, sizeof(gru_t));
-    load(GRU_0_BACKWARD_RECURRENT_BIAS, gru0b_rbias, GRU_FILTERS*GRU_SPLIT_SIZE, sizeof(gru_t));
+    load(GRU_0_BACKWARD_KERNEL, gru0b_kernel, GRU_FILTERS*CHANNELS*GRU_SPLIT_SIZE, sizeof(G_WG_W_BIT_WIDTH));
+    load(GRU_0_BACKWARD_RECURRENT_KERNEL, gru0b_rkernel, GRU_FILTERS*GRU_FILTERS*GRU_SPLIT_SIZE, sizeof(G_WG_W_BIT_WIDTH));
+    load(GRU_0_BACKWARD_BIAS, gru0b_bias, GRU_FILTERS*GRU_SPLIT_SIZE, sizeof(G_WG_W_BIT_WIDTH));
+    load(GRU_0_BACKWARD_RECURRENT_BIAS, gru0b_rbias, GRU_FILTERS*GRU_SPLIT_SIZE, sizeof(G_WG_W_BIT_WIDTH));
 
 	// gru_1_forward
-	load(GRU_1_FORWARD_KERNEL, gru1f_kernel, (GRU_FILTERS*2)*GRU_FILTERS*GRU_SPLIT_SIZE, sizeof(gru_t));
-	load(GRU_1_FORWARD_RECURRENT_KERNEL, gru1f_rkernel, GRU_FILTERS*GRU_FILTERS*GRU_SPLIT_SIZE, sizeof(gru_t));
-	load(GRU_1_FORWARD_BIAS, gru1f_bias, GRU_FILTERS*GRU_SPLIT_SIZE, sizeof(gru_t));
-	load(GRU_1_FORWARD_RECURRENT_BIAS, gru1f_rbias, GRU_FILTERS*GRU_SPLIT_SIZE, sizeof(gru_t));
+	load(GRU_1_FORWARD_KERNEL, gru1f_kernel, (GRU_FILTERS*2)*GRU_FILTERS*GRU_SPLIT_SIZE, sizeof(G_WG_W_BIT_WIDTH));
+	load(GRU_1_FORWARD_RECURRENT_KERNEL, gru1f_rkernel, GRU_FILTERS*GRU_FILTERS*GRU_SPLIT_SIZE, sizeof(G_WG_W_BIT_WIDTH));
+	load(GRU_1_FORWARD_BIAS, gru1f_bias, GRU_FILTERS*GRU_SPLIT_SIZE, sizeof(G_WG_W_BIT_WIDTH));
+	load(GRU_1_FORWARD_RECURRENT_BIAS, gru1f_rbias, GRU_FILTERS*GRU_SPLIT_SIZE, sizeof(G_WG_W_BIT_WIDTH));
 	// gru_1_backward
-	load(GRU_1_BACKWARD_KERNEL, gru1b_kernel, (GRU_FILTERS*2)*GRU_FILTERS*GRU_SPLIT_SIZE, sizeof(gru_t));
-	load(GRU_1_BACKWARD_RECURRENT_KERNEL, gru1b_rkernel, GRU_FILTERS*GRU_FILTERS*GRU_SPLIT_SIZE, sizeof(gru_t));
-	load(GRU_1_BACKWARD_BIAS, gru1b_bias, GRU_FILTERS*GRU_SPLIT_SIZE, sizeof(gru_t));
-	load(GRU_1_BACKWARD_RECURRENT_BIAS, gru1b_rbias, GRU_FILTERS*GRU_SPLIT_SIZE, sizeof(gru_t));
+	load(GRU_1_BACKWARD_KERNEL, gru1b_kernel, (GRU_FILTERS*2)*GRU_FILTERS*GRU_SPLIT_SIZE, sizeof(G_WG_W_BIT_WIDTH));
+	load(GRU_1_BACKWARD_RECURRENT_KERNEL, gru1b_rkernel, GRU_FILTERS*GRU_FILTERS*GRU_SPLIT_SIZE, sizeof(G_WG_W_BIT_WIDTH));
+	load(GRU_1_BACKWARD_BIAS, gru1b_bias, GRU_FILTERS*GRU_SPLIT_SIZE, sizeof(G_WG_W_BIT_WIDTH));
+	load(GRU_1_BACKWARD_RECURRENT_BIAS, gru1b_rbias, GRU_FILTERS*GRU_SPLIT_SIZE, sizeof(G_WG_W_BIT_WIDTH));
 
     // timedist_0
     load(TDIST_0_KERNEL, td0_kernel, (FILTERS*2)*FILTERS, sizeof(float));

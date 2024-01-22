@@ -1,6 +1,7 @@
 #ifndef UTILS_H
 #define UTILS_H
 
+#include "types.h"
 
 #include <math.h>
 
@@ -20,12 +21,14 @@ float inline sigmoid(float n) {
 #define W_SIG 8
 #define I_SIG 0
 #define SIG_TABLE_SIZE 256
-extern float sigmoidTable[SIG_TABLE_SIZE];
-#define SIG_startValue  -6.3
-#define SIG_endValue     5.2
+extern gru_sigmoid_t sigmoidTable[SIG_TABLE_SIZE];
+#define SIG_startValue_F    -6.3
+#define SIG_endValue_F      5.2
+#define SIG_startValue      gru_matrix_t(SIG_startValue_F)
+#define SIG_endValue        gru_matrix_t(SIG_endValue_F)
 float zsigmoid(float x);
 void loadSigmoidTable();
-float sigmoid_table(float value);
+gru_sigmoid_t sigmoid_table(gru_matrix_t value);
 
 
 
@@ -53,17 +56,26 @@ static inline float tanh_table_qkeras(float input) {
 #define W_TANH 8
 #define I_TANH 1
 #define TANH_TABLE_SIZE 256
-extern float tanhTable[TANH_TABLE_SIZE];
-#define TANH_startValue  -2.6
-#define TANH_endValue     2.6
+extern gru_tanh_t tanhTable[TANH_TABLE_SIZE];
+#define TANH_startValue_F   -2.6
+#define TANH_endValue_F     2.6
+#define TANH_startValue     gru_matrix_t(TANH_startValue_F)
+#define TANH_endValue       gru_matrix_t(TANH_endValue_F)
 float ztanh(float x);
 void loadTanhTable();
-float tanh_table(float value);
+gru_tanh_t tanh_table(gru_matrix_t value);
 
 
+
+#define UTILS_FLOAT
 
 #define SIGMOID_FLOAT(x)    sigmoid((float)(x))
-#define SIGMOID(x)          sigmoid_table((float)(x))	//sigmoid((float)(x))
-#define TANH(x)             tanh_table((float)(x))      //tanh((float)(x)) //tanh_table_qkeras((float)(x))
+#ifdef UTILS_FLOAT
+#define SIGMOID(x)          gru_sigmoid_t(sigmoid((float)x.to_float()))
+#define TANH(x)             gru_tanh_t(tanh((float)x.to_float()))
+#else
+#define SIGMOID(x)          sigmoid_table(x)    //gru_sigmoid_t(sigmoid((float)x.to_float()))
+#define TANH(x)             tanh_table(x)       //gru_tanh_t(tanh((float)x.to_float()))
+#endif
 
 #endif // UTILS_H
