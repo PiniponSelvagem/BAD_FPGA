@@ -67,7 +67,7 @@ gru_tanh_t tanh_table(gru_matrix_t value);
 
 
 
-#define UTILS_FLOAT
+//#define UTILS_FLOAT
 
 #define SIGMOID_FLOAT(x)    sigmoid((float)(x))
 #ifdef UTILS_FLOAT

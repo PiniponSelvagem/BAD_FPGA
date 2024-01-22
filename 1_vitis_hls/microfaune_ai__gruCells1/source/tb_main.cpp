@@ -17,7 +17,7 @@
 
 //#define PRINT_STATS
 //#define DEBUG_CONV
-//#define DO_CONV
+#define DO_CONV
 #define VALIDATE_OUTPUT
 
 
@@ -417,65 +417,6 @@ void writeInputNextGRU(gru_omap_t* outputGRU, int nCols, int isForward, int isGR
         }
     }
 }
-void conv2gru_float() {
-	int i = 0;
-    out_pkt tmpo;
-	typedef ap_ufixed<4,0> outputF;
-    while (!str_out.empty()) {
-        tmpo = str_out.read();
-        int out0 = (int)tmpo.data.range(3,0);	outputF out0F; out0F.range(3,0) = tmpo.data.range(3,0);
-        int out1 = (int)tmpo.data.range(7,4);	outputF out1F; out1F.range(3,0) = tmpo.data.range(7,4);
-        int out2 = (int)tmpo.data.range(11,8);  outputF out2F; out2F.range(3,0) = tmpo.data.range(11,8);
-        int out3 = (int)tmpo.data.range(15,12); outputF out3F; out3F.range(3,0) = tmpo.data.range(15,12);
-
-        int out4 = (int)tmpo.data.range(19,16); outputF out4F; out4F.range(3,0) = tmpo.data.range(19,16);
-        int out5 = (int)tmpo.data.range(23,20); outputF out5F; out5F.range(3,0) = tmpo.data.range(23,20);
-        int out6 = (int)tmpo.data.range(27,24); outputF out6F; out6F.range(3,0) = tmpo.data.range(27,24);
-        int out7 = (int)tmpo.data.range(31,28); outputF out7F; out7F.range(3,0) = tmpo.data.range(31,28);
-
-        int out8 = (int)tmpo.data.range(35,32); outputF out8F; out8F.range(3,0) = tmpo.data.range(35,32);
-        int out9 = (int)tmpo.data.range(39,36); outputF out9F; out9F.range(3,0) = tmpo.data.range(39,36);
-        int outA = (int)tmpo.data.range(43,40); outputF outAF; outAF.range(3,0) = tmpo.data.range(43,40);
-        int outB = (int)tmpo.data.range(47,44); outputF outBF; outBF.range(3,0) = tmpo.data.range(47,44);
-
-        int outC = (int)tmpo.data.range(51,48); outputF outCF; outCF.range(3,0) = tmpo.data.range(51,48);
-        int outD = (int)tmpo.data.range(55,52); outputF outDF; outDF.range(3,0) = tmpo.data.range(55,52);
-        int outE = (int)tmpo.data.range(59,56); outputF outEF; outEF.range(3,0) = tmpo.data.range(59,56);
-        int outF = (int)tmpo.data.range(63,60); outputF outFF; outFF.range(3,0) = tmpo.data.range(63,60);
-
-        printf("%02d - result %2d, %2d, %2d, %2d,   %2d, %2d, %2d, %2d,   %2d, %2d, %2d, %2d,   %2d, %2d, %2d, %2d   "
-        		"|   %f, %f, %f, %f,   %f, %f, %f, %f,   %f, %f, %f, %f,   %f, %f, %f, %f\n", i,
-        		out0, out1, out2, out3,
-				out4, out5, out6, out7,
-				out8, out9, outA, outB,
-				outC, outD, outE, outF,
-				(float)out0F, (float)out1F, (float)out2F, (float)out3F,
-				(float)out4F, (float)out5F, (float)out6F, (float)out7F,
-				(float)out8F, (float)out9F, (float)outAF, (float)outBF,
-				(float)outCF, (float)outDF, (float)outEF, (float)outFF
-		);
-
-        outputConv_float[i++] = (float)out0F;
-        outputConv_float[i++] = (float)out1F;
-        outputConv_float[i++] = (float)out2F;
-        outputConv_float[i++] = (float)out3F;
-
-        outputConv_float[i++] = (float)out4F;
-        outputConv_float[i++] = (float)out5F;
-        outputConv_float[i++] = (float)out6F;
-        outputConv_float[i++] = (float)out7F;
-
-        outputConv_float[i++] = (float)out8F;
-        outputConv_float[i++] = (float)out9F;
-        outputConv_float[i++] = (float)outAF;
-        outputConv_float[i++] = (float)outBF;
-
-        outputConv_float[i++] = (float)outCF;
-        outputConv_float[i++] = (float)outDF;
-        outputConv_float[i++] = (float)outEF;
-        outputConv_float[i++] = (float)outFF;
-    }
-}
 void printGRUoutput(gru_omap_t* output) {
 	#define OUT_WIDTH_GRU (GRU_FILTERS*2)
 	for (int i=0; i<IHEIGHT; ++i) {
@@ -628,24 +569,6 @@ int main() {
 #ifdef DEBUG_CONV
     printLastLayerOutput();
 #endif
-
-    // Temporary method to convert from hardware to software data.
-    printf("---- conv2gru ----\n");
-    conv2gru_float();
-    
-#else
-
-    /*
-    printf("---- outputConv_float from TF ----\n");
-    for (int i=0; i<IHEIGHT; ++i) {
-        printf("[%3d] - ", i);
-        for (int j=0; j<(FILTERS); ++j) {
-            printf("%10f ", outputConv_float[(i*FILTERS)+j]);
-        }
-        printf("\n");
-    }
-    */
-
 
 #endif	// !DO_CONV
 

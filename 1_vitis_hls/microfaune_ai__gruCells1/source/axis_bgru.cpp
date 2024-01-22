@@ -35,13 +35,12 @@ void gru_syncState() {
     ///printf("STATE:");
     GRU_syncstate_loop: for (int i = 0; i < GRU_FILTERS; ++i) {
         state[0][i] = state[1][i];
-        //printf("%f\n", state[0][i]);
     }
 }
 
 
 
-#define TRUNCATE_BITS
+//#define TRUNCATE_BITS
 #ifdef TRUNCATE_BITS
 #define Q_APF(W,I,value)		ap_fixed<W,I, AP_RND, AP_SAT>(value).to_float()
 #define Q_APUF(W,I,value)		ap_ufixed<W,I, AP_RND, AP_SAT>(value).to_float()
@@ -169,23 +168,6 @@ void gru_syncState() {
 #endif // TRUNCATE_BITS
 
 
-//#define STATISTICS
-/*
-in, k, b,
-m0,m1,m2, 		mb0,mb1,mb2,
-
-state, rk, rb,
-mi0,mi1,mi2, 	mib0,mib1,mib2
-
-zsig,z,
-rsig,r,
-hhtanh,hh,
-zstate,zhh,out
-*/
-#define STATS_SIZE	27
-float max[STATS_SIZE] = {0};
-float min[STATS_SIZE] = {0};
-
 //#define DEBUG_GRU
 void gru_cell(
     int idx,
@@ -198,6 +180,12 @@ void gru_cell(
 #ifdef DEBUG_GRU
 	printf("#### STEP START ####\n");
 #endif
+    /*
+    for (int i=0; i<kernelCols; ++i) {
+        printf("iVal = %f\n", (*(input + i)).to_float());
+    }
+    */
+
 	int pkernel_offset = (idx * GRU_SPLIT_SIZE * kernelCols);
     int preckernel_offset = (idx * GRU_SPLIT_SIZE * GRU_KERNEL_REC_COLS);
 
@@ -267,22 +255,6 @@ void gru_cell(
 #endif
 }
 
-void printStats() {
-#ifdef STATISTICS
-	printf("STATS: (only the last statistics matter)\n");
-    printf("MAX -> ");
-    for (int i=0; i<STATS_SIZE; ++i) {
-    	printf("%f ", max[i]);
-    }
-    printf("\n");
-
-    printf("MIN -> ");
-    for (int i=0; i<STATS_SIZE; ++i) {
-    	printf("%f ", min[i]);
-    }
-    printf("\n");
-#endif //!STATISTICS
-}
 
 void gru(
 	hls::stream<in_pkt> &strm_in,
@@ -309,7 +281,7 @@ void gru(
     }
 
     in_pkt tmp;
-    READ_KERNEL: for (int i = 0; i < kernelSize; ) {
+    READ_KERNEL: for (int i = 0; i < GRU0_KERNEL_SIZE; ) {
         if (i >= kernelSize)
             break;
         tmp = strm_in.read();
@@ -382,8 +354,6 @@ void gru(
 
         gru_syncState(); // TODO: improve by not sync
     }
-
-    printStats();	// TODO: remove later
 }
 
 #endif // GRU_H
