@@ -258,15 +258,21 @@ void gru_cell(
 
 void gru(
 	hls::stream<in_pkt> &strm_in,
+	hls::stream<in_pkt> &strm_out,
     int isForward,
     int kernelCols,
-	int kernelSize,
-	gru_omap_t* output
+	int kernelSize
 ) {
 #pragma HLS INTERFACE ap_ctrl_none port=return
 #pragma HLS INTERFACE axis port=strm_in
+#pragma HLS INTERFACE axis port=strm_out
 
 #pragma HLS ARRAY_PARTITION variable=kernel type=cyclic factor=4
+
+    out_pkt tmpo;
+    ap_uint<64> output = 0;
+#define GRU_LEFT_TO_SEND    (64/G_IN_W_BIT_WIDTH)
+    int leftToSend = GRU_LEFT_TO_SEND;
 
     gru_clearState();
     int row;
@@ -337,8 +343,27 @@ void gru(
             }
 
             //printf("ROW = %d\n", row);
-        	gru_omap_t* output_cell = output + (row * (GRU_FILTERS*2)) + (idx + offset);
-            gru_cell(idx, kernelCols, input, kernel, bias, rkernel, rbias, output_cell);
+        	//gru_omap_t* output_cell = output + (row * (GRU_FILTERS*2)) + (idx + offset);
+            gru_omap_t output_cell;
+            gru_cell(idx, kernelCols, input, kernel, bias, rkernel, rbias, &output_cell);
+            //printf("----\n");
+            //printf("output = 0x%x | output_cell = 0x%x F:%f\n", output, output_cell, output_cell.to_float());
+            output = output >> G_IN_W_BIT_WIDTH;
+            //printf("output = 0x%x | output_cell = 0x%x F:%f\n", output, output_cell, output_cell.to_float());
+            output.range(63,64-G_IN_W_BIT_WIDTH) = output_cell.range(G_IN_W_BIT_WIDTH-1,0);
+            //printf("output = 0x%x | output_cell = 0x%x F:%f\n", output, output_cell, output_cell.to_float());
+            --leftToSend;
+            if (leftToSend <= 0) {
+                leftToSend = GRU_LEFT_TO_SEND;
+                tmpo.data.range(63,0) = output.range(63,0);
+                if ((isForward & (row+1 >= GRU_IN_LINES)) || !isForward & (row-1 < 0))
+                    tmpo.last = 1;
+                else
+                    tmpo.last = 0;
+                //printf("LAST = %d\n", tmpo.last);
+                strm_out.write(tmpo);
+            }
+            //printf("----\n");
         }
         // exit contidions and inc/dec iteration
         if (isForward) {
@@ -354,6 +379,23 @@ void gru(
 
         gru_syncState(); // TODO: improve by not sync
     }
+
+    if (leftToSend > 0) {
+        //printf("####\n");
+        //printf("output = 0x%x\n", output);
+        //printf("leftToSend = %d\n");
+        output = output >> (G_IN_W_BIT_WIDTH*leftToSend);
+        //printf("output = 0x%x\n", output);
+        tmpo.data.range(63,0) = output.range(63,0);
+        if ((isForward & (row+1 >= GRU_IN_LINES)) || !isForward & (row-1 < 0))
+            tmpo.last = 1;
+        else
+            tmpo.last = 0;
+        //printf("LAST = %d\n", tmpo.last);
+        strm_out.write(tmpo);
+        //printf("####\n");
+    }
+    //printf("EXIT\n");
 }
 
 #endif // GRU_H

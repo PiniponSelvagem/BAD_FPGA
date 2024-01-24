@@ -17,7 +17,7 @@
 
 //#define PRINT_STATS
 //#define DEBUG_CONV
-#define DO_CONV
+//#define DO_CONV
 #define VALIDATE_OUTPUT
 
 
@@ -31,10 +31,10 @@ hls::stream<out_pkt> str_out;
 void conv2D(hls::stream<in_pkt> &strm_in, hls::stream<out_pkt> &strm_out, int pool, int maxWidth);
 void gru(
 	hls::stream<in_pkt> &strm_in,
-	int isForward,
-	int kernelCols,
-	int kernelSize,
-	gru_omap_t* output
+	hls::stream<in_pkt> &strm_out,
+    int isForward,
+    int kernelCols,
+	int kernelSize
 );
 
 imap_t input_0[IHEIGHT*IWIDTH/PACKET_CNN];
@@ -417,6 +417,43 @@ void writeInputNextGRU(gru_omap_t* outputGRU, int nCols, int isForward, int isGR
         }
     }
 }
+void readOutputGRU(const int nFilters, int isForward, gru_omap_t* output) {
+    out_pkt tmpo;
+    const int databits = 64/PACKET_GRU;
+#define GRU_N_ELEMS_SIZE    (GRU_IN_LINES*(nFilters*2))
+
+    int i=0;
+    if (!isForward)
+        i += GRU_N_ELEMS_SIZE-1;     // since this is BACKWARD, adjust the start offset to the end to do backwards fill
+
+    int nDataRead = 0;
+    int nColsRead = 0;
+    int exit = 0;
+    while (!str_out.empty()) {
+		tmpo = str_out.read();
+        if (exit)
+            continue;
+
+        for (int subOffset = 0; subOffset < 64/PACKET_GRU; ++subOffset) {
+            int start = databits * subOffset;
+            int end   = (databits * subOffset) + (PACKET_GRU-1);
+
+            output[i].range(7,0) = tmpo.data.range(end, start);
+            isForward ? ++i : --i;
+            ++nColsRead;
+
+            if (++nDataRead >= GRU_N_ELEMS_SIZE) {  // x2 because it is BiGRU and we only receive part of the input
+                exit = 1;  // just in case so it dosent write outside of output array
+                break;
+            }
+            
+            if (nColsRead>=nFilters) {
+                isForward ? i += nFilters : i -= nFilters; // offset due to the other part of the output of the other direction 
+                nColsRead = 0;
+            }
+        }
+	}
+}
 void printGRUoutput(gru_omap_t* output) {
 	#define OUT_WIDTH_GRU (GRU_FILTERS*2)
 	for (int i=0; i<IHEIGHT; ++i) {
@@ -589,11 +626,12 @@ int main() {
     writeInputNextGRU(outputConv_converted, FILTERS, GRU_FORWARD);
 	gru( // GRU_0_F
 		str_in,
+		str_out,
 		GRU_FORWARD,
 		GRU_0__IN_COLS,
-        GRU0_KERNEL_SIZE,
-		outputGRU0
+        GRU0_KERNEL_SIZE
 	);
+    readOutputGRU(GRU_FILTERS, GRU_FORWARD, outputGRU0);
     printGRUoutput(outputGRU0);
 
 	printf("---- 0 BACKWARD ----\n");
@@ -604,11 +642,12 @@ int main() {
     writeInputNextGRU(outputConv_converted, FILTERS, GRU_BACKWARD);     // send again same output of conv as input
 	gru( // GRU_0_B
 		str_in,
+		str_out,
 		GRU_BACKWARD,
 		GRU_0__IN_COLS,
-        GRU0_KERNEL_SIZE,
-		outputGRU0
+        GRU0_KERNEL_SIZE
 	);
+    readOutputGRU(GRU_FILTERS, GRU_BACKWARD, outputGRU0);
 	printGRUoutput(outputGRU0);
 
 	printf("\n\n\n###################################### GRU_1 ######################################\n");
@@ -620,11 +659,13 @@ int main() {
     writeInputNextGRU(outputGRU0, GRU_FILTERS*2, GRU_FORWARD, 1);
 	gru( // GRU_1_F
 		str_in,
+		str_out,
 		GRU_FORWARD,
 		GRU_FILTERS*2,
-		GRU1_KERNEL_SIZE,
-		outputGRU1
+		GRU1_KERNEL_SIZE
 	);
+    readOutputGRU(GRU_FILTERS, GRU_FORWARD, outputGRU1);
+    printGRUoutput(outputGRU1);
     
 	printf("---- 1 BACKWARD ----\n");
     writeWeigthGRU(gru1b_kernel, GRU1_KERNEL_SIZE);
@@ -634,11 +675,12 @@ int main() {
     writeInputNextGRU(outputGRU0, GRU_FILTERS*2, GRU_BACKWARD, 1);
 	gru( // GRU_1_B
 		str_in,
+		str_out,
 		GRU_BACKWARD,
 		GRU_FILTERS*2,
-		GRU1_KERNEL_SIZE,
-		outputGRU1
+		GRU1_KERNEL_SIZE
 	);
+    readOutputGRU(GRU_FILTERS, GRU_BACKWARD, outputGRU1);
 	printGRUoutput(outputGRU1);
 
 

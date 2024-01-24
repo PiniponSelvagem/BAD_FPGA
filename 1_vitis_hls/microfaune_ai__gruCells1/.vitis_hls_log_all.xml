@@ -7,6 +7,15 @@
       <mgLog/>
       <packageLog/>
       <csimLog>
+        <logs message="ERROR: [SIM 211-100] 'csim_design' failed: compilation error(s)." projectName="microfaune_ai__gruCells1" solutionName="algorithm" date="2024-01-23T23:21:05.557+0000"/>
+        <logs message="ERROR: [SIM 211-100] 'csim_design' failed: compilation error(s)." projectName="microfaune_ai__gruCells1" solutionName="algorithm" date="2024-01-23T23:15:09.438+0000"/>
+        <logs message="ERROR: [SIM 211-100] 'csim_design' failed: compilation error(s)." projectName="microfaune_ai__gruCells1" solutionName="algorithm" date="2024-01-23T23:14:48.526+0000"/>
+        <logs message="ERROR: [SIM 211-100] 'csim_design' failed: compilation error(s)." projectName="microfaune_ai__gruCells1" solutionName="algorithm" date="2024-01-23T23:09:58.257+0000"/>
+        <logs message="ERROR: [SIM 211-100] 'csim_design' failed: compilation error(s)." projectName="microfaune_ai__gruCells1" solutionName="algorithm" date="2024-01-23T23:09:16.442+0000"/>
+        <logs message="ERROR: [SIM 211-100] 'csim_design' failed: compilation error(s)." projectName="microfaune_ai__gruCells1" solutionName="algorithm" date="2024-01-23T23:08:38.467+0000"/>
+        <logs message="ERROR: [SIM 211-100] 'csim_design' failed: compilation error(s)." projectName="microfaune_ai__gruCells1" solutionName="algorithm" date="2024-01-23T20:49:33.535+0000"/>
+        <logs message="ERROR: [SIM 211-100] 'csim_design' failed: compilation error(s)." projectName="microfaune_ai__gruCells1" solutionName="algorithm" date="2024-01-23T20:17:14.242+0000"/>
+        <logs message="ERROR: [SIM 211-100] 'csim_design' failed: compilation error(s)." projectName="microfaune_ai__gruCells1" solutionName="algorithm" date="2024-01-23T20:16:27.069+0000"/>
         <logs message="ERROR: [SIM 211-100] 'csim_design' failed: compilation error(s)." projectName="microfaune_ai__gruCells1" solutionName="algorithm" date="2024-01-22T21:53:13.684+0000"/>
       </csimLog>
     </logs>
@@ -19,7 +28,20 @@
       <simLog/>
       <mgLog/>
       <packageLog/>
-      <csimLog/>
+      <csimLog>
+        <logs message="WARNING [HLS SIM]: hls::stream 'hls::stream&lt;hls::axis&lt;ap_int&lt;64>, 0ull, 0ull, 0ull>, 0>1' contains leftover data, which may result in RTL simulation hanging." projectName="microfaune_ai__gruCells1" solutionName="algorithm" date="2024-01-23T23:23:39.568+0000" type="Warning"/>
+        <logs message="WARNING [HLS SIM]: hls::stream 'hls::stream&lt;hls::axis&lt;ap_int&lt;64>, 0ull, 0ull, 0ull>, 0>1' contains leftover data, which may result in RTL simulation hanging." projectName="microfaune_ai__gruCells1" solutionName="algorithm" date="2024-01-23T23:23:11.873+0000" type="Warning"/>
+        <logs message="WARNING [HLS SIM]: hls::stream 'hls::stream&lt;hls::axis&lt;ap_int&lt;64>, 0ull, 0ull, 0ull>, 0>1' contains leftover data, which may result in RTL simulation hanging." projectName="microfaune_ai__gruCells1" solutionName="algorithm" date="2024-01-23T23:22:20.240+0000" type="Warning"/>
+        <logs message="WARNING [HLS SIM]: hls::stream 'hls::stream&lt;hls::axis&lt;ap_int&lt;64>, 0ull, 0ull, 0ull>, 0>1' contains leftover data, which may result in RTL simulation hanging." projectName="microfaune_ai__gruCells1" solutionName="algorithm" date="2024-01-23T23:21:28.709+0000" type="Warning"/>
+        <logs message="WARNING [HLS SIM]: hls::stream 'hls::stream&lt;hls::axis&lt;ap_int&lt;64>, 0ull, 0ull, 0ull>, 0>1' contains leftover data, which may result in RTL simulation hanging." projectName="microfaune_ai__gruCells1" solutionName="algorithm" date="2024-01-23T23:19:39.453+0000" type="Warning"/>
+        <logs message="WARNING [HLS SIM]: hls::stream 'hls::stream&lt;hls::axis&lt;ap_int&lt;64>, 0ull, 0ull, 0ull>, 0>1' contains leftover data, which may result in RTL simulation hanging." projectName="microfaune_ai__gruCells1" solutionName="algorithm" date="2024-01-23T23:17:49.098+0000" type="Warning"/>
+        <logs message="WARNING [HLS SIM]: hls::stream 'hls::stream&lt;hls::axis&lt;ap_int&lt;64>, 0ull, 0ull, 0ull>, 0>1' contains leftover data, which may result in RTL simulation hanging." projectName="microfaune_ai__gruCells1" solutionName="algorithm" date="2024-01-23T23:16:58.968+0000" type="Warning"/>
+        <logs message="WARNING [HLS SIM]: hls::stream 'hls::stream&lt;hls::axis&lt;ap_int&lt;64>, 0ull, 0ull, 0ull>, 0>1' contains leftover data, which may result in RTL simulation hanging." projectName="microfaune_ai__gruCells1" solutionName="algorithm" date="2024-01-23T23:15:34.064+0000" type="Warning"/>
+        <logs message="WARNING [HLS SIM]: hls::stream 'hls::stream&lt;hls::axis&lt;ap_int&lt;64>, 0ull, 0ull, 0ull>, 0>1' contains leftover data, which may result in RTL simulation hanging." projectName="microfaune_ai__gruCells1" solutionName="algorithm" date="2024-01-23T23:10:45.205+0000" type="Warning"/>
+        <logs message="WARNING [HLS SIM]: hls::stream 'hls::stream&lt;hls::axis&lt;ap_int&lt;64>, 0ull, 0ull, 0ull>, 0>1' contains leftover data, which may result in RTL simulation hanging." projectName="microfaune_ai__gruCells1" solutionName="algorithm" date="2024-01-23T20:51:28.197+0000" type="Warning"/>
+        <logs message="WARNING [HLS SIM]: hls::stream 'hls::stream&lt;hls::axis&lt;ap_int&lt;64>, 0ull, 0ull, 0ull>, 0>1' contains leftover data, which may result in RTL simulation hanging." projectName="microfaune_ai__gruCells1" solutionName="algorithm" date="2024-01-23T20:50:19.342+0000" type="Warning"/>
+        <logs message="WARNING [HLS SIM]: hls::stream 'hls::stream&lt;hls::axis&lt;ap_int&lt;64>, 0ull, 0ull, 0ull>, 0>1' contains leftover data, which may result in RTL simulation hanging." projectName="microfaune_ai__gruCells1" solutionName="algorithm" date="2024-01-23T20:46:40.248+0000" type="Warning"/>
+      </csimLog>
     </logs>
   </warningLogs>
 </vivadoHLSLog:LogRoot>
