@@ -9,7 +9,7 @@ def createFolderIfNotExists(folder):
 
 
 
-def saveArray_dim1(folder, fileName, array, arrayName, dataType):
+def saveArray_dim1(folder, fileName, array, arrayName, dataType, flatten=False):
     file_path = os.path.join(folder, '{}.h'.format(fileName))
     with open(file_path, 'w') as file:
         file.write('const {} {}[{}] = {{\n'.format(dataType, arrayName, array.size))
@@ -19,51 +19,75 @@ def saveArray_dim1(folder, fileName, array, arrayName, dataType):
         file.write('};\n')
 
 
-def saveArray_dim2(folder, fileName, array, arrayName, dataType):
+def saveArray_dim2(folder, fileName, array, arrayName, dataType, flatten=False):
     file_path = os.path.join(folder, '{}.h'.format(fileName))
     with open(file_path, 'w') as file:
-        file.write('const {} {}[{}][{}] = '.format(dataType, arrayName, *array.shape))
+        if (flatten):
+            file.write('const {} {}[{}*{}] = '.format(dataType, arrayName, *array.shape))
+        else:
+            file.write('const {} {}[{}][{}] = '.format(dataType, arrayName, *array.shape))
         file.write('{\n')
         for i in range(array.shape[0]):
-            file.write('    {\n')
-            for j in range(array.shape[1]):
-                file.write('        {},\n'.format(array[i, j]))
-            file.write('    },\n')
+            if (flatten):
+                for j in range(array.shape[1]):
+                    file.write('    {},\n'.format(array[i, j]))
+            else:
+                file.write('    {\n')
+                for j in range(array.shape[1]):
+                    file.write('        {},\n'.format(array[i, j]))
+                file.write('    },\n')
         file.write('};\n')
 
 
-def saveArray_dim3(folder, fileName, array, arrayName, dataType):
+def saveArray_dim3(folder, fileName, array, arrayName, dataType, flatten=False):
     file_path = os.path.join(folder, '{}.h'.format(fileName))
     with open(file_path, 'w') as file:
-        file.write('const {} {}[{}][{}][{}] = '.format(dataType, arrayName, *array.shape))
+        if (flatten):
+            file.write('const {} {}[{}*{}*{}] = '.format(dataType, arrayName, *array.shape))
+        else:
+            file.write('const {} {}[{}][{}][{}] = '.format(dataType, arrayName, *array.shape))
         file.write('{\n')
         for i in range(array.shape[0]):
-            file.write('    {\n')
-            for j in range(array.shape[1]):
-                file.write('        {\n')
-                for k in range(array.shape[2]):
-                    file.write('            {},\n'.format(array[i, j, k]))
-                file.write('        },\n')
-            file.write('    },\n')
+            if (flatten):
+                for j in range(array.shape[1]):
+                    for k in range(array.shape[2]):
+                        file.write('    {},\n'.format(array[i, j, k]))
+            else:
+                file.write('    {\n')
+                for j in range(array.shape[1]):
+                    file.write('        {\n')
+                    for k in range(array.shape[2]):
+                        file.write('            {},\n'.format(array[i, j, k]))
+                    file.write('        },\n')
+                file.write('    },\n')
         file.write('};\n')
 
 
-def saveArray_dim4(folder, fileName, array, arrayName, dataType):
+def saveArray_dim4(folder, fileName, array, arrayName, dataType, flatten=False):
     file_path = os.path.join(folder, '{}.h'.format(fileName))
     with open(file_path, 'w') as file:
-        file.write('const {} {}[{}][{}][{}][{}] = '.format(dataType, arrayName, *array.shape))
+        if (flatten):
+            file.write('const {} {}[{}*{}*{}*{}] = '.format(dataType, arrayName, *array.shape))
+        else:
+            file.write('const {} {}[{}][{}][{}][{}] = '.format(dataType, arrayName, *array.shape))
         file.write('{\n')
         for i in range(array.shape[0]):
-            file.write('    {\n')
-            for j in range(array.shape[1]):
-                file.write('        {\n')
-                for k in range(array.shape[2]):
-                    file.write('            {\n')
-                    for l in range(array.shape[3]):
-                        file.write('                {},\n'.format(array[i, j, k, l]))
-                    file.write('            },\n')
-                file.write('        },\n')
-            file.write('    },\n')
+            if (flatten):
+                for j in range(array.shape[1]):
+                    for k in range(array.shape[2]):
+                        for l in range(array.shape[3]):
+                            file.write('    {},\n'.format(array[i, j, k, l]))
+            else:    
+                file.write('    {\n')
+                for j in range(array.shape[1]):
+                    file.write('        {\n')
+                    for k in range(array.shape[2]):
+                        file.write('            {\n')
+                        for l in range(array.shape[3]):
+                            file.write('                {},\n'.format(array[i, j, k, l]))
+                        file.write('            },\n')
+                    file.write('        },\n')
+                file.write('    },\n')
         file.write('};\n')
 
 
@@ -190,19 +214,19 @@ def saveFileBin(file_path, packed_bits, dataType):
 
 
 
-def saveArray(folder, fileName, array, arrayName, dataType, saveBinAsInteger=False, binPositiveOnly=False):
+def saveArray(folder, fileName, array, arrayName, dataType, saveBinAsInteger=False, binPositiveOnly=False, flatten=False):
     size = len(array.shape)
     if size == 1:
-        saveArray_dim1(folder, fileName, array, arrayName, "float")
+        saveArray_dim1(folder, fileName, array, arrayName, "float", flatten)
         saveArray_bin(folder, fileName, array, dataType, saveBinAsInteger, binPositiveOnly)
     elif size == 2:
-        saveArray_dim2(folder, fileName, array, arrayName, "float")
+        saveArray_dim2(folder, fileName, array, arrayName, "float", flatten)
         saveArray_bin(folder, fileName, array, dataType, saveBinAsInteger, binPositiveOnly)
     elif size == 3:
-        saveArray_dim3(folder, fileName, array, arrayName, "float")
+        saveArray_dim3(folder, fileName, array, arrayName, "float", flatten)
         saveArray_bin(folder, fileName, array, dataType, saveBinAsInteger, binPositiveOnly)
     elif size == 4:
-        saveArray_dim4(folder, fileName, array, arrayName, "float")
+        saveArray_dim4(folder, fileName, array, arrayName, "float", flatten)
         saveArray_bin(folder, fileName, array, dataType, saveBinAsInteger, binPositiveOnly)
     else:
         print("ERROR saving array {}, with total dimensions {}.".format(arrayName, size))

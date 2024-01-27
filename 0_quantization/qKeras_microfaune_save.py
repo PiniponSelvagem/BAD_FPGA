@@ -35,6 +35,7 @@ from qkeras.quantizers import quantized_po2
 import qkeras_microfaune_model as qmodel
 import cutils
 
+flattenHeaderArrays = True  # if true, makes the header C files arrays flat
 
 
 model_folder = ModelConfig.folder
@@ -244,10 +245,10 @@ def processLayer(layerName, weightName, weight, data_type, isScale=False, saveBi
         rbias = np.squeeze(rbias)
         biasName = weightName
         rbiasBias = weightName+"_recurrent"
-        cutils.saveArray(folder, biasName, bias, biasName, data_type, saveBinAsInteger=saveBinAsInteger)
-        cutils.saveArray(folder, rbiasBias, rbias, rbiasBias, data_type, saveBinAsInteger=saveBinAsInteger)
+        cutils.saveArray(folder, biasName, bias, biasName, data_type, saveBinAsInteger=saveBinAsInteger, flatten=flattenHeaderArrays)
+        cutils.saveArray(folder, rbiasBias, rbias, rbiasBias, data_type, saveBinAsInteger=saveBinAsInteger, flatten=flattenHeaderArrays)
     else:
-        cutils.saveArray(folder, weightName, data, weightName, data_type, saveBinAsInteger=saveBinAsInteger)
+        cutils.saveArray(folder, weightName, data, weightName, data_type, saveBinAsInteger=saveBinAsInteger, flatten=flattenHeaderArrays)
 
 
 
@@ -608,17 +609,17 @@ for layerName in model_quant:
     if "conv2d" in layerName:
         print("- processing kernel")
         kernel = weight[0]
-        processLayer(layerName, layerName+"_kernel", kernel, data_type, isConv0=isConv0)
+        #processLayer(layerName, layerName+"_kernel", kernel, data_type, isConv0=isConv0)
         #
         print("- processing kernel_scale")
         kernel_scale = getQuantizeScale(layerName, 0)
-        processLayer(layerName, layerName+"_kernel_scale", kernel_scale, data_type, isScale=True)
+        #processLayer(layerName, layerName+"_kernel_scale", kernel_scale, data_type, isScale=True)
         print("- processing bias_scale")
-        processLayer(layerName, layerName+"_bias_scale", getQuantizeScale(layerName, 1), data_type, isScale=True)
+        #processLayer(layerName, layerName+"_bias_scale", getQuantizeScale(layerName, 1), data_type, isScale=True)
         #
         print("- processing kernel_merged_scale")
         kernelWscale = mergeKernelScale(kernel, kernel_scale)
-        processLayer(layerName, layerName+"_kernel_merged_scale", kernelWscale, data_type, saveBinAsInteger=True, isConv0=isConv0)   # TODO: This might be the same for GRU
+        processLayer(layerName, layerName+"_kernel_merged_scale_hls", kernelWscale, data_type, saveBinAsInteger=True, isConv0=isConv0)
         #
         print("- processing kernel_scale for HLS")
         scaleHLS = createScaleHLS(kernel_scale)
@@ -626,7 +627,7 @@ for layerName in model_quant:
         #
         print("- processing bias")
         bias = weight[1]
-        processLayer(layerName, layerName+"_bias", bias, data_type)
+        #processLayer(layerName, layerName+"_bias", bias, data_type)
         biasHLS = createBiasHLS(bias, scaleHLS)
         bias_data_type = data_type.copy()
         bias_data_type["name"] = "ap_int16"
