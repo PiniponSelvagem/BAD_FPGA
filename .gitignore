@@ -104,3 +104,14 @@ __pycache__/
 /1_vitis_hls/microfaune_ai__smallDebug/
 /1_vitis_hls/microfaune_ai__smallDebug_bigru/
 /1_vitis_hls/microfaune_ai__gruCells1/.vscode/
+/1_vitis_hls/microfaune_ai__gruCells1/source/weights - gru_float/
+/1_vitis_hls/microfaune_ai__gruCells1__GRUFLOAT/
+/1_vitis_hls/microfaune_ai__gruCells1__hardcodedWeights/.settings/
+/1_vitis_hls/microfaune_ai__gruCells1__hardcodedWeights/algorithm/
+/0_quantization/z_model_quantized/
+/0_quantization/z_plots/
+/1_vitis_hls/microfaune_ai__gruCells1__hardcodedWeights/.apc/
+/1_vitis_hls/microfaune_ai__gruCells1__hardcodedWeights/.vscode/
+/1_vitis_hls/microfaune_ai__gruCells1__hardcodedWeights/.cproject
+/1_vitis_hls/microfaune_ai__gruCells1__hardcodedWeights/.project
+/1_vitis_hls/microfaune_ai__gruCells1__hardcodedWeights/.vitis_hls_log_all.xml

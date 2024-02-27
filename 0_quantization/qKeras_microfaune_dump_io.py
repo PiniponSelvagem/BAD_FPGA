@@ -28,8 +28,8 @@ data_type["bits_int"] = 0
 # use old rearange
 shouldRearrange = False
 
-doPaddingInput = False
-START_PADDING = 64  # number of elements to place on the z axis with zeros to achieve padding for HLS
+doPaddingInput = True
+START_PADDING = 32   # 64/2 because half a byte    # number of padding to place on the z axis with zeros to achieve padding for HLS
 
 
 # Extend the JSONEncoder class
@@ -73,7 +73,7 @@ steps_per_epoch = ModelConfig.steps_per_epoch
 model, dual_model = qmodel.MicrofauneAI(ModelConfig).modelQuantized()
 dual_model.load_weights(f"{model_dir}/{model_name}.h5")
 
-audioIDX = 7
+audioIDX = 0
 if audioIDX == 0: audiofile = "bird_50124"
 if audioIDX == 1: audiofile = "bird_52046"
 if audioIDX == 2: audiofile = "bird_16835"
@@ -165,7 +165,7 @@ for layer_name in layers_names:
     out = getOutputOfLayer(layer_name)
     sdim = len(out.shape)
     if doPaddingInput:
-        if layer_name == "input_1" or layer_name == "q_activation":
+        if layer_name == "q_activation":        # or layer_name == "input_1
             # add padding to 1st input layer
             original_shape = out.shape
             # Create a new shape with the same dimensions, except the last dimension is set to 64
@@ -200,7 +200,11 @@ for layer_name in layers_names:
         print(" > INFO: Using", float_data_type["name"], "data_type for this layer.")
         cutils.saveArray(folder, str(i)+"__"+layer.name, np.array(out), str(i)+"__"+layer.name, float_data_type, binPositiveOnly=True)
     else:
-        cutils.saveArray(folder, str(i)+"__"+layer.name, np.array(out), str(i)+"__"+layer.name, data_type, binPositiveOnly=True)
+        if ("q_activation" == layer.name):
+            cutils.saveArray(folder, str(i)+"__"+layer.name, np.array(out), str(i)+"__"+layer.name, data_type, binPositiveOnly=True, nPacket=1)
+        else:
+            cutils.saveArray(folder, str(i)+"__"+layer.name, np.array(out), str(i)+"__"+layer.name, data_type, binPositiveOnly=True, saveBin=False)
+
     #
     """
     #### JSON output disabled ####

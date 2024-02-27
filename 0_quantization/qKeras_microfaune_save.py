@@ -187,7 +187,7 @@ class Layer:
 
 
 
-def processLayer(layerName, weightName, weight, data_type, isScale=False, saveBinAsInteger=False, isConv0=False):
+def processLayer(layerName, weightName, weight, data_type, isScale=False, saveBinAsInteger=False, isConv0=False, nPacket=0):
     shape = weight.shape
     sdim = len(shape)
     data = np.array(weight)
@@ -248,7 +248,7 @@ def processLayer(layerName, weightName, weight, data_type, isScale=False, saveBi
         cutils.saveArray(folder, biasName, bias, biasName, data_type, saveBinAsInteger=saveBinAsInteger, flatten=flattenHeaderArrays)
         cutils.saveArray(folder, rbiasBias, rbias, rbiasBias, data_type, saveBinAsInteger=saveBinAsInteger, flatten=flattenHeaderArrays)
     else:
-        cutils.saveArray(folder, weightName, data, weightName, data_type, saveBinAsInteger=saveBinAsInteger, flatten=flattenHeaderArrays)
+        cutils.saveArray(folder, weightName, data, weightName, data_type, saveBinAsInteger=saveBinAsInteger, flatten=flattenHeaderArrays, nPacket=nPacket)
 
 
 
@@ -619,11 +619,11 @@ for layerName in model_quant:
         #
         print("- processing kernel_merged_scale")
         kernelWscale = mergeKernelScale(kernel, kernel_scale)
-        processLayer(layerName, layerName+"_kernel_merged_scale_hls", kernelWscale, data_type, saveBinAsInteger=True, isConv0=isConv0)
+        processLayer(layerName, layerName+"_kernel_merged_scale_hls", kernelWscale, data_type, saveBinAsInteger=True, isConv0=isConv0, nPacket=16)
         #
         print("- processing kernel_scale for HLS")
         scaleHLS = createScaleHLS(kernel_scale)
-        processLayer(layerName, layerName+"_kernel_scale_hls", scaleHLS, data_type, isScale=True, saveBinAsInteger=True)
+        processLayer(layerName, layerName+"_kernel_scale_hls", scaleHLS, data_type, isScale=True, saveBinAsInteger=True, nPacket=16)
         #
         print("- processing bias")
         bias = weight[1]
