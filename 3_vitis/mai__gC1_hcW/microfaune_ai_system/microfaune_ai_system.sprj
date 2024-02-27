@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="ASCII"?>
+<systemproject:SystemProject xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:sdkproject="http://www.xilinx.com/sdkproject" xmlns:systemproject="http://www.xilinx.com/systemproject" name="microfaune_ai_system" platform="D:/BAD_FPGA/3_vitis/mai__gC1_hcW/design_1_wrapper/export/design_1_wrapper/design_1_wrapper.xpfm" platformUID="xilinx:ultra96v2::0.0(custom)" sysConfig="design_1_wrapper" runtime="cpp" rootFSLocation="" linuxImage="" sysroot="">
+  <configuration name="Debug" id="com.xilinx.sdx.system.managedbuilder.debugConfiguration.2137846889">
+    <configBuildOptions xsi:type="systemproject:SystemOptions">
+      <applications name="microfaune_ai" domainName="standalone_psu_cortexa53_0" domainPrettyName="standalone_psu_cortexa53_0" appBuildConfig="Debug"/>
+      <options xsi:type="sdkproject:SdkOptions" generateSdCard="true"/>
+    </configBuildOptions>
+  </configuration>
+  <configuration name="Release" id="com.xilinx.sdx.system.managedbuilder.releaseConfiguration.2015886079">
+    <configBuildOptions xsi:type="systemproject:SystemOptions">
+      <applications name="microfaune_ai" domainName="standalone_psu_cortexa53_0" domainPrettyName="standalone_psu_cortexa53_0" appBuildConfig="Release"/>
+      <options xsi:type="sdkproject:SdkOptions" generateSdCard="true"/>
+    </configBuildOptions>
+  </configuration>
+</systemproject:SystemProject>
