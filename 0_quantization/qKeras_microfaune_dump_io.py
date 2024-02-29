@@ -194,16 +194,23 @@ for layer_name in layers_names:
     )
     #
     # 20231120 - hotfix to create binary outputs of every layer
-    if ("bidirectional" in layer.name) or ("time_distributed" in layer.name) or ("reduce_max" in layer.name) or ("reduce_max_1" in layer.name):
+    if ("bidirectional" in layer.name) or ("time_distributed" in layer.name) or ("reduce_max_1" in layer.name):
         float_data_type = data_type.copy()
         float_data_type["name"] = "float"
         print(" > INFO: Using", float_data_type["name"], "data_type for this layer.")
         cutils.saveArray(folder, str(i)+"__"+layer.name, np.array(out), str(i)+"__"+layer.name, float_data_type, binPositiveOnly=True)
     else:
-        if ("q_activation" == layer.name):
+        if (("q_activation" == layer.name)):
             cutils.saveArray(folder, str(i)+"__"+layer.name, np.array(out), str(i)+"__"+layer.name, data_type, binPositiveOnly=True, nPacket=1)
         else:
-            cutils.saveArray(folder, str(i)+"__"+layer.name, np.array(out), str(i)+"__"+layer.name, data_type, binPositiveOnly=True, saveBin=False)
+            if ("reduce_max" in layer.name):
+                rmax_data_type = {}
+                rmax_data_type["name"] = "ap_fixed"
+                rmax_data_type["bits_total"] = 8
+                rmax_data_type["bits_int"] = 1
+                cutils.saveArray(folder, str(i)+"__"+layer.name, np.array(out), str(i)+"__"+layer.name, rmax_data_type, binPositiveOnly=True, nPacket=1)
+            else:
+                cutils.saveArray(folder, str(i)+"__"+layer.name, np.array(out), str(i)+"__"+layer.name, data_type, binPositiveOnly=True, saveBin=False)
 
     #
     """

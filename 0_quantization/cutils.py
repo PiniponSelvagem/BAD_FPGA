@@ -159,7 +159,8 @@ def packData(packed_bits, array, dataType, saveBinAsInteger=False, binPositiveOn
                 complement = (1 << bits_total) + scaled_value
                 binary = bin(complement)[2:].zfill(bits_total)
             #
-            #print(value, ",", scaled_value, " --- ", binary)
+            #if (nPacket != 0):
+            #    print(value, ",", scaled_value, " --- ", binary)
             #
             if bits_total == 4:
                 if isOddElement:
@@ -183,6 +184,22 @@ def packData(packed_bits, array, dataType, saveBinAsInteger=False, binPositiveOn
             else:
                 packet_array_curr = binary+packet_array_curr
                 pacs_count += 1
+        #
+        # check if packet is not complete and complete it
+        if (nPacket>0 and pacs_count > 0):
+            while (pacs_count != 0):
+                binary = "0" * nPacket  # padding with zeros
+                if (pacs_count >= nPacket-1):
+                    packet_array_curr = binary+packet_array_curr
+                    decimal_value = int(packet_array_curr, 2)
+                    hexadecimal_result = hex(decimal_value)
+                    packet_array = np.append(packet_array, hexadecimal_result)
+                    packet_array_curr = ""
+                    pacs_count = 0
+                else:
+                    packet_array_curr = binary+packet_array_curr
+                    pacs_count += 1
+        #
         if bits_total == 4: # closing in the case of 4 bits_total
             if isOddElement:
                 packed_bits.extend(prevBinary)

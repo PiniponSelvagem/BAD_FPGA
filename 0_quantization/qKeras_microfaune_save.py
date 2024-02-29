@@ -245,8 +245,8 @@ def processLayer(layerName, weightName, weight, data_type, isScale=False, saveBi
         rbias = np.squeeze(rbias)
         biasName = weightName
         rbiasBias = weightName+"_recurrent"
-        cutils.saveArray(folder, biasName, bias, biasName, data_type, saveBinAsInteger=saveBinAsInteger, flatten=flattenHeaderArrays)
-        cutils.saveArray(folder, rbiasBias, rbias, rbiasBias, data_type, saveBinAsInteger=saveBinAsInteger, flatten=flattenHeaderArrays)
+        cutils.saveArray(folder, biasName, bias, biasName, data_type, saveBinAsInteger=saveBinAsInteger, flatten=flattenHeaderArrays, nPacket=nPacket)
+        cutils.saveArray(folder, rbiasBias, rbias, rbiasBias, data_type, saveBinAsInteger=saveBinAsInteger, flatten=flattenHeaderArrays, nPacket=nPacket)
     else:
         cutils.saveArray(folder, weightName, data, weightName, data_type, saveBinAsInteger=saveBinAsInteger, flatten=flattenHeaderArrays, nPacket=nPacket)
 
@@ -598,8 +598,6 @@ processLayer("test_bias_hls", "test_bias_hls", test, data_type)
 """
 
 
-"""
-"""
 isConv0 = True
 for layerName in model_quant:
     print(layerName)
@@ -666,16 +664,33 @@ for layer in model.layers:
         float_data_type = data_type.copy()
         float_data_type["name"] = "float"
         #float_data_type["bits_int"] += 1
+
+        # gru forward kernel
         processLayer(layerName, layerName+"_gru_forward_kernel", weight[0], k_rk_b_rb_data_type)
+        #processLayer(layerName, layerName+"_gru_forward_kernel_hls", weight[0], k_rk_b_rb_data_type, saveBinAsInteger=False, nPacket=1)
+        
+        # gru forward recurrent kernel
         processLayer(layerName, layerName+"_gru_forward_recurrent_kernel", weight[1], k_rk_b_rb_data_type)
+        #processLayer(layerName, layerName+"_gru_forward_recurrent_kernel_hls", weight[1], k_rk_b_rb_data_type, saveBinAsInteger=False, nPacket=1)
+
+        # gru forward bias
         processLayer(layerName, layerName+"_gru_forward_bias", weight[2], k_rk_b_rb_data_type)
+        #processLayer(layerName, layerName+"_gru_forward_bias_hls", weight[2], k_rk_b_rb_data_type, saveBinAsInteger=False, nPacket=1)
+
+        # gru backward kernel
         processLayer(layerName, layerName+"_gru_backward_kernel", weight[3], k_rk_b_rb_data_type)
+        #processLayer(layerName, layerName+"_gru_backward_kernel_hls", weight[3], k_rk_b_rb_data_type, saveBinAsInteger=False, nPacket=1)
+        
+        # gru backward recurrent kernel
         processLayer(layerName, layerName+"_gru_backward_recurrent_kernel", weight[4], k_rk_b_rb_data_type)
+        #processLayer(layerName, layerName+"_gru_backward_recurrent_kernel_hls", weight[4], k_rk_b_rb_data_type, saveBinAsInteger=False, nPacket=1)
+
+        # gru backward bias
         processLayer(layerName, layerName+"_gru_backward_bias", weight[5], k_rk_b_rb_data_type)
+        #processLayer(layerName, layerName+"_gru_backward_bias_hls", weight[5], k_rk_b_rb_data_type, saveBinAsInteger=False, nPacket=1)
     if "time_distributed" in layerName:
         processLayer(layerName, layerName+"_kernel", weight[0], float_data_type)
         processLayer(layerName, layerName+"_bias", weight[1], float_data_type)
-
 
 
 
