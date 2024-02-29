@@ -16,8 +16,8 @@
 
 
 //#define PRINT_STATS
-#define DEBUG_CONV
-#define DO_CONV
+//#define DEBUG_CONV
+//#define DO_CONV
 #define VALIDATE_OUTPUT
 
 
@@ -552,7 +552,7 @@ int main() {
 
 #endif	// !DO_CONV
 
-#if 0
+//#if 0
     conv2gru();
     /*
     for (int i=0; i<431*64; ++i) {
@@ -684,7 +684,7 @@ int main() {
     compareStats("Stats LS: (actual | difference | expected)\n", outputLS, output_expect_LS, IHEIGHT, BREAK_AFTER);
     compareStats("Stats GS: (actual | difference | expected)\n", outputGS, output_expect_GS, 1, BREAK_AFTER);
 #endif
-#endif //0
+//#endif //0
 
 #else
 	/*

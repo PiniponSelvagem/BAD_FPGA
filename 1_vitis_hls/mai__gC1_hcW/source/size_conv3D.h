@@ -5,7 +5,7 @@
 #define IHEIGHT 3
 #define IWIDTH  2
 #else
-#define IHEIGHT 	2 //431
+#define IHEIGHT 	431
 #define IWIDTH  	40
 #define IWIDTH_1	20
 #define IWIDTH_2	10
