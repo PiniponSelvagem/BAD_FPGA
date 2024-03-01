@@ -91,7 +91,7 @@ void HW_gru(unsigned int *input, unsigned int input_size, unsigned int *output, 
 	/* receive OUTPUT */
 	// configure receive before core starts working
 	//rxBufferPtr = (unsigned int*)output;
-	printf("SimpleTransfer: Rx\r\n");
+	printf("SimpleTransfer: Rx (%d bytes)\r\n", output_size);
 	status = XAxiDma_SimpleTransfer(&AxiDma,(UINTPTR)output, output_size, XAXIDMA_DEVICE_TO_DMA);
 	if (status != XST_SUCCESS) {
 		printf("Error: %d | Failed sending: output\n", status);
@@ -100,7 +100,7 @@ void HW_gru(unsigned int *input, unsigned int input_size, unsigned int *output, 
 
 	/* send INPUT */
 	//txBufferPtr = (unsigned int*)input;
-	printf("SimpleTransfer: Tx\r\n");
+	printf("SimpleTransfer: Tx (%d bytes)\r\n", input_size);
 	status = XAxiDma_SimpleTransfer(&AxiDma, (UINTPTR)input, input_size, XAXIDMA_DMA_TO_DEVICE);
 	if (status != XST_SUCCESS) {
 		printf("Error: %d | Failed sending: input\n", status);
@@ -259,7 +259,8 @@ void saveOutputTo(unsigned char* input, size_t insize, unsigned char* output, in
 }
 
 #define OUT_SIZE	((LINES*GRU_CELLS)*2)
-unsigned char outputArray[OUT_SIZE] = {0};
+unsigned char outputArray0[OUT_SIZE] = {0};
+unsigned char outputArray1[OUT_SIZE] = {0};
 
 int main() {
 	printf("\r\n#### "__DATE__" "__TIME__" ####\r\n");
@@ -279,6 +280,8 @@ int main() {
 		return XST_FAILURE;
 	}
 
+
+	/* GRU_0 START */
 	// FORWARD
 	HW_gru(
 			(unsigned int*)input_gru, INPUT_SIZE_0_IN_BYTES,
@@ -286,25 +289,51 @@ int main() {
 			0
 	);
 	Xil_DCacheInvalidateRange((INTPTR)(RX_ADDR), OUTPUT_SIZE_0_IN_BYTES);
-	saveOutputTo((unsigned char*)RX_ADDR, LINES, outputArray, 1);
+	saveOutputTo((unsigned char*)RX_ADDR, LINES, outputArray0, 1);
 
-
-	// BACKWARD
+	// prepare input for backward
 	flipArrayLines(input_gru, INPUT_SIZE_0_IN_BYTES, 64);
 	Xil_DCacheInvalidateRange((INTPTR)(input_gru), INPUT_SIZE_0_IN_BYTES);
 
+	// BACKWARD
 	HW_gru(
 			(unsigned int*)input_gru, INPUT_SIZE_0_IN_BYTES,
 			(unsigned int*)RX_ADDR, OUTPUT_SIZE_0_IN_BYTES,
 			1
 	);
-
 	Xil_DCacheInvalidateRange((INTPTR)(RX_ADDR), OUTPUT_SIZE_0_IN_BYTES);
-	saveOutputTo((unsigned char*)RX_ADDR, LINES, outputArray, 0);
+	saveOutputTo((unsigned char*)RX_ADDR, LINES, outputArray0, 0);
+	/* GRU_0 END */
 
-	printf("outArray\r\n");
-	for (unsigned int i=0, l=0; i<OUT_SIZE; ++l) {
-		printf("[%3d] - 0x%02x 0x%02x\r\n", l, outputArray[i++], outputArray[i++]);
+
+	/* GRU_1 START */
+	// FORWARD
+	Xil_DCacheInvalidateRange((INTPTR)(outputArray0), 864);
+	HW_gru(
+			(unsigned int*)outputArray0, 864,
+			(unsigned int*)RX_ADDR, 432,
+			2
+	);
+	Xil_DCacheInvalidateRange((INTPTR)(RX_ADDR), 432);
+	saveOutputTo((unsigned char*)RX_ADDR, LINES, outputArray1, 1);
+
+	// prepare input for backward
+	flipArrayLines(outputArray0, 431*2, 2);
+	Xil_DCacheInvalidateRange((INTPTR)(outputArray0), 431*2);
+
+	// BACKWARD
+	HW_gru(
+			(unsigned int*)outputArray0, 864,
+			(unsigned int*)RX_ADDR, 432,
+			3
+	);
+	Xil_DCacheInvalidateRange((INTPTR)(RX_ADDR), 432);
+	saveOutputTo((unsigned char*)RX_ADDR, LINES, outputArray1, 0);
+	/* GRU_1 END */
+
+	printf("          GRU_0   |   GRU_1\r\n");
+	for (unsigned int i0=0, i1=0, l=0; i0<OUT_SIZE; ++l) {
+		printf("[%3d] - 0x%02x 0x%02x | 0x%02x 0x%02x\r\n", l, outputArray0[i0++], outputArray0[i0++], outputArray1[i1++], outputArray1[i1++]);
 	}
 
 

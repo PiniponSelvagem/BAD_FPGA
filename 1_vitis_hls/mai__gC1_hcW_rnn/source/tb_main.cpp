@@ -292,72 +292,60 @@ void conv2gru() {
         }
 	}
 }
-void writeInputNextGRU(gru_omap_t* outputGRU, int nCols, int isForward, int isGRU1=0) {
-    /* This function send the input in 2 ways:
-     * Lets say we have a 2D array 3*3.
-     * If isForward == 1, the array is sent LEFT to RIGHT, TOP to BOTTOM.
-     * (numbers in the following array are the send order)
-     * [
-     *  [1 2 3]
-     *  [4 5 6]
-     *  [7 8 9]
-     * ]
-     * If isForward == 0, the array is sent LEFT to RIGHT, BOTTOM to TOP.
-     * (numbers in the following array are the send order)
-     * [
-     *  [7 8 9]
-     *  [4 5 6]
-     *  [1 2 3]
-     * ]
-     * 
-     * NOTE:
-     * - THIS FUNCTION WAS ONLY TESTED AND WORKING FOR 64 AND 2 COLUMNS.
-     */
+void flipArrayLines(gru_imap_t* array, size_t size, int nCols) {
+	/* Lets say we have a 2D array 3*3.
+	 * The array will be flip by lines and will keep the columns in the original order.
+	 * (numbers in the following array are the send order)
+	 * Original:
+	 * [
+	 *  [1 2 3]
+	 *  [4 5 6]
+	 *  [7 8 9]
+	 * ]
+	 * Result:
+	 * [
+	 *  [7 8 9]
+	 *  [4 5 6]
+	 *  [1 2 3]
+	 * ]
+	 */
+    size_t start = 0;
+    size_t end = size - nCols;
+
+    while (start < end) {
+        // Swap elements at start and end indices for each row
+        for (int i = 0; i < nCols; i++) {
+        	gru_imap_t temp = array[start + i];
+            array[start + i] = array[end + i];
+            array[end + i] = temp;
+        }
+
+        // Move indices towards the center for the next row
+        start += nCols;
+        end -= nCols;
+    }
+}
+void writeInputNextGRU(gru_omap_t* outputGRU, int nCols) {
 	in_pkt tmp;     // to send to next layer
 
     int idx;
     int bytesTransfered = 0;
-    for (int i = 0; i < IHEIGHT; ++i) {
-        // Calculate the LINE based on the direction
-        if (isForward) {
-            idx = i * nCols;
-        } else {
-            idx = (IHEIGHT - 1 - i) * nCols;
-        }
+    for (int i = 0; i < IHEIGHT*nCols; ) {
+        for (int subOffset = 0; subOffset < 64/PACKET_GRU; ++subOffset) {
+			int dataBits = 8;
+			int startData = 0;  int endData = dataBits-1;
+			startData += dataBits * subOffset;  endData += dataBits * subOffset;
 
-        // Iterate over COLS
-        for (int j = 0; j < nCols; ) {            
-            for (int subOffset = 0; subOffset < 64/PACKET_GRU; ++subOffset) {
-                int dataBits = 8;
-                int startData = 0;                  int endData = dataBits-1;
-                startData += dataBits * subOffset;  endData += dataBits * subOffset;
-                if (!isGRU1) {
-                    tmp.data.range(endData,startData) = outputGRU[idx + j].range(7,0);
-                }
-                else {
-                    if (startData < (8*2)) {
-                        /* Why the wierd (8*2) ?
-                        * - GRU_1 will read lines with only 2 columns.
-                        * - But we are sending 8 values, so the last 6 value must be used as padding with 0.
-                        * - This simplifies the GRU_1 "READ_INIT_MAP" loop for now.
-                        * - Super unefficient, so a solution to this mess must be found.
-                        */
-                        tmp.data.range(endData,startData) = outputGRU[idx + j].range(7,0);
-                    }
-                    else
-                        tmp.data.range(endData,startData) = 0;
-                }
-                ++j;
-            }
-            if (i<IHEIGHT-1)
-                tmp.last = (ap_int<1>)0;
-            else
-                tmp.last = (ap_int<1>)1;
-            strm_in.write(tmp);
-            bytesTransfered += 8;	// 64 bits has 8 bytes
-        }
+			tmp.data.range(endData,startData) = outputGRU[i++].range(7,0);
+		}
+		if (i<IHEIGHT-1)
+			tmp.last = (ap_int<1>)0;
+		else
+			tmp.last = (ap_int<1>)1;
+		strm_in.write(tmp);
+		bytesTransfered += 8;	// 64 bits has 8 bytes
     }
-    printf("Total bytes transfered = %d\n", bytesTransfered);
+    printf("writeInputNextGRU: Total bytes transfered = %d\n", bytesTransfered);
 }
 void readOutputGRU(const int nFilters, int isForward, gru_omap_t* output) {
     out_pkt tmpo;
@@ -397,7 +385,7 @@ void readOutputGRU(const int nFilters, int isForward, gru_omap_t* output) {
             }
         }
 	}
-    printf("Total bytes transfered = %d\n", bytesTransfered);
+    printf("readOutputGRU: Total bytes transfered = %d\n", bytesTransfered);
 }
 void printGRUoutput(gru_omap_t* output) {
 	#define OUT_WIDTH_GRU (GRU_FILTERS*2)
@@ -538,7 +526,7 @@ int main() {
 
 	printf("###################################### GRU_0 ######################################\n");
 	printf("---- 0 FORWARD ----\n");
-    writeInputNextGRU(outputConv_converted, FILTERS, GRU_FORWARD);
+    writeInputNextGRU(outputConv_converted, FILTERS);
 	gru( // GRU_0_F
 		strm_in,
 		strm_out,
@@ -548,7 +536,8 @@ int main() {
     printGRUoutput(outputGRU0);
 
 	printf("---- 0 BACKWARD ----\n");
-    writeInputNextGRU(outputConv_converted, FILTERS, GRU_BACKWARD);     // send again same output of conv as input
+	flipArrayLines(outputConv_converted, IHEIGHT*FILTERS, FILTERS);
+    writeInputNextGRU(outputConv_converted, FILTERS);     // send again same output of conv as input flipped
 	gru( // GRU_0_B
 		strm_in,
 		strm_out,
@@ -559,7 +548,7 @@ int main() {
 
 	printf("\n\n\n###################################### GRU_1 ######################################\n");
 	printf("---- 1 FORWARD ----\n");
-    writeInputNextGRU(outputGRU0, GRU_FILTERS*2, GRU_FORWARD, 1);
+    writeInputNextGRU(outputGRU0, GRU_FILTERS*2);
 	gru( // GRU_1_F
 		strm_in,
 		strm_out,
@@ -569,7 +558,8 @@ int main() {
     printGRUoutput(outputGRU1);
     
 	printf("---- 1 BACKWARD ----\n");
-    writeInputNextGRU(outputGRU0, GRU_FILTERS*2, GRU_BACKWARD, 1);
+	flipArrayLines(outputGRU0, IHEIGHT*GRU_FILTERS*2, GRU_FILTERS*2);
+    writeInputNextGRU(outputGRU0, GRU_FILTERS*2);
 	gru( // GRU_1_B
 		strm_in,
 		strm_out,

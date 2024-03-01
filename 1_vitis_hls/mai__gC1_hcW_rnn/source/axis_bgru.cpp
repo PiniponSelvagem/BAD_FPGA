@@ -36,7 +36,7 @@
 typedef ap_axis<64, 0, 0, 0> in_pkt;
 typedef ap_axis<64, 0, 0, 0> out_pkt;
 
-gru_imap_t input[GRU_IN_MAX_COLS];
+gru_imap_t input[GRU_IN_LINES*GRU_IN_MAX_COLS];
 
 
 #define GRU_MAX_STATE   2
@@ -198,11 +198,11 @@ void gru_cell(
 #ifdef DEBUG_GRU
 	printf("#### STEP START ####\n");
 #endif
-    /*
+	/*
     for (int i=0; i<kernelCols; ++i) {
         printf("iVal = %f\n", (*(input + i)).to_float());
     }
-    */
+	*/
 
 	int pkernel_offset = (idx * GRU_SPLIT_SIZE * kernelCols);
     int preckernel_offset = (idx * GRU_SPLIT_SIZE * GRU_KERNEL_REC_COLS);
@@ -212,6 +212,7 @@ void gru_cell(
         matrix_x[i] = 0;
         int pkernel_offset_row = pkernel_offset + (i * kernelCols);
         GRU_cell_loop_x_col: for (int j = 0; j < GRU_KERNEL_COLS_MAX; ++j) {
+#pragma HLS PIPELINE II=2
             if (j >= kernelCols)
                 break;
             gru_imap_t iVal = *(input + j);
@@ -292,6 +293,8 @@ void gru(
 #pragma HLS INTERFACE axis port=strm_out
 #pragma HLS INTERFACE s_axilite port=layerIndex bundle=BUS1
 
+#pragma HLS ARRAY_PARTITION variable=input type=cyclic factor=4
+
     out_pkt tmpo;
     ap_uint<64> output = 0;
 #define GRU_LEFT_TO_SEND    (64/G_IN_W_BIT_WIDTH)
@@ -348,6 +351,22 @@ void gru(
 			break;
 	}
 
+    in_pkt tmp;
+	READ_INIT_MAP: for (int in = 0; in < (GRU_IN_LINES*GRU_IN_MAX_COLS); ) {
+		if (in > (GRU_IN_LINES*kernelCols))
+			break;
+		tmp = strm_in.read();
+		input[in++].range(7,0) = (int)tmp.data.range(7,0);
+		input[in++].range(7,0) = (int)tmp.data.range(15,8);
+		input[in++].range(7,0) = (int)tmp.data.range(23,16);
+		input[in++].range(7,0) = (int)tmp.data.range(31,24);
+
+		input[in++].range(7,0) = (int)tmp.data.range(39,32);
+		input[in++].range(7,0) = (int)tmp.data.range(47,40);
+		input[in++].range(7,0) = (int)tmp.data.range(55,48);
+		input[in++].range(7,0) = (int)tmp.data.range(63,56);
+	}
+
     gru_clearState();
     int row;
     int offset;
@@ -360,29 +379,16 @@ void gru(
         offset = GRU_FILTERS;
     }
 
-    in_pkt tmp;
     ap_uint<17> outputsLeftToSend = GRU_IN_LINES*GRU_FILTERS;	// No further calculations needed because output is 8bits width. This value does not have to be byte alligned.
     GRU_loop_row: for (int i = 0; i < GRU_IN_LINES; ++i) {
         GRU_loop_col: for (int idx = 0; idx < GRU_FILTERS; ++idx) {
         	//gru_t* input_row = input + (row * kernelCols);	/*inSize*/
-            READ_INIT_MAP: for (int in = 0; in < GRU_IN_MAX_COLS; ) {
-                if (in >= kernelCols)
-                    break;
-                tmp = strm_in.read();
-                input[in++].range(7,0) = (int)tmp.data.range(7,0);
-                input[in++].range(7,0) = (int)tmp.data.range(15,8);
-                input[in++].range(7,0) = (int)tmp.data.range(23,16);
-                input[in++].range(7,0) = (int)tmp.data.range(31,24);
+            gru_imap_t* inputLine = input + i*kernelCols;
 
-                input[in++].range(7,0) = (int)tmp.data.range(39,32);
-                input[in++].range(7,0) = (int)tmp.data.range(47,40);
-                input[in++].range(7,0) = (int)tmp.data.range(55,48);
-                input[in++].range(7,0) = (int)tmp.data.range(63,56);
-            }
-
+            //printf("ROW = %d\n", row);
         	//gru_omap_t* output_cell = output + (row * (GRU_FILTERS*2)) + (idx + offset);
             gru_omap_t output_cell;	// not an array because we only use 1 cell
-            gru_cell(idx, kernelCols, input, kernel, bias, rkernel, rbias, &output_cell);
+            gru_cell(idx, kernelCols, inputLine, kernel, bias, rkernel, rbias, &output_cell);
             --outputsLeftToSend;
 
             // adjust packet for later send
