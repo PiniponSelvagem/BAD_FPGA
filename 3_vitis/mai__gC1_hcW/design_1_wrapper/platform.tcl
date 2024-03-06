@@ -28,3 +28,11 @@ bsp reload
 catch {bsp regenerate}
 platform config -updatehw {D:/BAD_FPGA/2_vivado/mai__gC1_hcW/design_1_wrapper.xsa}
 platform generate
+platform active {design_1_wrapper}
+platform config -updatehw {D:/BAD_FPGA/2_vivado/mai__gC1_hcW/design_1_wrapper.xsa}
+platform generate
+platform config -updatehw {D:/BAD_FPGA/2_vivado/mai__gC1_hcW/design_1_wrapper.xsa}
+platform generate -domains 
+platform active {design_1_wrapper}
+platform config -updatehw {D:/BAD_FPGA/2_vivado/mai__gC1_hcW/design_1_wrapper.xsa}
+platform generate

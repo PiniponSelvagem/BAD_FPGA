@@ -173,3 +173,7 @@ __pycache__/
 /3_vitis/mai__gC1_hcW_rnn/microfaune_ai_system/.cproject
 /3_vitis/mai__gC1_hcW_rnn/microfaune_ai_system/.gitignore
 /3_vitis/mai__gC1_hcW_rnn/microfaune_ai_system/.project
+/3_vitis/mai__gC1_hcW_rnn/microfaune_gru/_ide/bitstream/design_1_wrapper.bit
+/3_vitis/mai__gC1_hcW_rnn/microfaune_gru/_ide/hwspec.checksum
+/3_vitis/mai__gC1_hcW_rnn/microfaune_gru/_ide/launch/Debugger_microfaune_gru-Default.launch
+/3_vitis/mai__gC1_hcW_rnn/microfaune_gru/_ide/psinit/psu_init.tcl

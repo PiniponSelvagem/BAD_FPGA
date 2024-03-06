@@ -34,7 +34,7 @@
 #elif SELECTED_INPUT == INPUT_NO_BIRD_1
     #define SELECTED_INPUT_PATH "nobird_1_51034"
 #elif SELECTED_INPUT == INPUT_NO_BIRD_2
-    #define SELECTED_INPUT_PATH "nobird_2_1631"
+    #define SELECTED_INPUT_PATH "nobird_2_1931"
 #elif SELECTED_INPUT == INPUT_NO_BIRD_3
     #define SELECTED_INPUT_PATH "nobird_3_79266"
 #else
@@ -42,7 +42,7 @@
 #endif
 /****************************************************/
 
-#define SOURCE_PATH		  "D:\\BAD_FPGA\\1_vitis_hls\\mai__gC1_hcW\\source\\"
+#define SOURCE_PATH		  "D:\\BAD_FPGA\\1_vitis_hls\\mai__gC1_hcW_rnn\\source\\"
 
 #define INPUTS_PATH       SOURCE_PATH"inputs\\"SELECTED_INPUT_PATH"\\"
 #define WEIGHTS_PATH      SOURCE_PATH"weights\\"
@@ -56,28 +56,6 @@
 #define OUTPUT_LS         INPUTS_PATH"21__time_distributed_1.bin"
 #define OUTPUT_GS         INPUTS_PATH"22__tf.math.reduce_max_1.bin"
 
-
-// gru_0_forward
-#define GRU_0_FORWARD_KERNEL                    WEIGHTS_PATH"q_bidirectional_gru_forward_kernel.bin"
-#define GRU_0_FORWARD_RECURRENT_KERNEL          WEIGHTS_PATH"q_bidirectional_gru_forward_recurrent_kernel.bin"
-#define GRU_0_FORWARD_BIAS                      WEIGHTS_PATH"q_bidirectional_gru_forward_bias.bin"
-#define GRU_0_FORWARD_RECURRENT_BIAS            WEIGHTS_PATH"q_bidirectional_gru_forward_bias_recurrent.bin"
-// gru_0_backward
-#define GRU_0_BACKWARD_KERNEL                   WEIGHTS_PATH"q_bidirectional_gru_backward_kernel.bin"
-#define GRU_0_BACKWARD_RECURRENT_KERNEL         WEIGHTS_PATH"q_bidirectional_gru_backward_recurrent_kernel.bin"
-#define GRU_0_BACKWARD_BIAS                     WEIGHTS_PATH"q_bidirectional_gru_backward_bias.bin"
-#define GRU_0_BACKWARD_RECURRENT_BIAS   		WEIGHTS_PATH"q_bidirectional_gru_backward_bias_recurrent.bin"
-
-// gru_1_forward
-#define GRU_1_FORWARD_KERNEL                    WEIGHTS_PATH"q_bidirectional_1_gru_forward_kernel.bin"
-#define GRU_1_FORWARD_RECURRENT_KERNEL          WEIGHTS_PATH"q_bidirectional_1_gru_forward_recurrent_kernel.bin"
-#define GRU_1_FORWARD_BIAS                      WEIGHTS_PATH"q_bidirectional_1_gru_forward_bias.bin"
-#define GRU_1_FORWARD_RECURRENT_BIAS            WEIGHTS_PATH"q_bidirectional_1_gru_forward_bias_recurrent.bin"
-// gru_1_backward
-#define GRU_1_BACKWARD_KERNEL                   WEIGHTS_PATH"q_bidirectional_1_gru_backward_kernel.bin"
-#define GRU_1_BACKWARD_RECURRENT_KERNEL         WEIGHTS_PATH"q_bidirectional_1_gru_backward_recurrent_kernel.bin"
-#define GRU_1_BACKWARD_BIAS                     WEIGHTS_PATH"q_bidirectional_1_gru_backward_bias.bin"
-#define GRU_1_BACKWARD_RECURRENT_BIAS   		WEIGHTS_PATH"q_bidirectional_1_gru_backward_bias_recurrent.bin"
 
 // timedist_0
 #define TDIST_0_KERNEL WEIGHTS_PATH"time_distributed_kernel.bin"
@@ -168,35 +146,9 @@ void loadIO(
 }
 
 void loadWeights(
-	gru_weigth_t* gru0f_kernel, gru_weigth_t* gru0f_rkernel, gru_weigth_t* gru0f_bias, gru_weigth_t* gru0f_rbias,
-	gru_weigth_t* gru0b_kernel, gru_weigth_t* gru0b_rkernel, gru_weigth_t* gru0b_bias, gru_weigth_t* gru0b_rbias,
-	gru_weigth_t* gru1f_kernel, gru_weigth_t* gru1f_rkernel, gru_weigth_t* gru1f_bias, gru_weigth_t* gru1f_rbias,
-	gru_weigth_t* gru1b_kernel, gru_weigth_t* gru1b_rkernel, gru_weigth_t* gru1b_bias, gru_weigth_t* gru1b_rbias,
 	float* td0_kernel, float* td0_bias,
 	float* td1_kernel, float* td1_bias
 ) {
-    // gru_0_forward
-    load(GRU_0_FORWARD_KERNEL, gru0f_kernel, GRU_FILTERS*CHANNELS*GRU_SPLIT_SIZE, G_WG_W_BIT_WIDTH);
-    load(GRU_0_FORWARD_RECURRENT_KERNEL, gru0f_rkernel, GRU_FILTERS*GRU_FILTERS*GRU_SPLIT_SIZE, sizeof(G_WG_W_BIT_WIDTH));
-    load(GRU_0_FORWARD_BIAS, gru0f_bias, GRU_FILTERS*GRU_SPLIT_SIZE, sizeof(G_WG_W_BIT_WIDTH));
-    load(GRU_0_FORWARD_RECURRENT_BIAS, gru0f_rbias, GRU_FILTERS*GRU_SPLIT_SIZE, sizeof(G_WG_W_BIT_WIDTH));
-    // gru_0_backward
-    load(GRU_0_BACKWARD_KERNEL, gru0b_kernel, GRU_FILTERS*CHANNELS*GRU_SPLIT_SIZE, sizeof(G_WG_W_BIT_WIDTH));
-    load(GRU_0_BACKWARD_RECURRENT_KERNEL, gru0b_rkernel, GRU_FILTERS*GRU_FILTERS*GRU_SPLIT_SIZE, sizeof(G_WG_W_BIT_WIDTH));
-    load(GRU_0_BACKWARD_BIAS, gru0b_bias, GRU_FILTERS*GRU_SPLIT_SIZE, sizeof(G_WG_W_BIT_WIDTH));
-    load(GRU_0_BACKWARD_RECURRENT_BIAS, gru0b_rbias, GRU_FILTERS*GRU_SPLIT_SIZE, sizeof(G_WG_W_BIT_WIDTH));
-
-	// gru_1_forward
-	load(GRU_1_FORWARD_KERNEL, gru1f_kernel, (GRU_FILTERS*2)*GRU_FILTERS*GRU_SPLIT_SIZE, sizeof(G_WG_W_BIT_WIDTH));
-	load(GRU_1_FORWARD_RECURRENT_KERNEL, gru1f_rkernel, GRU_FILTERS*GRU_FILTERS*GRU_SPLIT_SIZE, sizeof(G_WG_W_BIT_WIDTH));
-	load(GRU_1_FORWARD_BIAS, gru1f_bias, GRU_FILTERS*GRU_SPLIT_SIZE, sizeof(G_WG_W_BIT_WIDTH));
-	load(GRU_1_FORWARD_RECURRENT_BIAS, gru1f_rbias, GRU_FILTERS*GRU_SPLIT_SIZE, sizeof(G_WG_W_BIT_WIDTH));
-	// gru_1_backward
-	load(GRU_1_BACKWARD_KERNEL, gru1b_kernel, (GRU_FILTERS*2)*GRU_FILTERS*GRU_SPLIT_SIZE, sizeof(G_WG_W_BIT_WIDTH));
-	load(GRU_1_BACKWARD_RECURRENT_KERNEL, gru1b_rkernel, GRU_FILTERS*GRU_FILTERS*GRU_SPLIT_SIZE, sizeof(G_WG_W_BIT_WIDTH));
-	load(GRU_1_BACKWARD_BIAS, gru1b_bias, GRU_FILTERS*GRU_SPLIT_SIZE, sizeof(G_WG_W_BIT_WIDTH));
-	load(GRU_1_BACKWARD_RECURRENT_BIAS, gru1b_rbias, GRU_FILTERS*GRU_SPLIT_SIZE, sizeof(G_WG_W_BIT_WIDTH));
-
     // timedist_0
     load(TDIST_0_KERNEL, td0_kernel, (FILTERS*2)*FILTERS, sizeof(float));
     load(TDIST_0_BIAS, td0_bias, FILTERS, sizeof(float));

@@ -401,7 +401,10 @@ void printGRUoutput(gru_omap_t* output) {
 void gru2td() {
     printf(" --- gru2td ---\n");
     for (int i=0; i<IHEIGHT*(GRU_FILTERS*2); ++i) {
-        outputGRU1_float[i] = outputGRU1[i].to_float();
+    	unsigned char gruC = outputGRU1[i].range(7,0);
+    	float gruF = outputGRU1[i].to_float();
+    	printf("%d > 0x%02x | %f\n", i, gruC, gruF);
+        outputGRU1_float[i] = gruF;
     }
 }
 
@@ -625,6 +628,7 @@ int main() {
     compareStats("Stats LS: (actual | difference | expected)\n", outputLS, output_expect_LS, IHEIGHT, BREAK_AFTER);
     compareStats("Stats GS: (actual | difference | expected)\n", outputGS, output_expect_GS, 1, BREAK_AFTER);
 #endif
+
 
 #else
 	/*

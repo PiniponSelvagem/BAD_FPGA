@@ -14,7 +14,6 @@
 #define K_SIZE  3
 #define OWIDTH  (IWIDTH-K_SIZE+1+2)		// hardcoded padding, equal do input
 #define OHEIGHT (IHEIGHT-K_SIZE+1+2)	// hardcoded padding, equal to input
-//#define UNROLL  4
 
 
 #endif // !SIZE_CONV3D

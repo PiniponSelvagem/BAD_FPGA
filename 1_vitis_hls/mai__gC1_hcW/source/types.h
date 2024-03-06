@@ -13,7 +13,7 @@ typedef ap_uint<I_BIT_WIDTH*PACKET_CNN> imap_t;		// 2023-11-24 before was ap_int
 typedef ap_uint<I_BIT_WIDTH*PACKET_CNN> omap_t;
 
 /* GRU */
-typedef ap_fixed<G_WG_W_BIT_WIDTH, G_WG_I_BIT_WIDTH> gru_weigth_t;
+typedef ap_fixed<G_WG_W_BIT_WIDTH, G_WG_I_BIT_WIDTH, AP_RND, AP_SAT> gru_weigth_t;
 /* GRU internal types */
 #define I_MXB 4     // max bits used on average for matrix_x array
 typedef ap_fixed<G_IN_W_BIT_WIDTH,G_IN_I_BIT_WIDTH, AP_RND, AP_SAT> gru_imap_t;

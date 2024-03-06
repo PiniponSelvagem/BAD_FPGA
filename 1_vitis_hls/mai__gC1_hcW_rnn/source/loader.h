@@ -34,7 +34,7 @@
 #elif SELECTED_INPUT == INPUT_NO_BIRD_1
     #define SELECTED_INPUT_PATH "nobird_1_51034"
 #elif SELECTED_INPUT == INPUT_NO_BIRD_2
-    #define SELECTED_INPUT_PATH "nobird_2_1631"
+    #define SELECTED_INPUT_PATH "nobird_2_1931"
 #elif SELECTED_INPUT == INPUT_NO_BIRD_3
     #define SELECTED_INPUT_PATH "nobird_3_79266"
 #else
