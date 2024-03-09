@@ -91,16 +91,23 @@ def saveArray_dim4(folder, fileName, array, arrayName, dataType, flatten=False):
                 file.write('    },\n')
         file.write('};\n')
 
-
-
+"""
+import cProfile
+import pstats
+"""
 def packData(packed_bits, array, dataType, saveBinAsInteger=False, binPositiveOnly=False, nPacket=0):
+    """
+    with cProfile.Profile() as pr:
+    """
     # saveBinAsInteger should be True when Kernel is merged with its Scale making the values of the resulted kernel Integers.
     #       knowing that, the values should be saved without the fracction pre-processing
     # binPositiveOnly is only evaluated if saveBinAsInteger is set to False
     # packet is the number of values to contatenate together to get the "PACKET_CNN" in HLS, ex: 64/PACKET_CNN -> 64/16 = 4 bits
     #       the packet_array that is returned is flat with only 1 dimension
     #       if == 0 it will ignore this operation, returning packet_array empty
-    packet_array = np.array([], dtype='str')
+    packet_array_initial_size = 431*40*64
+    packet_array_curr_index = 0
+    packet_array = np.empty(packet_array_initial_size, dtype=object)
     if dataType["name"] == "ap_fixed":
         bits_total = dataType["bits_total"]
         bits_int = dataType["bits_int"]
@@ -132,12 +139,16 @@ def packData(packed_bits, array, dataType, saveBinAsInteger=False, binPositiveOn
         prevBinary = "0000"
         packet_array_curr = ""
         pacs_count = 0   # paccket_array_curr_size_count
+        """
         percent_size = len(array)
+        """
         pencent_idx = 0
         for value in array:
+            """
             percentage = (pencent_idx + 1) / percent_size * 100
             if percentage % 10 == 0:
                 print(f"{percentage:.0f}%")
+            """
             pencent_idx += 1
             # Check for overflow and underflow
             if value > max_value:
@@ -178,7 +189,12 @@ def packData(packed_bits, array, dataType, saveBinAsInteger=False, binPositiveOn
                 packet_array_curr = binary+packet_array_curr
                 decimal_value = int(packet_array_curr, 2)
                 hexadecimal_result = hex(decimal_value)
-                packet_array = np.append(packet_array, hexadecimal_result)
+                #packet_builder.write(hexadecimal_result)
+                if packet_array_curr_index >= len(packet_array):
+                    packet_array = np.resize(packet_array, len(packet_array) * 2)
+                packet_array[packet_array_curr_index] = hexadecimal_result
+                packet_array_curr_index += 1
+                #packet_array = np.append(packet_array, hexadecimal_result)
                 packet_array_curr = ""
                 pacs_count = 0
             else:
@@ -193,7 +209,12 @@ def packData(packed_bits, array, dataType, saveBinAsInteger=False, binPositiveOn
                     packet_array_curr = binary+packet_array_curr
                     decimal_value = int(packet_array_curr, 2)
                     hexadecimal_result = hex(decimal_value)
-                    packet_array = np.append(packet_array, hexadecimal_result)
+                    #packet_builder.write(hexadecimal_result)
+                    if packet_array_curr_index >= len(packet_array):
+                        packet_array = np.resize(packet_array, len(packet_array) * 2)
+                    packet_array[packet_array_curr_index] = hexadecimal_result
+                    packet_array_curr_index += 1
+                    #packet_array = np.append(packet_array, hexadecimal_result)
                     packet_array_curr = ""
                     pacs_count = 0
                 else:
@@ -223,6 +244,13 @@ def packData(packed_bits, array, dataType, saveBinAsInteger=False, binPositiveOn
         bits = bitarray()
         bits.frombytes(binary_representation)
         packed_bits.extend(bits)
+    """
+    stats = pstats.Stats(pr)
+    stats.sort_stats(pstats.SortKey.TIME)
+    # Now you have two options, either print the data or save it as a file
+    stats.print_stats() # Print The Stats
+    """
+    packet_array = packet_array[:packet_array_curr_index]
     return packed_bits, packet_array
 
 def packBits(packed_bits, array, dataType, saveBinAsInteger, binPositiveOnly, nPacket):
@@ -231,13 +259,14 @@ def packBits(packed_bits, array, dataType, saveBinAsInteger, binPositiveOnly, nP
     return packed_bits, packet_array
 
 
-def saveArray_bin(folder, fileName, array, dataType, saveBinAsInteger, binPositiveOnly, nPacket):
+def saveArray_bin(folder, fileName, array, dataType, saveBinAsInteger, binPositiveOnly, nPacket, saveFile=True):
     file_path = os.path.join(folder, '{}.bin'.format(fileName))
     packed_bits = bitarray()
     packed_bits, packet_array = packBits(packed_bits, array, dataType, saveBinAsInteger, binPositiveOnly, nPacket)
     #print(packed_bits)
-    saveFileBin(file_path, packed_bits, dataType)
-    return packet_array
+    if (saveFile):
+        saveFileBin(file_path, packed_bits, dataType)
+    return packed_bits, packet_array
 
 
 def saveFileBin(file_path, packed_bits, dataType):
@@ -262,19 +291,19 @@ def saveArray(folder, fileName, array, arrayName, dataType, saveBinAsInteger=Fal
     if size == 1:
         saveArray_dim1(folder, fileName, array, arrayName, "float", flatten)
         if (saveBin):
-            packet_array = saveArray_bin(folder, fileName, array, dataType, saveBinAsInteger, binPositiveOnly, nPacket)
+            _, packet_array = saveArray_bin(folder, fileName, array, dataType, saveBinAsInteger, binPositiveOnly, nPacket)
     elif size == 2:
         saveArray_dim2(folder, fileName, array, arrayName, "float", flatten)
         if (saveBin):
-            packet_array = saveArray_bin(folder, fileName, array, dataType, saveBinAsInteger, binPositiveOnly, nPacket)
+            _, packet_array = saveArray_bin(folder, fileName, array, dataType, saveBinAsInteger, binPositiveOnly, nPacket)
     elif size == 3:
         saveArray_dim3(folder, fileName, array, arrayName, "float", flatten)
         if (saveBin):
-            packet_array = saveArray_bin(folder, fileName, array, dataType, saveBinAsInteger, binPositiveOnly, nPacket)
+            _, packet_array = saveArray_bin(folder, fileName, array, dataType, saveBinAsInteger, binPositiveOnly, nPacket)
     elif size == 4:
         saveArray_dim4(folder, fileName, array, arrayName, "float", flatten)
         if (saveBin):
-            packet_array = saveArray_bin(folder, fileName, array, dataType, saveBinAsInteger, binPositiveOnly, nPacket)
+            _, packet_array = saveArray_bin(folder, fileName, array, dataType, saveBinAsInteger, binPositiveOnly, nPacket)
     else:
         print("ERROR saving array {}, with total dimensions {}.".format(arrayName, size))
     #
