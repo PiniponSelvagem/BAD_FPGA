@@ -26,6 +26,55 @@ float outputGS[1];
 /* ********** */
 
 
+#include "xtime_l.h"
+
+#define DO_TIMES
+#define TIMER_COUNTS_PER_SECOND		COUNTS_PER_SECOND
+struct Times {
+	XTime conv0;
+	XTime conv1;
+	XTime conv2;
+	XTime conv3;
+	XTime conv4;
+	XTime conv5;
+	XTime conv2gru;
+	XTime bgru_0;
+	XTime bgru_1;
+	XTime gru2td;
+	XTime timedist_0;
+	XTime timedist_1;
+	XTime reducemax_1;
+};
+
+Times xtimes = {};
+void getLastTimes(Times* times) {
+	times->conv0 = xtimes.conv0;
+	times->conv1 = xtimes.conv1;
+	times->conv2 = xtimes.conv2;
+	times->conv3 = xtimes.conv3;
+	times->conv4 = xtimes.conv4;
+	times->conv5 = xtimes.conv5;
+	times->conv2gru = xtimes.conv2gru;
+	times->bgru_0 = xtimes.bgru_0;
+	times->bgru_1 = xtimes.bgru_1;
+	times->gru2td = xtimes.gru2td;
+	times->timedist_0 = xtimes.timedist_0;
+	times->timedist_1 = xtimes.timedist_1;
+	times->reducemax_1 = xtimes.reducemax_1;
+}
+
+#ifdef DO_TIMES
+#define START_TIMER		XTime_GetTime(&tStart);
+#define STOP_TIMER(name) \
+		XTime_GetTime(&tEnd); \
+		xtimes.name = (tEnd - tStart);
+#else
+#define START_TIMER		 ;
+#define STOP_TIMER(name) ;
+#endif
+
+
+
 int init_model() {
 	int status = init_conv3d();
 	if (status != 0) {
@@ -41,96 +90,54 @@ int init_model() {
 }
 
 float modelPredict(const unsigned char* input) {
+	#ifdef DO_TIMES
 	XTime tStart, tEnd;
+	#endif // DO_TIMES
 
-	XTime_GetTime(&tStart);
+		START_TIMER
 	conv3d_0(input);
+		STOP_TIMER(conv0)
+		START_TIMER
 	conv3d_1();
+		STOP_TIMER(conv1)
+		START_TIMER
 	conv3d_2();
+		STOP_TIMER(conv2)
+		START_TIMER
 	conv3d_3();
+		STOP_TIMER(conv3)
+		START_TIMER
 	conv3d_4();
+		STOP_TIMER(conv4)
+		START_TIMER
 	unsigned char* outConv = conv3d_5();
-	XTime_GetTime(&tEnd);
+		STOP_TIMER(conv5)
 
-
-	printf("\nTime: Conv3D\n");
-	printf("> Clock cycles: %llu\n", 1*(tEnd - tStart));
-	printf("> %.3f us\n", 1.0 * (tEnd - tStart) / (COUNTS_PER_SECOND/1000000));
-	printf("> %.3f ms\n", 1.0 * (tEnd - tStart) / (COUNTS_PER_SECOND/1000));
-	printf("> %.3f s\n", 1.0 * (tEnd - tStart) / COUNTS_PER_SECOND);
-
-
-	XTime_GetTime(&tStart);
+		START_TIMER
 	conv2gru(outConv, CONV_OUTPUT_SIZE_5_IN_BYTES, inGru);
 	Xil_DCacheInvalidateRange((INTPTR)(inGru), GRU_INPUT_SIZE_0_IN_BYTES);
-	XTime_GetTime(&tEnd);
+		STOP_TIMER(conv2gru)
 
-	printf("\nTime: conv2gru\n");
-	printf("> Clock cycles: %llu\n", 1*(tEnd - tStart));
-	printf("> %.3f us\n", 1.0 * (tEnd - tStart) / (COUNTS_PER_SECOND/1000000));
-	printf("> %.3f ms\n", 1.0 * (tEnd - tStart) / (COUNTS_PER_SECOND/1000));
-	printf("> %.3f s\n", 1.0 * (tEnd - tStart) / COUNTS_PER_SECOND);
-
-	/*
-	unsigned int *out1 = (unsigned int*)outConv;
-#define EXIT1		(CONV_OUTPUT_SIZE_5_IN_BYTES/8)*2	// div 8 -> 32bits/4bits = 8 values   |   mult 2 -> 32 bits int and we using 64 bits
-	for (unsigned int i=0; i<EXIT1; ++i) {
-		printf("outConv[%d] = 0x%08x\r\n", i, out1[i]);
-	}
-	*/
-
-	/*
-	// validate gru input
-	for (unsigned int i=0; i<27584; ++i) {
-		unsigned char expected = input_gru[i];
-		unsigned char actual = inGru[i];
-		if (actual != expected)
-			printf("i=%d | expected=%0x02 - actual=0x%02x\r\n", i, expected, actual);
-	}
-	*/
-
-	XTime_GetTime(&tStart);
+		START_TIMER
 	bgru_0(inGru /*input_gru*/, outputArray0);
+		STOP_TIMER(bgru_0)
+		START_TIMER
 	bgru_1(outputArray0, outputArray1);
-	XTime_GetTime(&tEnd);
+		STOP_TIMER(bgru_1)
 
-	printf("\nTime: BGRU\n");
-	printf("> Clock cycles: %llu\n", 1*(tEnd - tStart));
-	printf("> %.3f us\n", 1.0 * (tEnd - tStart) / (COUNTS_PER_SECOND/1000000));
-	printf("> %.3f ms\n", 1.0 * (tEnd - tStart) / (COUNTS_PER_SECOND/1000));
-	printf("> %.3f s\n", 1.0 * (tEnd - tStart) / COUNTS_PER_SECOND);
-
-	/*
-	printf("          GRU_0   |   GRU_1\r\n");
-	for (unsigned int a=0, b=0, l=0; a<RNN_OUT_SIZE; ++l) {
-		printf("[%3d] - 0x%02x 0x%02x | 0x%02x 0x%02x\r\n", l, outputArray0[a++], outputArray0[a++], outputArray1[b++], outputArray1[b++]);
-	}
-	*/
-
-
+		START_TIMER
 	gru2td(outputArray1, RNN_OUT_SIZE, outputGRU);
+		STOP_TIMER(gru2td)
 
+		START_TIMER
 	timedist_0(outputGRU, outputTD0);
-	/*
-	for (int i=0; i<IHEIGHT; ++i) {
-		printf("[%3d] - ", i);
-		for (int j=0; j<FILTERS; ++j) {
-			printf("%10f ", outputTD0[(i*FILTERS)+j]);
-		}
-		printf("\n");
-	}
-	*/
-
+		STOP_TIMER(timedist_0)
+		START_TIMER
 	timedist_1(outputTD0, outputLS);
-	/*
-	for (int i=0; i<IHEIGHT; ++i) {
-		printf("[%3d] - %10f\n", i, outputLS[i]);
-		if (i>95)
-			sleep(2);
-	}
-	*/
-
+		STOP_TIMER(timedist_1)
+		START_TIMER
 	reducemax_1(outputLS, outputGS);
+		STOP_TIMER(reducemax_1)
 
 	return outputGS[0];
 }

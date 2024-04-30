@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="ASCII"?>
-<sdkproject:SdkProject xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:sdkproject="http://www.xilinx.com/sdkproject" name="microfaune_ai" location="D:/BAD_FPGA/3_vitis/mai__gC1_hcW/microfaune_ai" platform="D:/BAD_FPGA/3_vitis/mai__gC1_hcW/design_1_wrapper/export/design_1_wrapper/design_1_wrapper.xpfm" platformUID="xilinx:ultra96v2::0.0(custom)" systemProject="microfaune_ai_system" sysConfig="design_1_wrapper" runtime="cpp" cpu="standalone_psu_cortexa53_0" cpuInstance="psu_cortexa53_0" os="standalone" language="CPP" mssSignature="818ac9cbcfcd7d300a368db22033c039">
-  <configuration name="Debug" id="xilinx.gnu.arm.a53.exe.debug.1801846403">
+<sdkproject:SdkProject xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:sdkproject="http://www.xilinx.com/sdkproject" name="microfaune_ai" location="D:/BAD_FPGA/3_vitis/mai__gC1_hcW/microfaune_ai" platform="D:/BAD_FPGA/3_vitis/mai__gC1_hcW/design_1_wrapper/export/design_1_wrapper/design_1_wrapper.xpfm" platformUID="xilinx:ultra96v2::0.0(custom)" systemProject="microfaune_ai_system" sysConfig="design_1_wrapper" runtime="cpp" cpu="standalone_psu_cortexa53_0" cpuInstance="psu_cortexa53_0" os="standalone" language="CPP" mssSignature="11cfcc809e91326c7b5f98320a6c9d8e">
+  <configuration name="Debug" id="xilinx.gnu.arm.a53.exe.debug.1001624392">
     <configBuildOptions xsi:type="sdkproject:SdkOptions"/>
     <lastBuildOptions xsi:type="sdkproject:SdkOptions"/>
   </configuration>
-  <configuration name="Release" id="xilinx.gnu.arm.a53.exe.release.1558758140" dirty="true">
+  <configuration name="Release" id="xilinx.gnu.arm.a53.exe.release.1084559468" dirty="true">
     <configBuildOptions xsi:type="sdkproject:SdkOptions"/>
   </configuration>
   <template appTemplateName="empty_application"/>
