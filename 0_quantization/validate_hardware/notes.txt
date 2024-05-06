@@ -1,0 +1,2 @@
+- kernel unroll 1 e remover o unroll do loop interior faz com que esse unroll interno fique unroll 4 (completo)
+- não foi possivel 200Mhz porque deu "resource violation" na memoria, "period 5"

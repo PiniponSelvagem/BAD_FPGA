@@ -14,21 +14,15 @@ gpus = tf.config.experimental.list_physical_devices('GPU')
 for gpu in gpus:
     tf.config.experimental.set_memory_growth(gpu, True)
 
-import qkeras_microfaune_model as qmodel
-from model_config.config_0_qconvbnorm__input_relu_tensorflowBGRU_GRUunits1 import ModelConfig
-
 import cutils
 from bitarray import bitarray
-
+from qkeras_microfaune_model_1cell import MicrofauneAI
 
 dataset = "ff1010bird"
-nSelByClass = 8       # Will select X with 0 class and X with 1 class, total will the X*2 and the 1st half is all 0 class and 2nd half all 1 class.
+nSelByClass = 200       # Will select X with 0 class and X with 1 class, total will the X*2 and the 1st half is all 0 class and 2nd half all 1 class.
 basePath = "/mnt/e/Rodrigo/ISEL/2_Mestrado/2-ANO_1-sem/TFM"
 
-directory = "validate_hardware/"
-binName = "input_"+str(nSelByClass*2)
-
-
+directory = "validate_original"
 
 
 
@@ -36,11 +30,11 @@ binName = "input_"+str(nSelByClass*2)
 detector = RNNDetector()
 modelOrig = detector.model
 
-# Load quantized model
-modelQuant_folder = ModelConfig.folder
-modelQuant_name = ModelConfig.name
-_, modelQuant = qmodel.MicrofauneAI(ModelConfig).modelQuantized()
-modelQuant.load_weights(f"{modelQuant_folder}/{modelQuant_name}.h5")
+# Load modified model
+modelMod_folder = "/mnt/e/Rodrigo/ISEL/2_Mestrado/2-ANO_1-sem/TFM/BAD_FPGA/0_quantization/model"
+modelMod_name = "microfaune_1cell"
+_, modelMod = MicrofauneAI().modelOriginal()
+modelMod.load_weights(f"{modelMod_folder}/{modelMod_name}.h5")
 
 
 
@@ -53,10 +47,9 @@ data_type["bits_int"] = 0
 doPaddingInput = True
 START_PADDING = 64   # number of padding to place on the z axis with zeros to achieve padding for HLS
 
-folderDumpIO = "validate_hardware"
 
-if not os.path.isdir(folderDumpIO):
-    os.makedirs(folderDumpIO)
+if not os.path.isdir(directory):
+    os.makedirs(directory)
 ##################################################
 
 
@@ -128,66 +121,22 @@ class Stats:
         return [self.name, self.original, self.quantized]
 
 def saveStatsToCSV(stats, csvName):
-    with open(directory+csvName+'.csv', 'w', newline='') as csvfile:
-        fieldnames = ['Name', 'Original', 'Quantized']
+    with open(directory+"/"+csvName+'.csv', 'w', newline='') as csvfile:
+        fieldnames = ['Name', 'Original', 'Modified']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
         for stat in stats:
             writer.writerow(dict(zip(fieldnames, stat.toList())))
 
-def getInputBin(fileName, X):
-    """
-    Simplified version of qKeras_microfaune_dump_io.py that only saves the q_activation, aka quantized input, to bin file
-    """
-    layers_names = []
-    for layer in modelQuant.layers:
-        layers_names.append(layer.name)
-    #
-    def getOutputOfLayer(layer_name, X):
-        features = tf.keras.models.Model(
-            inputs=modelQuant.inputs,
-            outputs=modelQuant.get_layer(name=layer_name).output,
-        )
-        return features(np.array(X))
-    #
-    out = getOutputOfLayer("q_activation", X)
-    if doPaddingInput:  # if layer_name == "q_activation":
-        # add padding to 1st input layer
-        original_shape = out.shape
-        # Create a new shape with the same dimensions, except the last dimension is set to 64
-        new_shape = list(original_shape)
-        new_shape[-1] = START_PADDING
-        # Reshape the array to the new shape
-        new_array = np.zeros(new_shape)
-        new_array[..., 0] = out[..., 0]
-        # Convert NumPy array to TensorFlow tensor
-        tf_tensor = tf.constant(new_array)
-        out = tf_tensor
-    #
-    return cutils.saveArray_bin(folderDumpIO, fileName, np.array(out), data_type, saveBinAsInteger=False, binPositiveOnly=True, nPacket=1, saveFile=False)
-
-def saveBinPack(file_path, packed_bits):
-    packed_data = b''
-    while len(packed_bits) % 8 != 0:
-        # Pad the packed bits to a multiple of 8 if necessary
-        packed_bits.append(False)
-    #
-    packed_data = packed_bits.tobytes()
-    with open(file_path, 'wb') as file:
-        file.write(packed_data)
-
 def predictAll(selected_files, modelOrig, modelQuant):
     stats = np.array([])
-    binData = bitarray()
     for file in selected_files:
         fs, data = load_wav(audioDir+file+".wav")
         X = compute_features([data])
         scoreOrig, _  = modelOrig.predict(np.array(X))
-        scoreQuant, _ = modelQuant.predict(np.array(X))
-        packet_bits, _ = getInputBin(file, X)
-        binData.extend(packet_bits)
-        stats = np.append(stats, Stats(file, scoreOrig[0][0], scoreQuant[0][0]))
-    return stats, binData
+        scoreMod, _ = modelQuant.predict(np.array(X))
+        stats = np.append(stats, Stats(file, scoreOrig[0][0], scoreMod[0][0]))
+    return stats
 
 
 start = time.time()
@@ -213,26 +162,12 @@ assert len(selected_files_0) == nSelByClass
 assert len(selected_files_1) == nSelByClass
 
 # Predict selection
-stats_0, bin_data_0 = predictAll(selected_files_0, modelOrig, modelQuant)
-stats_1, bin_data_1 = predictAll(selected_files_1, modelOrig, modelQuant)
-
-bin_data_0.extend(bin_data_1)
-binData = bin_data_0
-saveBinPack(directory+binName+".bin", binData)
+stats_0 = predictAll(selected_files_0, modelOrig, modelMod)
+stats_1 = predictAll(selected_files_1, modelOrig, modelMod)
 
 # Save stats to CSV
 saveStatsToCSV(stats_0, "stats_0")
 saveStatsToCSV(stats_1, "stats_1")
-
-
-
-
-
-
-
-
-
-
 
 
 #########################################################

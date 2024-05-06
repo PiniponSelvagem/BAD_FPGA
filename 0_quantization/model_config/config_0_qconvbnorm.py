@@ -103,7 +103,8 @@ class ModelConfig:
         x = QBidirectional(
             QGRU(n_filter,
                 activation = f"quantized_tanh({bits})",
-                recurrent_activation = f"quantized_relu({bits},{integer_gru_recact},{symmetric})",
+                recurrent_activation = f'hard_sigmoid({bits})',
+                #recurrent_activation = f"quantized_relu({bits},{integer_gru_recact},{symmetric})",
                 kernel_quantizer = f"quantized_bits({bits},{integer},{symmetric})",
                 recurrent_quantizer = f"quantized_bits({bits},{integer},{symmetric})",
                 bias_quantizer = f"quantized_bits({bits},{integer},{symmetric})",
@@ -114,7 +115,8 @@ class ModelConfig:
         x = QBidirectional(
             QGRU(n_filter,
                 activation = f"quantized_tanh({bits})",
-                recurrent_activation = f"quantized_relu({bits},{integer_gru_recact},{symmetric})",
+                recurrent_activation = f'hard_sigmoid({bits})',
+                #recurrent_activation = f"quantized_relu({bits},{integer_gru_recact},{symmetric})",
                 kernel_quantizer = f"quantized_bits({bits},{integer},{symmetric})",
                 recurrent_quantizer = f"quantized_bits({bits},{integer},{symmetric})",
                 bias_quantizer = f"quantized_bits({bits},{integer},{symmetric})",
