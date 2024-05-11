@@ -42,7 +42,7 @@
 #endif
 /****************************************************/
 
-#define SOURCE_PATH		  "D:\\BAD_FPGA\\1_vitis_hls\\mai__gC1_hcW_rnn\\source\\"
+#define SOURCE_PATH		  "D:\\BAD_FPGA\\1_vitis_hls\\mai__gC1_hcW\\source\\"
 
 #define INPUTS_PATH       SOURCE_PATH"inputs\\"SELECTED_INPUT_PATH"\\"
 #define WEIGHTS_PATH      SOURCE_PATH"weights\\"

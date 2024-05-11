@@ -178,3 +178,12 @@ __pycache__/
 /3_vitis/mai__gC1_hcW_rnn/microfaune_gru/_ide/launch/Debugger_microfaune_gru-Default.launch
 /3_vitis/mai__gC1_hcW_rnn/microfaune_gru/_ide/psinit/psu_init.tcl
 /1_vitis_hls/mai__gC1_hcW/export/
+/1_vitis_hls/mai__gC1_hcW/source/inputs/
+/1_vitis_hls/mai__gC1_hcW_rnn/source/inputs/
+/1_vitis_hls/mai__gC1_hcW_rnn/source/weights/
+/1_vitis_hls/microfaune_ai__gruCells1__hardcodedWeights/source/inputs/
+/1_vitis_hls/microfaune_ai__gruCells1__hardcodedWeights/source/weights/
+/2_vivado/mai__gC1_hcW - x2_HPs
+/2_vivado/mai__gC1_hcW/mai__gC1_hcW.cache/
+/2_vivado/mai__gC1_hcW/mai__gC1_hcW.gen/
+/playground/ARM_model/

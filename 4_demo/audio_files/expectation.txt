@@ -1,0 +1,9 @@
+bird_0_50124      // expected 1 cell: 0.9706467986106873   | expected 64 cells: 0.9919541478157043
+bird_1_52046      // expected 1 cell: 0.5680659413337708   | expected 64 cells: 0.9428370594978333
+bird_2_16835      // expected 1 cell: 0.9324995875358582   | expected 64 cells: 0.9812303781509399
+bird_3_80705      // expected 1 cell: 0.9636806845664978   | expected 64 cells: 0.9797500371932983
+
+nobird_0_50678    // expected 1 cell: 0.041791435331106186 | expected 64 cells: 0.0710141733288765
+nobird_1_51034    // expected 1 cell: 0.40294381976127625  | expected 64 cells: 0.12189839780330658
+nobird_2_1931     // expected 1 cell: 0.061949472874403    | expected 64 cells: 0.041453707963228226
+nobird_3_79266    // expected 1 cell: 0.12713807821273804  | expected 64 cells: 0.0648108646273613
