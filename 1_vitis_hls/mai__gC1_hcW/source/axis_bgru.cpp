@@ -38,7 +38,7 @@ gru_imap_t input[GRU_IN_LINES*GRU_IN_MAX_COLS];
 
 
 #define GRU_MAX_STATE   2
-gru_omap_t state[GRU_MAX_STATE][GRU_FILTERS];     // 0 -> current, 1 -> next
+gru_omap_t state[GRU_MAX_STATE][GRU_FILTERS];     // 0 -> current, 1 -> next   // This can be improved by commutating the current selected state.
 
 void gru_clearState() {
     GRU_clearstate_loop_row: for (int i = 0; i < GRU_MAX_STATE; ++i) {
@@ -250,7 +250,7 @@ void gru(
 
     ap_uint<17> outputsLeftToSend = GRU_IN_LINES*GRU_FILTERS;	// No further calculations needed because output is 8bits width. This value does not have to be byte alligned.
     GRU_loop_row: for (int i = 0; i < GRU_IN_LINES; ++i) {
-        GRU_loop_col: for (int idx = 0; idx < GRU_FILTERS; ++idx) {
+        GRU_loop_cell: for (int idx = 0; idx < GRU_FILTERS; ++idx) {
         	//gru_t* input_row = input + (row * kernelCols);	/*inSize*/
             gru_imap_t* inputLine = input + i*kernelCols;
 

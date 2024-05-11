@@ -192,10 +192,12 @@ void conv2D(hls::stream<in_pkt> &strm_in, hls::stream<out_pkt> &strm_out, int la
                     img_in[(orow+3)%4 * maxWidth*CHANNELS/PACKET_CNN + rd_index] = tmp.data.range(63, 0);
                 }
                 rd_index += 1;
-                for (int j = 0; j < K_SIZE; j++){
-                    for (int k = 0; k < K_SIZE; k++){
-                        for (int l = 0; l < CHANNELS/PACKET_CNN; l++){
-#pragma HLS UNROLL factor = 2
+                loop_kernel_j: for (int j = 0; j < K_SIZE; j++){
+//#pragma HLS UNROLL factor = 1
+                	loop_kernel_k: for (int k = 0; k < K_SIZE; k++){
+#pragma HLS UNROLL factor = 1
+                    	loop_calc: for (int l = 0; l < CHANNELS/PACKET_CNN; l++){
+//#pragma HLS UNROLL factor = 4
                             i_index = ((orow+j)%4) * maxWidth*CHANNELS/PACKET_CNN + (ocol+k) * CHANNELS/PACKET_CNN + l;
                             //printf("bi = %d\n", (int)i_index);
                             //printf("orow= %d | ocol= %d | i (filter)= %d | j= %d | k= %d | l= %d\n", (int)orow, (int)ocol, (int)i, (int)j, (int)k, (int)l);

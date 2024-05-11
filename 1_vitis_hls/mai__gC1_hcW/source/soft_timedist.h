@@ -37,6 +37,25 @@ void timedistributed_dense(
             *poutput = out;
         }
     }
+
+    /*
+    float input[IHEIGHT][inCols] = {};
+    float output[IHEIGHT][kLines] = {};
+    TDIST_loop_row: for (int row = 0; row < IHEIGHT; ++row) {
+		TDIST_loop_col: for (int ocol = 0; ocol < outCols; ++ocol) {
+			float bias[ocol] = {};
+			float acc = bias[ocol];
+			TDIST_loop_kcol: for (int kcol = 0; kcol < kCols; ++kcol) {
+				float kernel[ocol][kCols] = {};
+				float k = kernel[ocol][kcol];
+				float i = input[row][kcol];
+				acc += k * i;
+			}
+			float out = SIGMOID_FLOAT(acc);
+			output[row][ocol] = out;
+		}
+	}
+     */
 }
 
 #endif // TIMEDIST_H

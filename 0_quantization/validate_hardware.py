@@ -14,7 +14,7 @@ gpus = tf.config.experimental.list_physical_devices('GPU')
 for gpu in gpus:
     tf.config.experimental.set_memory_growth(gpu, True)
 
-import qkeras_microfaune_model as qmodel
+import qkeras_microfaune_model_1cell as qmodel
 from model_config.config_0_qconvbnorm__input_relu_tensorflowBGRU_GRUunits1 import ModelConfig
 
 import cutils
