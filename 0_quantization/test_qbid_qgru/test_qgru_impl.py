@@ -17,9 +17,42 @@ integer = "1"
 integer_gru_recact = "0"
 symmetric = "1"
 
-### model start ###
 units = 2
-spec = keras.Input(shape=[None, 1], dtype=np.float32)
+input_size = 3
+
+if units == 1 and input_size == 1:
+    kernel = np.array([[-0.875, 0.25, 0.125]])            # [[-0.875 0.21875 0.109375]]
+    recurrent_kernel = np.array([[-0.75, -0.25, 0.75]])   # [[-0.75 -0.21875 0.75]]
+    bias = np.array([0.125, -0.125, 0.875])               # [0 0 1]
+    input_data = np.array([[0.125, -0.125]])
+
+if units == 2 and input_size == 1:
+    kernel = np.array([
+        [ -0.875, 0.25, 0.125,   0.5, -0.125, 0.125 ],
+    ])
+    recurrent_kernel = np.array([
+        [ -0.125, -0.25,  0.75,    0.125,  0.25, -0.75 ],
+        [  0.125,  0.25, -0.75,   -0.125, -0.25,  0.75 ]
+    ])
+    bias = np.array([-0.875, -0.125, -0.5,    0.875, 0.125, 0.5])
+    input_data = np.array([[0.125]])
+
+if units == 2 and input_size == 3:
+    kernel = np.array([
+        [ -0.875, 0.25, 0.125,   0.5, -0.125, 0.125 ],
+        [ -0.125, 0.25, 0.875,  -0.5,  0.25, -0.125 ],
+        [  0.5,   0.5, -0.875,  -0.25, 0.125, 0.125 ],
+    ])
+    recurrent_kernel = np.array([
+        [ -0.125, -0.25,  0.75,    0.125,  0.25, -0.75 ],
+        [  0.125,  0.25, -0.75,   -0.125, -0.25,  0.75 ]
+    ])
+    bias = np.array([-0.875, -0.125, -0.5,    0.875, 0.125, 0.5])
+    input_data = np.array([[[0.375, -0.125, 0.5]]])
+
+
+### model start ###
+spec = keras.Input(shape=[None, input_size], dtype=np.float32)
 x = QGRU(units,
         activation = f"quantized_tanh({bits})",
         recurrent_activation = f"quantized_relu({bits},{integer_gru_recact},{symmetric})",
@@ -33,22 +66,37 @@ x = QGRU(units,
 #
 _model = keras.Model(inputs=spec, outputs=x)
 model = model_quantize(_model, None, bits, transfer_weights=True)
+model.weights
 
+# units = 3 & input_size = 2
+# kernel (2, 9) -> [2][9]           ---> [input_size][unints * 3]
+# recurrent_kernel (3, 9) -> [3][9] ---> [units][units * 3]
+# bias (192) -> [9]                 ---> [units * 3]
+
+# units = 64 & input_size = 1
+# kernel (1, 192) -> [3][64]
+# recurrent_kernel (64, 192) -> [64][3][64]
+# bias (192) -> [3][64]
+
+# units = 64 & input_size = 64
+# kernel (64, 192) -> [64][3][64]
+# recurrent_kernel (64, 192) -> [64][3][64]
+# bias (192) -> [3][64]
+
+## WARNING: the script to save weights, rearanges the weights, so [3][64] can be changed to [64][3]
 
 
 # QGRU does not have "recurrent_bias"
 
-#kernel = np.array([[-0.875, 0.25, 0.125]])            # [[-0.875 0.21875 0.109375]]
-#recurrent_kernel = np.array([[-0.75, -0.25, 0.75]])   # [[-0.75 -0.21875 0.75]]
-#bias = np.array([0.125, -0.125, 0.875])               # [0 0 1]
 
-kernel = np.array([[-0.875, 0.25, 0.125,    -0.125, 0.375, -0.25]])
+"""
+kernel = np.array([[-0.875, 0.25, 0.125], [-0.125, 0.375, -0.25]])
 recurrent_kernel = np.array([
     [-0.125, -0.25, 0.75,    -0.375,  0.125,  0.5],
     [ 0.125,  0,    0.25,     0.375, -0.125, -0.5],
 ])
 bias = np.array([-0.875, -0.125, -0.5,     0.875, -0.125, 0.375])
-
+"""
 
 model.set_weights([
     kernel, recurrent_kernel, bias
@@ -56,15 +104,8 @@ model.set_weights([
 
 
 
-
-input_data = np.array([[0.125, -0.125]])
 result = model.predict(input_data)
 print(result)
-
-
-
-
-
 
 
 
@@ -86,6 +127,7 @@ def recurrent_activation(value):
 def gru_cell(input, h_tm1):
     ####################################################
     # The "split", example:
+    # units = 2
     # xpto = [ 1, 2, 3, 4, 5, 6 ]
     # z = xpto[:, :units])              ---> z = [1, 2] 
     # r = xpto[:, units:units * 2])     ---> r = [3, 4]
@@ -126,6 +168,7 @@ def gru_cell(input, h_tm1):
     print("h_tm1_r =", h_tm1_r)
     print("h_tm1_h =", h_tm1_h)
     #
+    print("quantiz", quantized_recurrent[:, :units])
     recurrent_z = np.dot(h_tm1_z, quantized_recurrent[:, :units])
     recurrent_r = np.dot(h_tm1_r, quantized_recurrent[:, units:units * 2])
     print("recurrent_z =", recurrent_z)
@@ -155,6 +198,45 @@ out1, h_tm1 = gru_cell(np.array(inputs[1]), h_tm1)
 
 
 
+
+
+
+
+units = 2
+quantized_kernel = np.array([
+    [ -0.875, 0.25, 0.125,   0.5, -0.125, 0.125 ],
+])
+quantized_recurrent = np.array([
+    [ -0.125, -0.25,  0.75,    0.125,  0.25, -0.75 ],
+    [  0.125,  0.25, -0.75,   -0.125, -0.25,  0.75 ]
+])
+input_bias = np.array([-0.875, -0.125, -0.5,    0.875, 0.125, 0.5])
+inputs = np.array([[0.125]])
+h_tm1 = np.array([[0, 0]])
+
+out0, h_tm1 = gru_cell(np.array(inputs[0]), h_tm1)
+
+
+
+
+"""
+"""
+units = 2
+quantized_kernel = np.array([
+    [ -0.875, 0.25, 0.125,   0.5, -0.125, 0.125 ],
+    [ -0.125, 0.25, 0.875,  -0.5,  0.25, -0.125 ],
+    [  0.5,   0.5, -0.875,  -0.25, 0.125, 0.125 ],
+]) 
+quantized_recurrent = np.array([
+    [ -0.125, -0.25,  0.75,    0.125,  0.25, -0.75 ],
+    [  0.125,  0.25, -0.75,   -0.125, -0.25,  0.75 ]
+])
+
+input_bias = np.array([-0.875, -0.125, -0.5,    0.875, 0.125, 0.5])
+inputs = np.array([[[0.125, -0.125, 0.5]]])
+h_tm1 = np.array([[[0, 0]]])
+
+out0, h_tm1 = gru_cell(np.array(inputs[0]), h_tm1)
 
 
 
@@ -206,3 +288,48 @@ hh = activation(x_h + recurrent_h) # activation: quantized_tahn
 h = z * h_tm1 + (1 - z) * hh
 h
 """
+
+
+
+
+
+
+units = 2
+quantized_kernel = np.array([
+        [ -0.875, 0.25, 0.125,   0.5, -0.125, 0.125 ],
+        [ -0.125, 0.25, 0.875,  -0.5,  0.25, -0.125 ],
+        [  0.5,   0.5, -0.875,  -0.25, 0.125, 0.125 ],
+    ])
+quantized_recurrent = np.array([
+    [ -0.125, -0.25,  0.75,    0.125,  0.25, -0.75 ],
+    [  0.125,  0.25, -0.75,   -0.125, -0.25,  0.75 ]
+])
+input_bias = np.array([-0.875, -0.125, -0.5,    0.875, 0.125, 0.5])
+inputs = np.array([[[0.375, -0.125, 0.5]]])
+h_tm1 = np.array([[0, 0]])
+
+out0, h_tm1 = gru_cell(np.array(inputs[0]), h_tm1)
+
+# improve memory by doing:
+quantized_kernel.reshape(6, 3, order='F')
+quantized_recurrent.reshape(4, 3, order='F')
+input_bias.reshape(2, 3, order='F')
+"""
+>>> quantized_kernel.reshape(6, 3, order='F')
+array([[-0.875,  0.125, -0.125],
+       [-0.125,  0.875,  0.25 ],
+       [ 0.5  , -0.875,  0.125],
+       [ 0.25 ,  0.5  ,  0.125],
+       [ 0.25 , -0.5  , -0.125],
+       [ 0.5  , -0.25 ,  0.125]])
+>>> quantized_recurrent.reshape(4, 3, order='F')
+array([[-0.125,  0.75 ,  0.25 ],
+       [ 0.125, -0.75 , -0.25 ],
+       [-0.25 ,  0.125, -0.75 ],
+       [ 0.25 , -0.125,  0.75 ]])
+>>> input_bias.reshape(2, 3, order='F')
+array([[-0.875, -0.5  ,  0.125],
+       [-0.125,  0.875,  0.5  ]])
+"""
+
+

@@ -27,7 +27,7 @@ data_type["bits_total"] = 4
 data_type["bits_int"] = 0
 
 doPaddingInput = True
-START_PADDING = 64   # number of padding to place on the z axis with zeros to achieve padding for HLS
+PADDING = 1   # number of padding to place on the z axis, actual value included (1 means no padding, keep value)
 
 
 
@@ -127,7 +127,7 @@ def getInputBin(X):
         original_shape = out.shape
         # Create a new shape with the same dimensions, except the last dimension is set to 64
         new_shape = list(original_shape)
-        new_shape[-1] = START_PADDING
+        new_shape[-1] = PADDING
         # Reshape the array to the new shape
         new_array = np.zeros(new_shape)
         new_array[..., 0] = out[..., 0]

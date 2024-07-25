@@ -1,0 +1,22 @@
+winget install usbipd
+
+usbipd list
+            Connected:
+            BUSID  VID:PID    DEVICE                                                        STATE
+            1-2    0db0:419c  Realtek USB Audio, USB Input Device                           Not shared
+            1-4    8087:0032  Intel(R) Wireless Bluetooth(R)                                Not shared
+            1-5    0403:6010  USB Serial Converter A, USB Serial Converter B                Attached
+            2-5    1462:7d52  USB Input Device                                              Not shared
+            3-1    1532:0510  Razer Kraken 7.1 V2, USB Input Device                         Not shared
+            3-4    0592:0002  Eaton UPS 0592-L                                              Not shared
+            5-1    1b1c:1bad  USB Input Device                                              Not shared
+            5-2    1038:1720  USB Input Device, SteelSeries Rival 310 eSports Mouse, St...  Not shared
+            5-3    044f:0405  T.A320 Pilot                                                  Not shared
+            
+            Persisted:
+            GUID                                  DEVICE
+
+usbipd bind --busid=1-5
+
+usbipd attach --wsl --busid 1-5
+usbipd detach --busid 1-5

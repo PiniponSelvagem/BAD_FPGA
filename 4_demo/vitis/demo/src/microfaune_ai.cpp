@@ -59,57 +59,84 @@ void printResult(int idx, char* percentage, struct Times* times) {
 #ifdef DO_TIMES
 	printf("input[%03d] = %s | " SHOW_TIMES_STR "\n", idx, percentage, SHOW_TIMES_VALS);
 #else
-	printf("%s\n", percentage);
+	printf("%s", percentage);
 #endif
 }
 
 
 
-const unsigned char* inputFile = (unsigned char*)0x1000000;	// D:\BAD_FPGA\3_vitis\mai__gC1_hcW\microfaune_ai\input_pack\input_400.bin
 
+
+unsigned char* inputNoPad = (unsigned char*)0x1000000;
+unsigned char* inputFile  = (unsigned char*)0x100F000;	// D:\BAD_FPGA\3_vitis\mai__gC1_hcW\microfaune_ai\input_pack\input_400.bin
+#define INPUT_BYTES_NOPAD	((431*40)/2)
+#define INPUT_BYTES			(INPUT_BYTES_NOPAD*64)
+
+#define PADDING 64
+void addPadding(unsigned char* in, unsigned char* out) {
+	char* pin  = (char*)in;
+	char* pout = (char*)out;
+    for (int i=0; i<INPUT_BYTES_NOPAD; ++i) {
+    	char valH = (*pin & 0xF0) >> 4;
+    	char valL = *pin & 0x0F;
+
+    	*pout = valL;
+    	++pout;
+    	for (int j=0; j<((PADDING/2)-1); ++j) {
+    		*pout = 0;
+    		++pout;
+    	}
+
+    	*pout = valH;
+    	++pout;
+    	for (int j=0; j<((PADDING/2)-1); ++j) {
+    		*pout = 0;
+    		++pout;
+    	}
+
+    	++pin;
+    }
+}
 
 #include "xuartps.h"  // Include the UART peripheral header file
 int main() {
-	printf("\r\n#### "__DATE__" "__TIME__" ####\r\n");
+	//printf("\r\n#### "__DATE__" "__TIME__" ####\r\n");
 
 	int status = init_model();
 	if (status != 0) {
-		printf("Model failed initializing with code: %d\r\n", status);
+		//printf("Model failed initializing with code: %d\r\n", status);
 		return status;
 	}
 
-
-	// Initialize UART (Assuming UART0)
 	XUartPs_Config *ConfigPtr;
 	XUartPs uart;
 	ConfigPtr = XUartPs_LookupConfig(XPAR_PSU_UART_1_DEVICE_ID);
 	XUartPs_CfgInitialize(&uart, ConfigPtr, ConfigPtr->BaseAddress);
 
 	while (1) {
-		printf("Waiting...\n");
 		int bytesRead = 0;
-		const unsigned char* input = inputFile;
-#define BUFF_SIZE	20
+#define BUFF_SIZE	32
 		char buffer[BUFF_SIZE];
 		struct Times times = {};
 
-		while (bytesRead < (431*40*(64/2))) {
+		while (bytesRead < INPUT_BYTES_NOPAD) {		// TODO: handle incomplete RX by ignoring them
 			// Wait until data is available
 			while (!(XUartPs_IsReceiveData(uart.Config.BaseAddress)))
 				;
 
 			// Read data from UART
-			bytesRead += XUartPs_Recv(&uart, (u8 *)(input + bytesRead), (431*40*(64/2)) - bytesRead);
+			bytesRead += XUartPs_Recv(&uart, (u8 *)(inputNoPad + bytesRead), INPUT_BYTES_NOPAD - bytesRead);
 		}
 
-		Xil_DCacheInvalidateRange((INTPTR)(input), (431*40*(64/2)));
+		addPadding(inputNoPad, inputFile);
+		Xil_DCacheInvalidateRange((INTPTR)(inputFile), INPUT_BYTES);
 
-		// TODO: create timeout in the while to handle half transactions, discarding them
-
-		float percentage = modelPredict(input);
+		float percentage = modelPredict(inputFile);
 		getLastTimes(&times);
 		floatToString(percentage, buffer, BUFF_SIZE, 6);
 		printResult(0, buffer, &times);
+
+		XUartPs_Send(&uart, (u8*)buffer, 8);
 	}
 
 	return 0;

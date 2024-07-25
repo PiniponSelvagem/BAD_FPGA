@@ -108,3 +108,25 @@ recurrent_h = np.dot(r * h_tm1_h, quantized_recurrent[:, units * 2:])
 
 hh = activation(x_h + recurrent_h) # activation: quantized_tahn
 h = z * h_tm1 + (1 - z) * hh
+
+
+
+
+
+import numpy as np
+
+bias = np.array([
+    10, 20, 11, 21, 12, 22
+])
+
+units = 2
+a = bias[:units]
+b = bias[units: units * 2]
+c = bias[units * 2:]
+
+
+
+num_rows = len(bias) // 3
+
+reshaped_bias = bias.reshape(num_rows, -1, order='F')
+reshaped_bias

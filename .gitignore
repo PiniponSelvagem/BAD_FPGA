@@ -187,3 +187,5 @@ __pycache__/
 /2_vivado/mai__gC1_hcW/mai__gC1_hcW.cache/
 /2_vivado/mai__gC1_hcW/mai__gC1_hcW.gen/
 /playground/ARM_model/
+/4_demo/vitis/.metadata/
+/4_demo/vitis/design_1_wrapper/

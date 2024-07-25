@@ -1,46 +1,53 @@
 import os
 import time
-from datetime import timedelta
-
-import numpy as np
-import serial
-
-import audio2input
-
-
-##################################################
-
-folder_audio = "audio_files"
-
-
-files = os.listdir(folder_audio)
-
-print("Files in the folder:")
-for i, file in enumerate(files):
-    print(f"{i}. {file}")
-
-selection = input("Enter the number of the file you want to select: ")
-
-try:
-    selection_index = int(selection)
-    selected_file = files[selection_index]
-    print(f"Selected file: {selected_file}")
-    full_path = os.path.join(folder_audio, selected_file)
-    print(f"Full path of the selected file: {full_path}")
-except (ValueError, IndexError):
-    print("Invalid selection. Please enter a valid number.")
-
-
-
-bin_data = audio2input.getHardwareInput(full_path)
-input_data = bin_data.tobytes()
-
-
 
 import sys
 import glob
 import serial
 
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' 
+import audio2input
+
+##################################################
+
+folder_audio = "audio_files"
+vlc_path = "/mnt/c/Program Files/VideoLAN/VLC/vlc.exe"
+
+##################################################
+ascii_bird = """                 _.----._ 
+               ,'.::.--..:._
+              /::/_,-<o)::;_`-._
+             ::::::::`-';'`,--`-`
+             ;::;'|::::,','
+           ,'::/  ;:::/, :.
+          /,':/  /::;' \ ':\\
+         :'.:: ,-''   . `.::\\
+         \.:;':.    `    :: .:
+         (;' ;;;       .::' :|
+          \,:;;      \ `::.\.\\
+          `);'        '::'  `:
+           \.  `        `'  .:      _,'
+            `.: ..  -. ' :. :/  _.-' _.-
+              >;._.:._.;,-=_(.-'  __ `._
+            ,;'  _..-((((''  .,-''  `-._
+         _,'<.-''  _..``'.'`-'`.        `
+     _.-((((_..--''       \ \ `.`.
+   -'  _.``'               \      ` SSt
+     ,'
+"""
+#Thank you for visiting https://asciiart.website/
+#This ASCII pic can be found at
+#https://asciiart.website/index.php?art=animals/birds%20(land)
+
+ascii_nobird = """  _  _    ___  _  _         _     _         _               _      __                       _ 
+ | || |  / _ \| || |    _  | |__ (_)_ __ __| |  _ __   ___ | |_   / _| ___  _   _ _ __   __| |
+ | || |_| | | | || |_  (_) | '_ \| | '__/ _` | | '_ \ / _ \| __| | |_ / _ \| | | | '_ \ / _` |
+ |__   _| |_| |__   _|  _  | |_) | | | | (_| | | | | | (_) | |_  |  _| (_) | |_| | | | | (_| |
+    |_|  \___/   |_|   (_) |_.__/|_|_|  \__,_| |_| |_|\___/ \__| |_|  \___/ \__,_|_| |_|\__,_|
+"""
+#Created at:
+#https://patorjk.com/software/taag/#p=display&f=Ivrit&t=404%20%3A%20bird%20not%20found
+##################################################
 
 def serial_ports():
     """ Lists serial port names
@@ -70,25 +77,66 @@ def serial_ports():
             pass
     return result
 
+ports = serial_ports()
+print("INFO: USB devices found", ports)
 
-print(serial_ports())
+port = ports[0]
+baudrate = 115200
+print(f"INFO: Selecting port '{port}' with {baudrate}")
+ser = serial.Serial(port, baudrate)
 
-
-port = serial_ports()[0]
-print(port)
-ser = serial.Serial(port, 115200)
-
-import time
 
 try:
     while True:
+        print("################################################################")
+        files = os.listdir(folder_audio)
+
+        print("Folder:", folder_audio)
+        for i, file in enumerate(files):
+            print(f"{i}. {file}")
+
+        option_notvalid = True
+        while (option_notvalid):
+            selection = input("Option: ")
+            try:
+                selection_index = int(selection)
+                selected_file = files[selection_index]
+                full_path = os.path.join(folder_audio, selected_file)
+                print(f"Selected audio: {selected_file}")
+                option_notvalid = False
+            except (ValueError, IndexError):
+                print("Invalid option. Please enter a valid number.")
+
+        import subprocess
+        def play_audio_vlc(file_path):
+            command = [vlc_path , '--play-and-exit', file_path]
+            subprocess.run(command)
+        print("Playing audio with VLC")
+        play_audio_vlc(full_path)
+        
+        print("Creating feature map... ")
+        bin_data = audio2input.getHardwareInput(full_path)
+        input_data = bin_data.tobytes()
+        print("> DONE")
+
+        print("Sending feature map... ")
         ser.write(input_data)
-        time.sleep(5)
-        # Read bytes from the serial port
-        data = ser.read_all()  # Read up to 100 bytes
-        # Print the received bytes
-        print("Received:", data)
-        # Do something with the received data
+        ser.flush()
+        print("> DONE")
+
+        while ser.in_waiting == 0:
+            pass
+
+        print("Receiving... ")
+        data = ser.read_all()
+        print("> DONE")
+        percentage = float(data)
+        if (percentage >= 0.50):
+            ascii_art = ascii_bird
+        else:
+            ascii_art = ascii_nobird
+        print(ascii_art)
+        print(f"Result = {percentage} ({str(round(float(data)*100, 2))} %)")
         time.sleep(5)
 except KeyboardInterrupt:
     print("Keyboard interrupt. Exiting...")
