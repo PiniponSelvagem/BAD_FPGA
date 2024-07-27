@@ -22,7 +22,7 @@ from bitarray import bitarray
 
 
 dataset = "ff1010bird"
-nSelByClass = 8       # Will select X with 0 class and X with 1 class, total will the X*2 and the 1st half is all 0 class and 2nd half all 1 class.
+nSelByClass = 200       # Will select X with 0 class and X with 1 class, total will the X*2 and the 1st half is all 0 class and 2nd half all 1 class.
 basePath = "/mnt/e/Rodrigo/ISEL/2_Mestrado/2-ANO_1-sem/TFM"
 
 directory = "validate_hardware/"
